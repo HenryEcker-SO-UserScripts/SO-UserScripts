@@ -4,7 +4,7 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       @samliew
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.31
+// @version      1.4
 //
 // @include      https://*stackoverflow.com/users*
 // @include      https://*serverfault.com/users*
@@ -12,7 +12,6 @@
 // @include      https://*askubuntu.com/users*
 // @include      https://*mathoverflow.net/users*
 // @include      https://*stackexchange.com/users*
-// @include      https://*stackapps.com/users*
 //
 // @exclude      *chat.*
 // @exclude      *blog.*
@@ -26,7 +25,7 @@
     // Check if profile menu exists
     const isUserPage = document.body.classList.contains('user-page');
     const profilesMenu = document.getElementById('profiles-menu');
-    if(!isUserPage && !profilesMenu) {
+    if(!isUserPage || !profilesMenu) {
         console.log('User network profile dropdown not found.');
         return;
     }
