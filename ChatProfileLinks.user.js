@@ -3,7 +3,7 @@
 // @description  Expands user network links menu to add chat profile links modified from https://github.com/samliew/SO-mod-userscripts/blob/master/UserProfileLinks.user.js
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       @samliew
-// @contributor  Henry Ecker (https://github.com/HenryEcker)
+// @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      1.31
 //
 // @include      https://*stackoverflow.com/users*
@@ -12,6 +12,7 @@
 // @include      https://*askubuntu.com/users*
 // @include      https://*mathoverflow.net/users*
 // @include      https://*stackexchange.com/users*
+// @include      https://*stackapps.com/users*
 //
 // @exclude      *chat.*
 // @exclude      *blog.*
