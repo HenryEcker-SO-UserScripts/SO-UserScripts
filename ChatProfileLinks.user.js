@@ -1,8 +1,10 @@
 // ==UserScript==
 // @name         User Profile Links
 // @description  Expands user network links menu to add chat profile links modified from https://github.com/samliew/SO-mod-userscripts/blob/master/UserProfileLinks.user.js
-// @author       @samliew, @HenryEcker
-// @version      1.3
+// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @author       @samliew
+// @contributor  Henry Ecker (https://github.com/HenryEcker)
+// @version      1.31
 //
 // @include      https://*stackoverflow.com/users*
 // @include      https://*serverfault.com/users*
