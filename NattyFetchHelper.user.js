@@ -3,10 +3,12 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.8
+// @version      1.0.9
 //
 // @include /^https?://chat.stackoverflow.com/rooms/111347/.*/
 // @run-at  document-end
+// @downloadURL https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
+// @updateURL   https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @grant none
 //
 // ==/UserScript==
@@ -18,7 +20,7 @@
 
     const config = {
         'linksMaxRowLength': 11,
-        'rowsToFetch': 4,
+        'rowsToFetch': 2,
         'countAlias': ['count', 'amount', 'number']
     };
 
