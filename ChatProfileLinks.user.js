@@ -4,7 +4,7 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       @samliew
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.4
+// @version      1.41
 //
 // @include      https://*stackoverflow.com/users*
 // @include      https://*serverfault.com/users*
@@ -16,6 +16,10 @@
 // @exclude      *chat.*
 // @exclude      *blog.*
 // @exclude      https://stackoverflow.com/c/*
+//
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
+// @grant        none
 // ==/UserScript==
 
 'use strict';
