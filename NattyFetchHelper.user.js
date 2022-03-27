@@ -3,7 +3,7 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.2
+// @version      1.1.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
@@ -25,7 +25,9 @@ GM_config.init({
         'ROWS_TO_FETCH': {
             'label': 'Number of rows to request per message',
             'type': 'int',
-            default: 2
+            'min': 1,
+            'max': 6,
+            'default': 2
         },
     },
     'events': {
