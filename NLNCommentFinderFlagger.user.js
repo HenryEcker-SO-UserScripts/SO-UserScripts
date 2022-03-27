@@ -4,15 +4,15 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      1.3.9
-// @downloadURL https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
-// @updateURL   https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
-// @include      *://*stackoverflow.com/users/flag-summary/15497888?group=4*
+// @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //
-// @require            https://openuserjs.org/src/libs/sizzle/GM_config.js
-// @grant              GM_getValue
-// @grant              GM_setValue
-// @run-at  document-end
+// @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @run-at       document-end
 //
 // ==/UserScript==
 /* globals $, StackExchange, GM_config */
