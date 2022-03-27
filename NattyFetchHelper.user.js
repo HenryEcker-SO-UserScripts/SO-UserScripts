@@ -3,7 +3,7 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.0
+// @version      1.1.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
@@ -12,6 +12,7 @@
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        none
 //
 // ==/UserScript==
 /* globals CHAT, $, GM_config */
