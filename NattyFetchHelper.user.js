@@ -29,11 +29,6 @@ GM_config.init({
             'max': 6,
             'default': 2
         },
-    },
-    'events': {
-        'save': () => {
-            window.location.reload()
-        }
     }
 });
 
@@ -60,8 +55,8 @@ GM_config.init({
         });
     };
 
-    const sendMessageOnButtonClick = (messageText) => (ev) => {
-        sendMessagePOST(messageText).then((res) => {
+    const sendMessageOnButtonClick = (messageTextBuilder) => (ev) => {
+        sendMessagePOST(messageTextBuilder()).then((res) => {
             // console.log(res);
             // Do Nothing
         }).catch((res) => {
@@ -73,10 +68,10 @@ GM_config.init({
 
     const makeButtons = () => {
         const fetchLinksButton = $('<button class="button" style="margin-left: 5px">Fetch Links</button>');
-        fetchLinksButton.on('click', sendMessageOnButtonClick(`@Natty fetch links ${GM_config.get('ROWS_TO_FETCH') * STATIC_CONFIG.linksMaxRowLength}`));
+        fetchLinksButton.on('click', sendMessageOnButtonClick(() => `@Natty fetch links ${GM_config.get('ROWS_TO_FETCH') * STATIC_CONFIG.linksMaxRowLength}`));
 
         const fetchCountButton = $('<button class="button" style="margin-left: 5px">Fetch Count</button>');
-        fetchCountButton.on('click', sendMessageOnButtonClick(`@Natty fetch ${STATIC_CONFIG.countAlias.sample()}`));
+        fetchCountButton.on('click', sendMessageOnButtonClick(() => `@Natty fetch ${STATIC_CONFIG.countAlias.sample()}`));
 
         const settingsButton = $('<button class="button" title="Natty Fetch Helper Settings" style="margin-left: 5px">⚙</button>');
         settingsButton.on('click', () => GM_config.open());

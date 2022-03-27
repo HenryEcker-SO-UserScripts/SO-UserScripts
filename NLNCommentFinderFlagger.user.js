@@ -102,11 +102,6 @@ GM_config.init({
             'max': 99,
             'default': 0
         }
-    },
-    'events': {
-        'save': () => {
-            window.location.reload()
-        }
     }
 });
 
