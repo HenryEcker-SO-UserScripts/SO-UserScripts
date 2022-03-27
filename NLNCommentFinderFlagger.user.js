@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.3.8
+// @version      1.3.9
 // @downloadURL https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL   https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -74,6 +74,11 @@ GM_config.init({
             'label': 'Key',
             'type': 'text'
         },
+        'API_QUOTA_LIMIT': {
+            'label': 'At what API quota should this script stop making new requests',
+            'type': 'int',
+            default: 500
+        },
         'ACTIVE': {
             'label': 'Running',
             'section': ['Run Information'],
@@ -105,6 +110,7 @@ GM_config.init({
     const ACCESS_TOKEN = GM_config.get('ACCESS_TOKEN');
     const KEY = GM_config.get('KEY');
     if (!SITE_NAME || !ACCESS_TOKEN || !KEY) {
+        // Will not run without a valid API auth string
         GM_config.open();
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
@@ -155,7 +161,7 @@ GM_config.init({
             COMMENT_FILTER,
             Math.floor(new Date(new Date() - API_REQUEST_RATE) / 1000)
         );
-        if (response.quota_remaining < 2000) {
+        if (response.quota_remaining < GM_config.get("API_QUOTA_LIMIT")) {
             clearInterval(mainInterval);
         }
         if (response.hasOwnProperty('items')) {
