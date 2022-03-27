@@ -3,28 +3,41 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.9
+// @version      1.1.0
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
-// @include /^https?://chat.stackoverflow.com/rooms/111347/.*/
-// @run-at  document-end
-// @downloadURL https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
-// @updateURL   https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
-// @grant none
+// @include      /^https?://chat.stackoverflow.com/rooms/111347/.*/
+// @run-at       document-end
+// @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @grant        GM_getValue
+// @grant        GM_setValue
 //
 // ==/UserScript==
-/* globals CHAT, $ */
+/* globals CHAT, $, GM_config */
 
-'use strict';
 
-(() => {
+GM_config.init({
+    'id': 'Natty_Fetch_Helper_Config',
+    'title': 'Natty Fetch Helper Config',
+    'fields': {
+        'ROWS_TO_FETCH': {
+            'label': 'Number of rows to request per message',
+            'type': 'int',
+            default: 2
+        },
+    }
+});
 
-    const config = {
+(function () {
+    'use strict';
+
+    const STATIC_CONFIG = {
         'linksMaxRowLength': 11,
-        'rowsToFetch': 2,
         'countAlias': ['count', 'amount', 'number']
     };
 
-    Array.prototype.sample = function(){
+    Array.prototype.sample = function () {
         return this[Math.floor(Math.random() * this.length)];
     }
 
@@ -52,14 +65,18 @@
 
     const makeButtons = () => {
         const fetchLinksButton = $('<button class="button" style="margin-left: 5px">Fetch Links</button>');
-        fetchLinksButton.click(sendMessageOnButtonClick(`@Natty fetch links ${config.rowsToFetch * config.linksMaxRowLength}`));
+        fetchLinksButton.on('click', sendMessageOnButtonClick(`@Natty fetch links ${GM_config.get('ROWS_TO_FETCH') * STATIC_CONFIG.linksMaxRowLength}`));
 
         const fetchCountButton = $('<button class="button" style="margin-left: 5px">Fetch Count</button>');
-        fetchCountButton.click(sendMessageOnButtonClick(`@Natty fetch ${config.countAlias.sample()}`));
+        fetchCountButton.on('click', sendMessageOnButtonClick(`@Natty fetch ${STATIC_CONFIG.countAlias.sample()}`));
+
+        const settingsButton = $('<button class="button" title="Natty Fetch Helper Settings" style="margin-left: 5px">⚙</button>');
+        settingsButton.on('click', () => GM_config.open());
 
         const cb = $('#chat-buttons');
         cb.append(fetchLinksButton);
         cb.append(fetchCountButton);
+        cb.append(settingsButton);
     };
     makeButtons();
 })();
