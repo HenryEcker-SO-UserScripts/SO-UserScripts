@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.3.9
+// @version      1.4.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -77,7 +77,7 @@ GM_config.init({
         'API_QUOTA_LIMIT': {
             'label': 'At what API quota should this script stop making new requests',
             'type': 'int',
-            default: 500
+            'default': 500
         },
         'ACTIVE': {
             'label': 'Running',
@@ -93,7 +93,14 @@ GM_config.init({
         'CERTAINTY': {
             'label': 'How Certain should the script be to autoflag (out of 100)',
             'type': 'unsigned float',
-            default: 75
+            'default': 75
+        },
+        'FLAG_QUOTA_LIMIT': {
+            'label': 'Stop flagging with how many remaining comment flags',
+            'type': 'int',
+            'min': 0,
+            'max': 99,
+            'default': 0
         }
     },
     'events': {
@@ -102,6 +109,18 @@ GM_config.init({
         }
     }
 });
+
+const getFlagQuota = (commentID) => {
+    return new Promise((resolve, reject) => {
+        $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
+            .done(function (data) {
+                const pattern = /you have (\d+) flags left today/i;
+                const flagsRemaining = Number($('div:contains("flags left today")', data).filter((idx, n) => n.childElementCount === 0 && n.innerText.match(pattern)).last().text().match(pattern)[1]);
+                resolve(flagsRemaining);
+            })
+            .fail(reject);
+    });
+}
 
 (function () {
     'use strict';
@@ -161,36 +180,44 @@ GM_config.init({
             COMMENT_FILTER,
             Math.floor(new Date(new Date() - API_REQUEST_RATE) / 1000)
         );
-        if (response.quota_remaining < GM_config.get("API_QUOTA_LIMIT")) {
+        if (response.quota_remaining <= GM_config.get("API_QUOTA_LIMIT")) {
             clearInterval(mainInterval);
         }
-        if (response.hasOwnProperty('items')) {
-            response.items
-                .filter(elem => elem.body.length < 85)
-                .map(a => ({
-                    can_flag: a.can_flag,
-                    body: a.body,
-                    body_length: a.body.length,
-                    link: a.link,
-                    comment_id: a.comment_id,
-                    post_id: a.post_id,
-                    blacklist_matches: a.body.match(blacklist)
-                }))
-                .filter(elem => elem.blacklist_matches && !elem.body.match(whitelist))
-                .forEach((elem, idx) => {
-                    let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
-                    console.log(elem.blacklist_matches, noiseRatio, elem.link);
-                    if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
-                        checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
-                            if (
-                                flagOptions.hasOwnProperty('items') &&
-                                !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
-                            ) {
-                                console.log("Would've autoflagged");
-                            }
-                        });
-                    }
-                });
+        if (response.hasOwnProperty('items') && response.items.length > 0) {
+            getFlagQuota(response.items[0].comment_id).then(remainingFlags => {
+                if (remainingFlags <= GM_config.get("FLAG_QUOTA_LIMIT")) {
+                    console.log("Out of flags. Stopping script");
+                    clearInterval(mainInterval);
+                }
+                response.items
+                    .filter(elem => elem.body.length < 85)
+                    .map(a => ({
+                        can_flag: a.can_flag,
+                        body: a.body,
+                        body_length: a.body.length,
+                        link: a.link,
+                        comment_id: a.comment_id,
+                        post_id: a.post_id,
+                        blacklist_matches: a.body.match(blacklist)
+                    }))
+                    .filter(elem => elem.blacklist_matches && !elem.body.match(whitelist))
+                    .forEach((elem, idx) => {
+                        let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
+                        console.log(elem.blacklist_matches, noiseRatio, elem.link);
+                        if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
+                            checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
+                                if (
+                                    flagOptions.hasOwnProperty('items') &&
+                                    !flagOptions.items.some(e => e.has_flagged) && // Ensure not already flagged in some way
+                                    remainingFlags > GM_config.get("FLAG_QUOTA_LIMIT") // Ensure has flags to do so
+                                ) {
+                                    remainingFlags -= 1; // Flag would have been used
+                                    console.log("Would've autoflagged");
+                                }
+                            });
+                        }
+                    });
+            });
         }
     };
     if (GM_config.get('ACTIVE')) {
