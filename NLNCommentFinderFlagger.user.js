@@ -18,6 +18,7 @@
 /* globals $, StackExchange, GM_config */
 
 
+/* Functions that make external requests */
 const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE) => {
     return fetch(`https://api.stackexchange.com/2.3/comments?fromdate=${FROM_DATE}&pagesize=100&order=desc&sort=creation&filter=${COMMENT_FILTER}&${AUTH_STR}`).then(res => res.json())
 };
@@ -25,6 +26,18 @@ const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE) => {
 const checkFlagOptions = (AUTH_STR, commentID) => {
     return fetch(`https://api.stackexchange.com/2.3/comments/${commentID}/flags/options?${AUTH_STR}`).then(res => res.json())
 };
+
+const getFlagQuota = (commentID) => {
+    return new Promise((resolve, reject) => {
+        $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
+            .done(function (data) {
+                const pattern = /you have (\d+) flags left today/i;
+                const flagsRemaining = Number($('div:contains("flags left today")', data).filter((idx, n) => n.childElementCount === 0 && n.innerText.match(pattern)).last().text().match(pattern)[1]);
+                resolve(flagsRemaining);
+            })
+            .fail(reject);
+    });
+}
 
 const flagComment = (fkey, commentID) => {
     const fd = new FormData();
@@ -37,10 +50,10 @@ const flagComment = (fkey, commentID) => {
     })
 };
 
+/* General Utility Functions */
 const countWords = (str) => {
     return str.trim().split(/\s+/).length;
 }
-
 
 const calcNoiseRatio = (matches, body) => {
     let countWeight = matches.reduce((total, match) => {
@@ -56,6 +69,11 @@ const calcNoiseRatio = (matches, body) => {
     return (countNoiseRatio + lengthNoiseRatio) / 2;
 }
 
+const mergeRegexes = (arrRegex, flags) => {
+    return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
+}
+
+/* Configurable Options */
 GM_config.init({
     'id': 'NLN_Comment_Config',
     'title': 'NLN Comment Finder/FLagger Settings',
@@ -118,22 +136,6 @@ GM_config.init({
     }
 });
 
-const getFlagQuota = (commentID) => {
-    return new Promise((resolve, reject) => {
-        $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
-            .done(function (data) {
-                const pattern = /you have (\d+) flags left today/i;
-                const flagsRemaining = Number($('div:contains("flags left today")', data).filter((idx, n) => n.childElementCount === 0 && n.innerText.match(pattern)).last().text().match(pattern)[1]);
-                resolve(flagsRemaining);
-            })
-            .fail(reject);
-    });
-}
-
-const mergeRegexes = (arrRegex, flags) => {
-    return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
-}
-
 (function () {
     'use strict';
 
@@ -147,7 +149,7 @@ const mergeRegexes = (arrRegex, flags) => {
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!1zIEzUczZRkkJ4rMA(o8G';
     const FLAG_RATE = 7 * 1000;
-    const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000;
+    const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000; // Function call to allow changing delay without needing to reload the page
 
     // Add Config Button
     const settingsButton = $('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="-link">⚙</span>');
@@ -209,6 +211,7 @@ const mergeRegexes = (arrRegex, flags) => {
         }
         if (response.hasOwnProperty('items') && response.items.length > 0) {
             getFlagQuota(response.items[0].comment_id).then(remainingFlags => {
+                console.log("You have", remainingFlags, "remaining flags");
                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
                     console.log("Out of flags. Stopping script");
                     clearInterval(mainInterval);
@@ -242,7 +245,8 @@ const mergeRegexes = (arrRegex, flags) => {
                                         remainingFlags > GM_config.get('FLAG_QUOTA_LIMIT') // Ensure has flags to do so
                                     ) {
                                         remainingFlags -= 1; // Flag would have been used
-                                        console.log("Would've autoflagged ", elem.comment_id, " (", elem.link, ")");
+                                        console.log("Would've autoflagged", elem.comment_id, "(", elem.link, ")", remainingFlags, "flags remaining.");
+                                        // flagComment(fkey, elem.comment_id); // Autoflagging
                                     }
                                 });
                             }, idx * FLAG_RATE);
