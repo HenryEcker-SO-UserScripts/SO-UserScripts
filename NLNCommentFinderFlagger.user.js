@@ -245,17 +245,14 @@ GM_config.init({
                     }
                 })
                 .filter(comment => {
-                    let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
-                    if (
-                        GM_config.get('AUTO_FLAG') &&
-                        (noiseRatio > GM_config.get('CERTAINTY')) &&
-                        comment.blacklist_matches &&
-                        !comment.body.match(whitelist)
-                    ) {
-                        console.log(comment.blacklist_matches, noiseRatio, comment.link);
-                        return true;
-                    } else {
-                        return false;
+                    if (comment.blacklist_matches && !comment.body.match(whitelist)) {
+                        let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
+                        if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
+                            console.log(comment.blacklist_matches, noiseRatio, comment.link);
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
                 })
                 .forEach((comment, idx) => {
