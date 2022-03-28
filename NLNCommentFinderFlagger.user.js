@@ -250,7 +250,7 @@ GM_config.init({
                         let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
                         console.log(comment.blacklist_matches, noiseRatio, comment.link);
 
-                        return noiseRatio > GM_config.get('CERTAINTY');
+                        return noiseRatio >= GM_config.get('CERTAINTY');
                     } else {
                         return false;
                     }
