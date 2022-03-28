@@ -242,8 +242,7 @@ GM_config.init({
                                 checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
                                     if (
                                         flagOptions.hasOwnProperty('items') &&
-                                        !flagOptions.items.some(e => e.has_flagged) && // Ensure not already flagged in some way
-                                        remainingFlags > GM_config.get('FLAG_QUOTA_LIMIT') // Ensure has flags to do so
+                                        !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
                                         // Flag post
                                         console.log("Would've autoflagged", elem.comment_id, "(", elem.link, ")", remainingFlags, "flags remaining.");
