@@ -179,6 +179,8 @@ GM_config.init({
         /(Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
         // Exactly what I was looking for
         /(?:That's\s+(?:exactly\s+what\s+I\s+was\s+looking\s+for|what\s+I\s+was\s+looking\s+for!)|exactly\s+what\s+I\s+was\s+looking\s+for(?:,\s+thank\s+you!)?|You\s+found\s+it!|that\'s\s+it)/,
+        // Happy coding
+        /happy\s*coding/,
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
