@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.4.1
+// @version      1.4.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -52,7 +52,7 @@ const calcNoiseRatio = (matches, body) => {
         return total + match.length
     }, 0);
     let lengthNoiseRatio = lengthWeight / body.length * 100;
-    console.log("Count Ratio ", countNoiseRatio, " Length Ratio ", lengthNoiseRatio);
+
     return (countNoiseRatio + lengthNoiseRatio) / 2;
 }
 
@@ -179,13 +179,12 @@ const getFlagQuota = (commentID) => {
         "[?]"
     ].join("|"), 'gi');
 
+    // Prime last successful read
+    let lastSuccessfulRead = Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000);
+
     const main = async (mainInterval) => {
         console.log('Fetching...')
-        let response = await getComments(
-            AUTH_STR,
-            COMMENT_FILTER,
-            Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000)
-        );
+        let response = await getComments(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead);
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             clearInterval(mainInterval);
             return; // Exit script because checkFlagOptions could potentially make more API Calls
@@ -197,6 +196,10 @@ const getFlagQuota = (commentID) => {
                     clearInterval(mainInterval);
                     return; // Exit so nothing tries to be flagged from this batch
                 }
+
+                // Update last successful read time
+                lastSuccessfulRead = Math.floor(new Date() / 1000);
+
                 response.items
                     .filter(elem => elem.body.length < 85)
                     .map(a => ({
