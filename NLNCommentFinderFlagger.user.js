@@ -157,6 +157,12 @@ const getFlagQuota = (commentID) => {
         '(?::(?:‑(?:\\)|,|D|P|b|p|Þ|þ)|\\-(?:\\*|\\]|\\}|3|>)|\'(?:‑\\)|\\))|\\^\\)|c\\)|o\\)|"D|\\)|\\*|\\]|\\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\\)|\\])|\\^\\)|\\)|\\]|3|>|D)|8(?:\\-\\)|\\)|‑D|D)|=(?:\\)|\\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\\*(?:\\-\\)|\\))|>:[3P]|B\\^D|C:|c:|d:)',
         // Text-speak
         '(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?)',
+        // Glad to help
+        '(?:happy\s+to\s+he(?:ar|lp)|glad\s+to\s+he(?:ar|lp))',
+        // You're/that's awesome!
+        '(you(\'re|\\s+are)?|that\'?s)\\s+(?:a(?:\\ rock\\ star|mazing|wesome)|incredible|brilliant|wonderful)[.!]?',
+        // Any help would be appreciated
+        'Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great)',
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
@@ -168,8 +174,6 @@ const getFlagQuota = (commentID) => {
         '(?:(?:you(?:\'?re?| are)\s+)?welcome)+[!\.:()\s]*',
         // this was very helpful
         '(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*',
-        // updated/fixed
-        '(?:I\s+)?(?:done|updated|edited|fixed)+\s*(?:my|the|a)?\s*(?:answer|question|it|that|this)?[!\.:()\s]*',
         // excitement
         '(?:wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*',
         // life saver
