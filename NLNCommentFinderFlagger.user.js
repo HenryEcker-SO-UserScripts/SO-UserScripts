@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.3
+// @version      1.5.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -77,6 +77,7 @@ String.prototype.htmlDecode = function () {
     return new DOMParser().parseFromString(this, "text/html").documentElement.textContent;
 }
 
+
 /* Configurable Options */
 GM_config.init({
     'id': 'NLN_Comment_Config',
@@ -123,6 +124,12 @@ GM_config.init({
             'type': 'checkbox',
             'default': false
         },
+        'POST_TYPE':{
+            'label': 'Types of post to consider',
+            'type': 'select',
+            'options': ['all', 'question', 'answer'],
+            'default': 'all'
+        },
         'CERTAINTY': {
             'label': 'How Certain should the script be to autoflag (out of 100)',
             'type': 'unsigned float',
@@ -151,7 +158,7 @@ GM_config.init({
         GM_config.open();
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
-    const COMMENT_FILTER = '!1zIEzUczZRkkJ4rV1NUZp';
+    const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
     const FLAG_RATE = 7 * 1000;
     const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000; // Function call to allow changing delay without needing to reload the page
 
@@ -203,6 +210,15 @@ GM_config.init({
         /[?]/
     ], 'gi');
 
+    const postTypeFilter = (actualPT) => {
+        const configPT = GM_config.get('POST_TYPE');
+        if(configPT === 'all'){
+            return true;
+        } else {
+            return configPT === actualPT;
+        }
+    }
+
     // Prime last successful read
     let lastSuccessfulRead = Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000);
 
@@ -227,10 +243,11 @@ GM_config.init({
                         link: a.link,
                         comment_id: a.comment_id,
                         post_id: a.post_id,
+                        post_type: a.post_type,
                         blacklist_matches: decodedMarkdown.match(blacklist)
                     }
                 })
-                .filter(elem => elem.blacklist_matches && !elem.body.match(whitelist))
+                .filter(elem => postTypeFilter(elem.post_type) && elem.blacklist_matches && !elem.body.match(whitelist))
                 .forEach((elem, idx) => {
                     let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
                     console.log(elem.blacklist_matches, noiseRatio, elem.link);
