@@ -51,22 +51,11 @@ const flagComment = (fkey, commentID) => {
 };
 
 /* General Utility Functions */
-const countWords = (str) => {
-    return str.trim().split(/\s+/).length;
-}
-
 const calcNoiseRatio = (matches, body) => {
-    let countWeight = matches.reduce((total, match) => {
-        return total + countWords(match)
-    }, 0);
-    let countNoiseRatio = countWeight / countWords(body) * 100;
-
     let lengthWeight = matches.reduce((total, match) => {
         return total + match.length
     }, 0);
-    let lengthNoiseRatio = lengthWeight / body.length * 100;
-
-    return (countNoiseRatio + lengthNoiseRatio) / 2;
+    return lengthWeight / body.length * 100;
 }
 
 const mergeRegexes = (arrRegex, flags) => {
@@ -124,7 +113,7 @@ GM_config.init({
             'type': 'checkbox',
             'default': false
         },
-        'POST_TYPE':{
+        'POST_TYPE': {
             'label': 'Types of post to consider',
             'type': 'select',
             'options': ['all', 'question', 'answer'],
@@ -212,7 +201,7 @@ GM_config.init({
 
     const postTypeFilter = (actualPT) => {
         const configPT = GM_config.get('POST_TYPE');
-        if(configPT === 'all'){
+        if (configPT === 'all') {
             return true;
         } else {
             return configPT === actualPT;
