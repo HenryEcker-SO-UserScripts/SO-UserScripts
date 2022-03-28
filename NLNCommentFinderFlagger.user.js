@@ -172,15 +172,15 @@ GM_config.init({
         // Text-speak
         /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
         // Glad to help/Happy I could help/Glad to hear
-        /(?:happy|glad)\s*(?:\w*\s*)*?(he(?:ar|lp))/,
+        /(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))/,
         // You're/that's awesome!
         /(you(['’]?re|\s+are)?|that['’]?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
         // Any help would be appreciated
         /(Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
         // That's what I was looking for/that's it
-        /((?:\w*\s*)*?(?:looking\s*for)|that['’]?s\s*it)[.!]?/,
+        /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s\s*it)[.!]?/,
         // Happy coding
-        /happy\s*coding/,
+        /happy\s+coding/,
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
@@ -189,17 +189,17 @@ GM_config.init({
         // it worked like a charm
         /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?[!\.:()\s]*/,
         // you are welcome
-        /(?:(?:you(?:'?re?| are)\s+)?welcome)+[!.:()\s]*/,
+        /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+[!.:()\s]*/,
         // this was very helpful
         /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*/,
         // excitement
         /(?:wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*/,
         // life saver
-        /(?:You(?:'re|\s*are) )?a life saver[!.:()d=\s]*/,
+        /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver[!.:()d=\s]*/,
         // please accept
-        /(?:please(?: \w+)* )?accept(?:ed|ing)?\b(?: the answer)?/,
+        /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
         // please upvote
-        /(?:please(?: \w+) )?(?:give an? )?upvot(?:ed?|ing)(?: the answer)?/,
+        /(?:please(?:\s+\w+)\s+)?(?:give an?\s+)?upvot(?:ed?|ing)(?:\s+the answer)?/,
     ], 'gi');
 
     const whitelist = mergeRegexes([
