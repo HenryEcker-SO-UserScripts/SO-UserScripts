@@ -70,7 +70,7 @@ String.prototype.htmlDecode = function () {
 /* Configurable Options */
 GM_config.init({
     'id': 'NLN_Comment_Config',
-    'title': 'NLN Comment Finder/FLagger Settings',
+    'title': 'NLN Comment Finder/Flagger Settings',
     'fields': {
         'SITE_NAME': {
             'label': 'Site Name',
