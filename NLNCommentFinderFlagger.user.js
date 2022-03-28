@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.1
+// @version      1.5.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -210,49 +210,51 @@ GM_config.init({
             return; // Exit script because checkFlagOptions could potentially make more API Calls
         }
         if (response.hasOwnProperty('items') && response.items.length > 0) {
-            getFlagQuota(response.items[0].comment_id).then(remainingFlags => {
-                console.log("You have", remainingFlags, "remaining flags");
-                if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
-                    console.log("Out of flags. Stopping script");
-                    clearInterval(mainInterval);
-                    return; // Exit so nothing tries to be flagged from this batch
-                }
 
-                // Update last successful read time
-                lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
+            // Update last successful read time
+            lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
 
-                response.items
-                    .filter(elem => elem.body.length < 85)
-                    .map(a => ({
-                        can_flag: a.can_flag,
-                        body: a.body,
-                        body_length: a.body.length,
-                        link: a.link,
-                        comment_id: a.comment_id,
-                        post_id: a.post_id,
-                        blacklist_matches: a.body.match(blacklist)
-                    }))
-                    .filter(elem => elem.blacklist_matches && !elem.body.match(whitelist))
-                    .forEach((elem, idx) => {
-                        let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
-                        console.log(elem.blacklist_matches, noiseRatio, elem.link);
-                        if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
-                            setTimeout(() => {
+            response.items
+                .filter(elem => elem.body.length < 85)
+                .map(a => ({
+                    can_flag: a.can_flag,
+                    body: a.body,
+                    body_length: a.body.length,
+                    link: a.link,
+                    comment_id: a.comment_id,
+                    post_id: a.post_id,
+                    blacklist_matches: a.body.match(blacklist)
+                }))
+                .filter(elem => elem.blacklist_matches && !elem.body.match(whitelist))
+                .forEach((elem, idx) => {
+                    let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
+                    console.log(elem.blacklist_matches, noiseRatio, elem.link);
+                    if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
+                        setTimeout(() => {
+                            // "Open" comment flagging dialog to get remaining Flag Count
+                            getFlagQuota(elem.comment_id).then(remainingFlags => {
+                                console.log("You have", remainingFlags, "remaining flags");
+                                if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
+                                    console.log("Out of flags. Stopping script");
+                                    clearInterval(mainInterval);
+                                    return; // Exit so nothing tries to be flagged
+                                }
                                 checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
                                     if (
                                         flagOptions.hasOwnProperty('items') &&
                                         !flagOptions.items.some(e => e.has_flagged) && // Ensure not already flagged in some way
                                         remainingFlags > GM_config.get('FLAG_QUOTA_LIMIT') // Ensure has flags to do so
                                     ) {
-                                        remainingFlags -= 1; // Flag would have been used
+                                        // Flag post
                                         console.log("Would've autoflagged", elem.comment_id, "(", elem.link, ")", remainingFlags, "flags remaining.");
                                         // flagComment(fkey, elem.comment_id); // Autoflagging
                                     }
                                 });
-                            }, idx * FLAG_RATE);
-                        }
-                    });
-            });
+
+                            });
+                        }, idx * FLAG_RATE);
+                    }
+                });
         }
     };
     if (GM_config.get('ACTIVE')) {
