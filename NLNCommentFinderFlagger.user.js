@@ -251,6 +251,8 @@ GM_config.init({
                         console.log(comment.blacklist_matches, noiseRatio, comment.link);
 
                         return noiseRatio > GM_config.get('CERTAINTY');
+                    } else {
+                        return false;
                     }
                 })
                 .forEach((comment, idx) => {
