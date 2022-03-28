@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.6
+// @version      1.5.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -203,7 +203,7 @@ GM_config.init({
     ], 'gi');
 
     const whitelist = mergeRegexes([
-        /(?:n(?:eed|ot)|unfortunate|persists|require|but)/,
+        /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but)\b/,
         /(?:c(?:ouldn(?:'t?|’t?|t)?|an(?:'t?|’t?|t)?)|d(?:oesn(?:'t?|’t?|t)?|idn(?:'t?|’t?|t)?)|shouldn(?:'t?|’t?|t)?|wouldn(?:'t?|’t?|t)?|haven(?:'t?|’t?|t)?|isn(?:'t?|’t?|t)?)/,
         /[?]/
     ], 'gi');
