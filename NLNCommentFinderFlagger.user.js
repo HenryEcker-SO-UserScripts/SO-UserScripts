@@ -247,37 +247,36 @@ GM_config.init({
                 .filter(comment => {
                     if (comment.blacklist_matches && !comment.body.match(whitelist)) {
                         let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
-                        if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
-                            console.log(comment.blacklist_matches, noiseRatio, comment.link);
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        console.log(comment.blacklist_matches, noiseRatio, comment.link);
+
+                        return noiseRatio > GM_config.get('CERTAINTY');
                     }
                 })
                 .forEach((comment, idx) => {
-                    setTimeout(() => {
-                        // "Open" comment flagging dialog to get remaining Flag Count
-                        getFlagQuota(comment._id).then(remainingFlags => {
-                            console.log("You have", remainingFlags, "remaining flags");
-                            if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
-                                console.log("Out of flags. Stopping script");
-                                clearInterval(mainInterval);
-                                return; // Exit so nothing tries to be flagged
-                            }
-                            checkFlagOptions(AUTH_STR, comment._id).then((flagOptions) => {
-                                if (
-                                    flagOptions.hasOwnProperty('items') &&
-                                    !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
-                                ) {
-                                    // Flag post
-                                    console.log("Would've autoflagged", comment._id, "(", comment.link, ")", remainingFlags, "flags remaining.");
-                                    // flagComment(fkey, elem.comment_id); // Autoflagging
+                    if (GM_config.get('AUTO_FLAG')) {
+                        setTimeout(() => {
+                            // "Open" comment flagging dialog to get remaining Flag Count
+                            getFlagQuota(comment._id).then(remainingFlags => {
+                                console.log("You have", remainingFlags, "remaining flags");
+                                if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
+                                    console.log("Out of flags. Stopping script");
+                                    clearInterval(mainInterval);
+                                    return; // Exit so nothing tries to be flagged
                                 }
-                            });
+                                checkFlagOptions(AUTH_STR, comment._id).then((flagOptions) => {
+                                    if (
+                                        flagOptions.hasOwnProperty('items') &&
+                                        !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
+                                    ) {
+                                        // Flag post
+                                        console.log("Would've autoflagged", comment._id, "(", comment.link, ")", remainingFlags, "flags remaining.");
+                                        // flagComment(fkey, elem.comment_id); // Autoflagging
+                                    }
+                                });
 
-                        });
-                    }, idx * FLAG_RATE);
+                            });
+                        }, idx * FLAG_RATE);
+                    }
                 });
         }
     };
