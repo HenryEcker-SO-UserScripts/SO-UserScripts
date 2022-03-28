@@ -79,9 +79,20 @@ GM_config.init({
             'type': 'int',
             'default': 500
         },
+        'DELAY_BETWEEN_API_CALLS': {
+            'label': 'How frequently (in seconds) should comments be fetched',
+            'type': 'unsigned float',
+            'min': 60, // Calls shouldn't be made more than once a minute
+            'default': 180
+        },
         'ACTIVE': {
             'label': 'Running',
             'section': ['Run Information'],
+            'type': 'checkbox',
+            'default': false
+        },
+        'RUN_IMMEDIATELY': {
+            'label': 'Should run immediately on entering matched pages',
             'type': 'checkbox',
             'default': false
         },
@@ -130,7 +141,7 @@ const getFlagQuota = (commentID) => {
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!1zIEzUczZRkkJ4rMA(o8G';
     const FLAG_RATE = 10 * 1000;
-    const API_REQUEST_RATE = 180 * 1000;
+    const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000;
 
     // Add Config Button
     const settingsButton = $('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="-link">⚙</span>');
@@ -173,15 +184,15 @@ const getFlagQuota = (commentID) => {
         let response = await getComments(
             AUTH_STR,
             COMMENT_FILTER,
-            Math.floor(new Date(new Date() - API_REQUEST_RATE) / 1000)
+            Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000)
         );
-        if (response.quota_remaining <= GM_config.get("API_QUOTA_LIMIT")) {
+        if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             clearInterval(mainInterval);
             return; // Exit script because checkFlagOptions could potentially make more API Calls
         }
         if (response.hasOwnProperty('items') && response.items.length > 0) {
             getFlagQuota(response.items[0].comment_id).then(remainingFlags => {
-                if (remainingFlags <= GM_config.get("FLAG_QUOTA_LIMIT")) {
+                if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
                     console.log("Out of flags. Stopping script");
                     clearInterval(mainInterval);
                     return; // Exit so nothing tries to be flagged from this batch
@@ -206,7 +217,7 @@ const getFlagQuota = (commentID) => {
                                 if (
                                     flagOptions.hasOwnProperty('items') &&
                                     !flagOptions.items.some(e => e.has_flagged) && // Ensure not already flagged in some way
-                                    remainingFlags > GM_config.get("FLAG_QUOTA_LIMIT") // Ensure has flags to do so
+                                    remainingFlags > GM_config.get('FLAG_QUOTA_LIMIT') // Ensure has flags to do so
                                 ) {
                                     remainingFlags -= 1; // Flag would have been used
                                     console.log("Would've autoflagged");
@@ -218,6 +229,9 @@ const getFlagQuota = (commentID) => {
         }
     };
     if (GM_config.get('ACTIVE')) {
-        let mainInterval = setInterval(() => main(mainInterval), API_REQUEST_RATE);
+        if (GM_config.get('RUN_IMMEDIATELY')) {
+            main(undefined);
+        }
+        let mainInterval = setInterval(() => main(mainInterval), API_REQUEST_RATE());
     }
 })();
