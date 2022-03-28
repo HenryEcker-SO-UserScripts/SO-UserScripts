@@ -151,18 +151,19 @@ const getFlagQuota = (commentID) => {
     $('header ol.user-logged-in > li:nth-child(3)').before(li);
     const fkey = StackExchange.options.user.fkey;
 
-
-    const blacklist = new RegExp([
+    let blacklist = new RegExp([
         // Smileys
         '(?::(?:‑(?:\\)|,|D|P|b|p|Þ|þ)|\\-(?:\\*|\\]|\\}|3|>)|\'(?:‑\\)|\\))|\\^\\)|c\\)|o\\)|"D|\\)|\\*|\\]|\\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\\)|\\])|\\^\\)|\\)|\\]|3|>|D)|8(?:\\-\\)|\\)|‑D|D)|=(?:\\)|\\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\\*(?:\\-\\)|\\))|>:[3P]|B\\^D|C:|c:|d:)',
         // Text-speak
-        '(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?)',
+        '\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b',
         // Glad to help
         '(?:happy\s+to\s+he(?:ar|lp)|glad\s+to\s+he(?:ar|lp))',
         // You're/that's awesome!
         '(you(\'re|\\s+are)?|that\'?s)\\s+(?:a(?:\\ rock\\ star|mazing|wesome)|incredible|brilliant|wonderful)[.!]?',
         // Any help would be appreciated
         'Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great)',
+        // Exactly what I was looking for
+        '(?:That\'s\s+(?:exactly\s+what\s+I\s+was\s+looking\s+for|what\s+I\s+was\s+looking\s+for!)|exactly\s+what\s+I\s+was\s+looking\s+for(?:,\s+thank\s+you!)?|You\s+found\s+it!|that\'s\s+it)',
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
