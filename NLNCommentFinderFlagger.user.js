@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.0
+// @version      1.5.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -146,7 +146,7 @@ const mergeRegexes = (arrRegex, flags) => {
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!1zIEzUczZRkkJ4rMA(o8G';
-    const FLAG_RATE = 10 * 1000;
+    const FLAG_RATE = 7 * 1000;
     const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000;
 
     // Add Config Button
@@ -234,16 +234,18 @@ const mergeRegexes = (arrRegex, flags) => {
                         let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
                         console.log(elem.blacklist_matches, noiseRatio, elem.link);
                         if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
-                            checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
-                                if (
-                                    flagOptions.hasOwnProperty('items') &&
-                                    !flagOptions.items.some(e => e.has_flagged) && // Ensure not already flagged in some way
-                                    remainingFlags > GM_config.get('FLAG_QUOTA_LIMIT') // Ensure has flags to do so
-                                ) {
-                                    remainingFlags -= 1; // Flag would have been used
-                                    console.log("Would've autoflagged");
-                                }
-                            });
+                            setTimeout(() => {
+                                checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
+                                    if (
+                                        flagOptions.hasOwnProperty('items') &&
+                                        !flagOptions.items.some(e => e.has_flagged) && // Ensure not already flagged in some way
+                                        remainingFlags > GM_config.get('FLAG_QUOTA_LIMIT') // Ensure has flags to do so
+                                    ) {
+                                        remainingFlags -= 1; // Flag would have been used
+                                        console.log("Would've autoflagged ", elem.comment_id, " (", elem.link, ")");
+                                    }
+                                });
+                            }, idx * FLAG_RATE);
                         }
                     });
             });
