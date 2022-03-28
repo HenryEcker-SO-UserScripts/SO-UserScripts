@@ -104,15 +104,15 @@ GM_config.init({
         'CERTAINTY': {
             'label': 'How Certain should the script be to autoflag (out of 100)',
             'type': 'unsigned float',
-            'min': 25, // This really shouldn't be this low
-            'max': 100, // Unlikely due to the non-capture groups in the TRIE
+            'min': 25,
+            'max': 100,
             'default': 75
         },
         'FLAG_QUOTA_LIMIT': {
             'label': 'Stop flagging with how many remaining comment flags',
             'type': 'int',
             'min': 0,
-            'max': 99,
+            'max': 100,
             'default': 0
         }
     }
