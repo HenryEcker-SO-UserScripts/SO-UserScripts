@@ -119,6 +119,13 @@ GM_config.init({
             'options': ['all', 'question', 'answer'],
             'default': 'all'
         },
+        'MAXIMUM_LENGTH_COMMENT':{
+            'label': 'Maximum length comments to consider',
+            'type': 'int',
+            'min': 15, // Minimum comment length
+            'max': 600, // Maximum length limit
+            'default': 600 // Default to max
+        },
         'CERTAINTY': {
             'label': 'How Certain should the script be to autoflag (out of 100)',
             'type': 'unsigned float',
@@ -224,39 +231,40 @@ GM_config.init({
             lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
 
             response.items
-                .map(a => {
-                    let decodedMarkdown = a.body_markdown.htmlDecode();
+                .filter(comment => comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT'))
+                .map(comment => {
+                    let decodedMarkdown = comment.body_markdown.htmlDecode();
                     return {
-                        can_flag: a.can_flag,
+                        can_flag: comment.can_flag,
                         body: decodedMarkdown,
-                        link: a.link,
-                        comment_id: a.comment_id,
-                        post_id: a.post_id,
-                        post_type: a.post_type,
+                        link: comment.link,
+                        _id: comment.comment_id,
+                        post_id: comment.post_id,
+                        post_type: comment.post_type,
                         blacklist_matches: decodedMarkdown.match(blacklist)
                     }
                 })
-                .filter(elem => postTypeFilter(elem.post_type) && elem.blacklist_matches && !elem.body.match(whitelist))
-                .forEach((elem, idx) => {
-                    let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
-                    console.log(elem.blacklist_matches, noiseRatio, elem.link);
+                .filter(comment => postTypeFilter(comment.post_type) && comment.blacklist_matches && !comment.body.match(whitelist))
+                .forEach((comment, idx) => {
+                    let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
+                    console.log(comment.blacklist_matches, noiseRatio, comment.link);
                     if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
                         setTimeout(() => {
                             // "Open" comment flagging dialog to get remaining Flag Count
-                            getFlagQuota(elem.comment_id).then(remainingFlags => {
+                            getFlagQuota(comment._id).then(remainingFlags => {
                                 console.log("You have", remainingFlags, "remaining flags");
                                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
                                     console.log("Out of flags. Stopping script");
                                     clearInterval(mainInterval);
                                     return; // Exit so nothing tries to be flagged
                                 }
-                                checkFlagOptions(AUTH_STR, elem.comment_id).then((flagOptions) => {
+                                checkFlagOptions(AUTH_STR, comment._id).then((flagOptions) => {
                                     if (
                                         flagOptions.hasOwnProperty('items') &&
                                         !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
                                         // Flag post
-                                        console.log("Would've autoflagged", elem.comment_id, "(", elem.link, ")", remainingFlags, "flags remaining.");
+                                        console.log("Would've autoflagged", comment._id, "(", comment.link, ")", remainingFlags, "flags remaining.");
                                         // flagComment(fkey, elem.comment_id); // Autoflagging
                                     }
                                 });
