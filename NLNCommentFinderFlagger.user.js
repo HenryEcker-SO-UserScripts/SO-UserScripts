@@ -221,7 +221,6 @@ GM_config.init({
     let lastSuccessfulRead = Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000);
 
     const main = async (mainInterval) => {
-        console.log('Fetching...')
         let response = await getComments(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead);
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             clearInterval(mainInterval);
