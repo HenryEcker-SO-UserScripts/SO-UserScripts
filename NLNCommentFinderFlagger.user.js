@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.4.0
+// @version      1.4.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -177,12 +177,14 @@ const getFlagQuota = (commentID) => {
         );
         if (response.quota_remaining <= GM_config.get("API_QUOTA_LIMIT")) {
             clearInterval(mainInterval);
+            return; // Exit script because checkFlagOptions could potentially make more API Calls
         }
         if (response.hasOwnProperty('items') && response.items.length > 0) {
             getFlagQuota(response.items[0].comment_id).then(remainingFlags => {
                 if (remainingFlags <= GM_config.get("FLAG_QUOTA_LIMIT")) {
                     console.log("Out of flags. Stopping script");
                     clearInterval(mainInterval);
+                    return; // Exit so nothing tries to be flagged from this batch
                 }
                 response.items
                     .filter(elem => elem.body.length < 85)
