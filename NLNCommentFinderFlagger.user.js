@@ -193,7 +193,7 @@ GM_config.init({
         // this was very helpful
         /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*/,
         // excitement
-        /(?:wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*/,
+        /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*/,
         // life saver
         /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver[!.:()d=\s]*/,
         // please accept
