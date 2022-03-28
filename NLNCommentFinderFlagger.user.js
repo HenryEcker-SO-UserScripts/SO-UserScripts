@@ -171,14 +171,14 @@ GM_config.init({
         /\b(?::(?:\-(?:\)\)|\*|\]|\}|3|>)|‑(?:\)|,|D|P|b|p|Þ|þ)|'(?:‑\)|\))|\^\)|c\)|o\)|"D|\)|\*|\]|\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\)|\])|\^\)|\)|\]|3|>|D)|8(?:\-\)|\)|‑D|D)|=(?:\)|\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\*(?:\-\)|\))|>:[3P]|B\^D|C:|c:|d:)\b/,
         // Text-speak
         /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
-        // Glad to help
-        /(?:happy\s+to\s+he(?:ar|lp)|glad\s+to\s+he(?:ar|lp))/,
+        // Glad to help/Happy I could help/Glad to hear
+        /(?:happy|glad)\s*(?:\w*\s*)*?(he(?:ar|lp))/,
         // You're/that's awesome!
-        /(you('re|\s+are)?|that'?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock)[.!]?/,
+        /(you(['’]?re|\s+are)?|that['’]?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
         // Any help would be appreciated
         /(Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
-        // Exactly what I was looking for
-        /(?:That's\s+(?:exactly\s+what\s+I\s+was\s+looking\s+for|what\s+I\s+was\s+looking\s+for!)|exactly\s+what\s+I\s+was\s+looking\s+for(?:,\s+thank\s+you!)?|You\s+found\s+it!|that\'s\s+it)/,
+        // That's what I was looking for/that's it
+        /((?:\w*\s*)*?(?:looking\s*for)|that['’]?s\s*it)[.!]?/,
         // Happy coding
         /happy\s*coding/,
         /*
@@ -204,7 +204,7 @@ GM_config.init({
 
     const whitelist = mergeRegexes([
         /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but)\b/,
-        /(?:c(?:ouldn(?:'t?|’t?|t)?|an(?:'t?|’t?|t)?)|d(?:oesn(?:'t?|’t?|t)?|idn(?:'t?|’t?|t)?)|shouldn(?:'t?|’t?|t)?|wouldn(?:'t?|’t?|t)?|haven(?:'t?|’t?|t)?|isn(?:'t?|’t?|t)?)/,
+        /(?:w(?:ouldn(?:'t?|’t?)?|asn(?:'t?|’t?)?)|c(?:ouldn(?:'t?|’t?)?|an(?:'t?|’t?)?)|d(?:oesn(?:'t?|’t?)?|idn(?:'t?|’t?)?)|ha(?:ven(?:'t?|’t?)?|sn(?:'t?|’t?)?)|shouldn(?:'t?|’t?)?|isn(?:'t?|’t?)?)/,
         /[?]/
     ], 'gi');
 
