@@ -193,7 +193,7 @@ const mergeRegexes = (arrRegex, flags) => {
 
     const whitelist = mergeRegexes([
         /(?:n(?:eed|ot)|unfortunate|persists|require|but)/,
-        /(?:d(?:o(?:esn't?|n't?)|idn't?)|c(?:ouldn't?|an't)|shouldn't?|wouldn't?|isn't?)/,
+        /(?:d(?:oesn(?:'t?|’t?|t)?|idn(?:'t?|’t?|t)?)|shouldn(?:'t?|’t?|t)?|couldn(?:'t?|’t?|t)?|wouldn(?:'t?|’t?|t)?|isn(?:'t?|’t?|t)?)/,
         /[?]/
     ], 'gi');
 
