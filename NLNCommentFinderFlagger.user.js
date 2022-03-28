@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.4.3
+// @version      1.5.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -104,6 +104,8 @@ GM_config.init({
         'CERTAINTY': {
             'label': 'How Certain should the script be to autoflag (out of 100)',
             'type': 'unsigned float',
+            'min': 25, // This really shouldn't be this low
+            'max': 100, // Unlikely due to the non-capture groups in the TRIE
             'default': 75
         },
         'FLAG_QUOTA_LIMIT': {
@@ -126,6 +128,10 @@ const getFlagQuota = (commentID) => {
             })
             .fail(reject);
     });
+}
+
+const mergeRegexes = (arrRegex, flags) => {
+    return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
 }
 
 (function () {
@@ -151,45 +157,45 @@ const getFlagQuota = (commentID) => {
     $('header ol.user-logged-in > li:nth-child(3)').before(li);
     const fkey = StackExchange.options.user.fkey;
 
-    let blacklist = new RegExp([
+    const blacklist = mergeRegexes([
         // Smileys
-        '(?::(?:‑(?:\\)|,|D|P|b|p|Þ|þ)|\\-(?:\\*|\\]|\\}|3|>)|\'(?:‑\\)|\\))|\\^\\)|c\\)|o\\)|"D|\\)|\\*|\\]|\\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\\)|\\])|\\^\\)|\\)|\\]|3|>|D)|8(?:\\-\\)|\\)|‑D|D)|=(?:\\)|\\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\\*(?:\\-\\)|\\))|>:[3P]|B\\^D|C:|c:|d:)',
+        /(?::(?:\-(?:\)\)|\*|\]|\}|3|>)|‑(?:\)|,|D|P|b|p|Þ|þ)|'(?:‑\)|\))|\^\)|c\)|o\)|"D|\)|\*|\]|\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\)|\])|\^\)|\)|\]|3|>|D)|8(?:\-\)|\)|‑D|D)|=(?:\)|\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\*(?:\-\)|\))|>:[3P]|B\^D|C:|c:|d:)/,
         // Text-speak
-        '\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b',
+        /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
         // Glad to help
-        '(?:happy\s+to\s+he(?:ar|lp)|glad\s+to\s+he(?:ar|lp))',
+        /(?:happy\s+to\s+he(?:ar|lp)|glad\s+to\s+he(?:ar|lp))/,
         // You're/that's awesome!
-        '(you(\'re|\\s+are)?|that\'?s)\\s+(?:a(?:\\ rock\\ star|mazing|wesome)|incredible|brilliant|wonderful)[.!]?',
+        /(you('re|\s+are)?|that'?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock)[.!]?/,
         // Any help would be appreciated
-        'Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great)',
+        /(Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
         // Exactly what I was looking for
-        '(?:That\'s\s+(?:exactly\s+what\s+I\s+was\s+looking\s+for|what\s+I\s+was\s+looking\s+for!)|exactly\s+what\s+I\s+was\s+looking\s+for(?:,\s+thank\s+you!)?|You\s+found\s+it!|that\'s\s+it)',
+        /(?:That's\s+(?:exactly\s+what\s+I\s+was\s+looking\s+for|what\s+I\s+was\s+looking\s+for!)|exactly\s+what\s+I\s+was\s+looking\s+for(?:,\s+thank\s+you!)?|You\s+found\s+it!|that\'s\s+it)/,
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
         // gratitude
-        '(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)[!\.,:()\s]*(?:\w+[!\.,:()\s]*)?',
+        /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)[!\.,:()\s]*(?:\w+[!\.,:()\s]*)?/,
         // it worked like a charm
-        '(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?[!\.:()\s]*',
+        /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?[!\.:()\s]*/,
         // you are welcome
-        '(?:(?:you(?:\'?re?| are)\s+)?welcome)+[!\.:()\s]*',
+        /(?:(?:you(?:'?re?| are)\s+)?welcome)+[!.:()\s]*/,
         // this was very helpful
-        '(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*',
+        /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*/,
         // excitement
-        '(?:wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*',
+        /(?:wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*/,
         // life saver
-        '(?:You(?:\'re|\s*are) )?a life saver[!\.:()d=\s]*',
+        /(?:You(?:'re|\s*are) )?a life saver[!.:()d=\s]*/,
         // please accept
-        '(?:please(?: \w+)* )?accept(?:ed|ing)?\b(?: the answer)?',
+        /(?:please(?: \w+)* )?accept(?:ed|ing)?\b(?: the answer)?/,
         // please upvote
-        '(?:please(?: \w+) )?(?:give an? )?upvot(?:ed?|ing)(?: the answer)?',
-    ].join('|'), 'gi');
+        /(?:please(?: \w+) )?(?:give an? )?upvot(?:ed?|ing)(?: the answer)?/,
+    ], 'gi');
 
-    let whitelist = RegExp([
-        '(?:n(?:eed|ot)|unfortunate|persists|require|but)',
-        '(?:d(?:o(?:esn\'t?|n\'t?)|idn\'t?)|c(?:ouldn\'t?|an\'t)|shouldn\'t?|wouldn\'t?|isn\'t?)',
-        '[?]'
-    ].join('|'), 'gi');
+    const whitelist = mergeRegexes([
+        /(?:n(?:eed|ot)|unfortunate|persists|require|but)/,
+        /(?:d(?:o(?:esn't?|n't?)|idn't?)|c(?:ouldn't?|an't)|shouldn't?|wouldn't?|isn't?)/,
+        /[?]/
+    ], 'gi');
 
     // Prime last successful read
     let lastSuccessfulRead = Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000);
@@ -210,7 +216,7 @@ const getFlagQuota = (commentID) => {
                 }
 
                 // Update last successful read time
-                lastSuccessfulRead = Math.floor(new Date() / 1000);
+                lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
 
                 response.items
                     .filter(elem => elem.body.length < 85)
