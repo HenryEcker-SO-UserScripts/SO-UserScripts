@@ -119,7 +119,7 @@ GM_config.init({
             'options': ['all', 'question', 'answer'],
             'default': 'all'
         },
-        'MAXIMUM_LENGTH_COMMENT':{
+        'MAXIMUM_LENGTH_COMMENT': {
             'label': 'Maximum length comments to consider',
             'type': 'int',
             'min': 15, // Minimum comment length
@@ -231,7 +231,7 @@ GM_config.init({
             lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
 
             response.items
-                .filter(comment => comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT'))
+                .filter(comment => postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) // Easy excludes before doing regex
                 .map(comment => {
                     let decodedMarkdown = comment.body_markdown.htmlDecode();
                     return {
@@ -244,7 +244,7 @@ GM_config.init({
                         blacklist_matches: decodedMarkdown.match(blacklist)
                     }
                 })
-                .filter(comment => postTypeFilter(comment.post_type) && comment.blacklist_matches && !comment.body.match(whitelist))
+                .filter(comment => comment.blacklist_matches && !comment.body.match(whitelist))
                 .forEach((comment, idx) => {
                     let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
                     console.log(comment.blacklist_matches, noiseRatio, comment.link);
