@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.4
+// @version      1.5.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -244,34 +244,43 @@ GM_config.init({
                         blacklist_matches: decodedMarkdown.match(blacklist)
                     }
                 })
-                .filter(comment => comment.blacklist_matches && !comment.body.match(whitelist))
-                .forEach((comment, idx) => {
+                .filter(comment => {
                     let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
-                    console.log(comment.blacklist_matches, noiseRatio, comment.link);
-                    if (GM_config.get('AUTO_FLAG') && (noiseRatio > GM_config.get('CERTAINTY'))) {
-                        setTimeout(() => {
-                            // "Open" comment flagging dialog to get remaining Flag Count
-                            getFlagQuota(comment._id).then(remainingFlags => {
-                                console.log("You have", remainingFlags, "remaining flags");
-                                if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
-                                    console.log("Out of flags. Stopping script");
-                                    clearInterval(mainInterval);
-                                    return; // Exit so nothing tries to be flagged
-                                }
-                                checkFlagOptions(AUTH_STR, comment._id).then((flagOptions) => {
-                                    if (
-                                        flagOptions.hasOwnProperty('items') &&
-                                        !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
-                                    ) {
-                                        // Flag post
-                                        console.log("Would've autoflagged", comment._id, "(", comment.link, ")", remainingFlags, "flags remaining.");
-                                        // flagComment(fkey, elem.comment_id); // Autoflagging
-                                    }
-                                });
-
-                            });
-                        }, idx * FLAG_RATE);
+                    if (
+                        GM_config.get('AUTO_FLAG') &&
+                        (noiseRatio > GM_config.get('CERTAINTY')) &&
+                        comment.blacklist_matches &&
+                        !comment.body.match(whitelist)
+                    ) {
+                        console.log(comment.blacklist_matches, noiseRatio, comment.link);
+                        return true;
+                    } else {
+                        return false;
                     }
+                })
+                .forEach((comment, idx) => {
+                    setTimeout(() => {
+                        // "Open" comment flagging dialog to get remaining Flag Count
+                        getFlagQuota(comment._id).then(remainingFlags => {
+                            console.log("You have", remainingFlags, "remaining flags");
+                            if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
+                                console.log("Out of flags. Stopping script");
+                                clearInterval(mainInterval);
+                                return; // Exit so nothing tries to be flagged
+                            }
+                            checkFlagOptions(AUTH_STR, comment._id).then((flagOptions) => {
+                                if (
+                                    flagOptions.hasOwnProperty('items') &&
+                                    !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
+                                ) {
+                                    // Flag post
+                                    console.log("Would've autoflagged", comment._id, "(", comment.link, ")", remainingFlags, "flags remaining.");
+                                    // flagComment(fkey, elem.comment_id); // Autoflagging
+                                }
+                            });
+
+                        });
+                    }, idx * FLAG_RATE);
                 });
         }
     };
