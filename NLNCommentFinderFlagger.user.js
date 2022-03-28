@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.4.2
+// @version      1.4.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -153,31 +153,38 @@ const getFlagQuota = (commentID) => {
 
 
     const blacklist = new RegExp([
-        "((?:^)@(\\w+)\\b\\s)?thank([\\w.,!\']*)?(\\s[\\w{1,8},.@!:\\-)]*)?(\\s[\\w{1,8},.@!:\\-)]*)?(\\s[\\w{1,8},.@!:\\-)]*)?",
-        "glad(?:\\sto\\shelp|hear)?",
-        "(appreciate|perfect|awesome|amazing|excellent)(?:,|\w{1,2})?(\\s(?:solution|example)?)?",
-        "solv(\\w{1,3})(\\s(\w{2,5}))\\s(\\w{1,9})?",
-        "(\\w{1,8}\\s)?up(?:\\s)?vote\\s(\\w{0,8})?\\s(\\w{0,8})?",
-        "(\\w{1,5}([\\w{,2}\']*)\\s)?work([\\w*{0,3}!.]*)?(\\s[:\\-)+=.}]*)?",
-        "save(\\w{1,3})?\\s(\\w{0,4})\\s([\\w{0,6}.!:\\-)]*)?",
-        "([\\w{1,8},.@!:)]*\\s)?(love|cheers|great)(\\s[\\w{1,8},.@!:)]*)?",
-        ":\\)| :-\\)|;\\)",
+        // Smileys
+        '(?::(?:‑(?:\\)|,|D|P|b|p|Þ|þ)|\\-(?:\\*|\\]|\\}|3|>)|\'(?:‑\\)|\\))|\\^\\)|c\\)|o\\)|"D|\\)|\\*|\\]|\\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\\)|\\])|\\^\\)|\\)|\\]|3|>|D)|8(?:\\-\\)|\\)|‑D|D)|=(?:\\)|\\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\\*(?:\\-\\)|\\))|>:[3P]|B\\^D|C:|c:|d:)',
+        // Text-speak
+        '(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?)',
+        /*
+         * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
+         */
+        // gratitude
         '(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)[!\.,:()\s]*(?:\w+[!\.,:()\s]*)?',
+        // it worked like a charm
         '(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?[!\.:()\s]*',
+        // you are welcome
         '(?:(?:you(?:\'?re?| are)\s+)?welcome)+[!\.:()\s]*',
+        // this was very helpful
         '(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*',
+        // updated/fixed
         '(?:I\s+)?(?:done|updated|edited|fixed)+\s*(?:my|the|a)?\s*(?:answer|question|it|that|this)?[!\.:()\s]*',
+        // excitement
         '(?:wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*',
+        // life saver
         '(?:You(?:\'re|\s*are) )?a life saver[!\.:()d=\s]*',
+        // please accept
         '(?:please(?: \w+)* )?accept(?:ed|ing)?\b(?: the answer)?',
+        // please upvote
         '(?:please(?: \w+) )?(?:give an? )?upvot(?:ed?|ing)(?: the answer)?',
-    ].join("|"), 'gi');
+    ].join('|'), 'gi');
 
     let whitelist = RegExp([
-        "not|unfortunate|but|require|need|persists",
-        "\\b(doesn|don|didn|couldn|can|isn)(['’])?(\\w{1,2})?\\b",
-        "[?]"
-    ].join("|"), 'gi');
+        '(?:n(?:eed|ot)|unfortunate|persists|require|but)',
+        '(?:d(?:o(?:esn\'t?|n\'t?)|idn\'t?)|c(?:ouldn\'t?|an\'t)|shouldn\'t?|wouldn\'t?|isn\'t?)',
+        '[?]'
+    ].join('|'), 'gi');
 
     // Prime last successful read
     let lastSuccessfulRead = Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000);
