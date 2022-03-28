@@ -168,7 +168,7 @@ GM_config.init({
 
     const blacklist = mergeRegexes([
         // Ascii Smileys/Punctuation spam
-        /[^\w\s]{2,}/,
+        /\s+((?=[!-~])[\W_]){2,}\s*/,
         // Text-speak
         /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
         // Glad to help/Happy I could help/Glad to hear
