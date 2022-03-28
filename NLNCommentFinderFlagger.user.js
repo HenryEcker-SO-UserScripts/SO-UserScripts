@@ -259,7 +259,6 @@ GM_config.init({
                         setTimeout(() => {
                             // "Open" comment flagging dialog to get remaining Flag Count
                             getFlagQuota(comment._id).then(remainingFlags => {
-                                console.log("You have", remainingFlags, "remaining flags");
                                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
                                     console.log("Out of flags. Stopping script");
                                     clearInterval(mainInterval);
@@ -271,7 +270,7 @@ GM_config.init({
                                         !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
                                         // Flag post
-                                        console.log("Would've autoflagged", comment._id, "(", comment.link, ")", remainingFlags, "flags remaining.");
+                                        console.log("Would've autoflagged", comment._id, "(", comment.link, ")");
                                         // flagComment(fkey, elem.comment_id); // Autoflagging
                                     }
                                 });
