@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.2
+// @version      1.5.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -71,6 +71,10 @@ const calcNoiseRatio = (matches, body) => {
 
 const mergeRegexes = (arrRegex, flags) => {
     return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
+}
+
+String.prototype.htmlDecode = function () {
+    return new DOMParser().parseFromString(this, "text/html").documentElement.textContent;
 }
 
 /* Configurable Options */
@@ -147,7 +151,7 @@ GM_config.init({
         GM_config.open();
     }
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
-    const COMMENT_FILTER = '!1zIEzUczZRkkJ4rMA(o8G';
+    const COMMENT_FILTER = '!1zIEzUczZRkkJ4rV1NUZp';
     const FLAG_RATE = 7 * 1000;
     const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000; // Function call to allow changing delay without needing to reload the page
 
@@ -215,16 +219,17 @@ GM_config.init({
             lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
 
             response.items
-                .filter(elem => elem.body.length < 85)
-                .map(a => ({
-                    can_flag: a.can_flag,
-                    body: a.body,
-                    body_length: a.body.length,
-                    link: a.link,
-                    comment_id: a.comment_id,
-                    post_id: a.post_id,
-                    blacklist_matches: a.body.match(blacklist)
-                }))
+                .map(a => {
+                    let decodedMarkdown = a.body_markdown.htmlDecode();
+                    return {
+                        can_flag: a.can_flag,
+                        body: decodedMarkdown,
+                        link: a.link,
+                        comment_id: a.comment_id,
+                        post_id: a.post_id,
+                        blacklist_matches: decodedMarkdown.match(blacklist)
+                    }
+                })
                 .filter(elem => elem.blacklist_matches && !elem.body.match(whitelist))
                 .forEach((elem, idx) => {
                     let noiseRatio = calcNoiseRatio(elem.blacklist_matches, elem.body);
