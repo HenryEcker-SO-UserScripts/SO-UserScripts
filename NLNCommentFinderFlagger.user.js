@@ -167,33 +167,33 @@ GM_config.init({
     const fkey = StackExchange.options.user.fkey;
 
     const blacklist = mergeRegexes([
-        // Smileys
-        /\b(?::(?:\-(?:\)\)|\*|\]|\}|3|>)|‑(?:\)|,|D|P|b|p|Þ|þ)|'(?:‑\)|\))|\^\)|c\)|o\)|"D|\)|\*|\]|\}|3|>|D|P|b|p|×|Þ|þ)|;(?:‑(?:\)|\])|\^\)|\)|\]|3|>|D)|8(?:\-\)|\)|‑D|D)|=(?:\)|\]|3|D|p)|X(?:‑[DP]|3|D|P)|x(?:‑[Dp]|3|D|p)|\*(?:\-\)|\))|>:[3P]|B\^D|C:|c:|d:)\b/,
+        // Ascii Smileys/Punctuation spam
+        /[^\w\s]{2,}/,
         // Text-speak
         /\b(?:t(?:y(?:sm|vm)?|hx)|ily(?:sm)?|k)\b/,
         // Glad to help/Happy I could help/Glad to hear
         /(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))/,
         // You're/that's awesome!
-        /(you(['’]?re|\s+are)?|that['’]?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
+        /(?:you(['’]?re|\s+are)?|that['’]?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
         // Any help would be appreciated
-        /(Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
+        /(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
         // That's what I was looking for/that's it
         /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s\s*it)[.!]?/,
         // Happy coding
-        /happy\s+coding/,
+        /(?:happy\s+coding)/,
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
         // gratitude
         /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)[!\.,:()\s]*(?:\w+[!\.,:()\s]*)?/,
         // it worked like a charm
-        /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?[!\.:()\s]*/,
+        /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?/,
         // you are welcome
         /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+[!.:()\s]*/,
         // this was very helpful
         /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*/,
         // excitement
-        /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You )?saved my\s+\w+)+[!\.:()\s]*/,
+        /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You\s+)?saved\s+my\s+\w+)/,
         // life saver
         /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver[!.:()d=\s]*/,
         // please accept
