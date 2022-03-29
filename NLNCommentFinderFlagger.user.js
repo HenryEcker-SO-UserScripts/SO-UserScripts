@@ -302,7 +302,8 @@ GM_config.init({
                                 });
                             }).catch(err => {
                                 console.error(err);
-                                console.log("Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.")
+                                console.log("Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.");
+                                console.log("Would've autoflagged", comment._id, "(", comment.link, ")");
                             });
                         }, idx * FLAG_RATE);
                     }
