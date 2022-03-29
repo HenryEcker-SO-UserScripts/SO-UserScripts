@@ -259,6 +259,7 @@ GM_config.init({
                 .filter(comment => postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) // Easy excludes before doing regex
                 .map(comment => {
                     let decodedMarkdown = comment.body_markdown.htmlDecode();
+                    console.log(decodedMarkdown, comment.link);
                     return {
                         can_flag: comment.can_flag,
                         body: decodedMarkdown,
