@@ -244,7 +244,7 @@ GM_config.init({
             AUTH_STR,
             COMMENT_FILTER,
             Math.floor(lastSuccessfulRead / 1000),
-            Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) + API_REQUEST_RATE()) / 1000)
+            Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000)
         );
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             clearInterval(mainInterval);
