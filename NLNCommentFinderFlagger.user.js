@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.7
+// @version      1.5.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -19,8 +19,17 @@
 
 
 /* Functions that make external requests */
-const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE) => {
-    return fetch(`https://api.stackexchange.com/2.3/comments?fromdate=${FROM_DATE}&pagesize=100&order=desc&sort=creation&filter=${COMMENT_FILTER}&${AUTH_STR}`).then(res => res.json())
+const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) => {
+    let usp = new URLSearchParams();
+    usp.set('pagesize', '100');
+    usp.set('order', 'desc');
+    usp.set('sort', 'creation');
+    usp.set('filter', COMMENT_FILTER);
+    usp.set('fromdate', FROM_DATE);
+    if (TO_DATE) {
+        usp.set('todate', TO_DATE);
+    }
+    return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`).then(res => res.json());
 };
 
 const checkFlagOptions = (AUTH_STR, commentID) => {
@@ -64,6 +73,10 @@ const mergeRegexes = (arrRegex, flags) => {
 
 String.prototype.htmlDecode = function () {
     return new DOMParser().parseFromString(this, "text/html").documentElement.textContent;
+}
+
+const getOffset = (hours) => {
+    return new Date() - (hours * 60 * 60 * 1000)
 }
 
 
@@ -125,6 +138,12 @@ GM_config.init({
             'min': 15, // Minimum comment length
             'max': 600, // Maximum length limit
             'default': 600 // Default to max
+        },
+        'HOUR_OFFSET': {
+            'label': 'How long ago (in hours) should the calls be offset',
+            'type': 'unsigned float',
+            'min': 0,
+            'default': 0
         },
         'CERTAINTY': {
             'label': 'How Certain should the script be to autoflag (out of 100)',
@@ -218,10 +237,15 @@ GM_config.init({
     }
 
     // Prime last successful read
-    let lastSuccessfulRead = Math.floor(new Date(new Date() - API_REQUEST_RATE()) / 1000);
+    let lastSuccessfulRead = new Date(getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE());
 
     const main = async (mainInterval) => {
-        let response = await getComments(AUTH_STR, COMMENT_FILTER, lastSuccessfulRead);
+        let response = await getComments(
+            AUTH_STR,
+            COMMENT_FILTER,
+            Math.floor(lastSuccessfulRead / 1000),
+            Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) + API_REQUEST_RATE()) / 1000)
+        );
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             clearInterval(mainInterval);
             return; // Exit script because checkFlagOptions could potentially make more API Calls
@@ -229,7 +253,7 @@ GM_config.init({
         if (response.hasOwnProperty('items') && response.items.length > 0) {
 
             // Update last successful read time
-            lastSuccessfulRead = Math.floor(new Date() / 1000) + 1;
+            lastSuccessfulRead = getOffset(GM_config.get('HOUR_OFFSET')) + 1;
 
             response.items
                 .filter(comment => postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) // Easy excludes before doing regex
