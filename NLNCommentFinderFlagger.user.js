@@ -300,7 +300,9 @@ GM_config.init({
                                         // flagComment(fkey, elem.comment_id); // Autoflagging
                                     }
                                 });
-
+                            }).catch(err => {
+                                console.error(err);
+                                console.log("Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.")
                             });
                         }, idx * FLAG_RATE);
                     }
