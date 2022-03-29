@@ -206,17 +206,17 @@ GM_config.init({
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
         // gratitude
-        /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)[!\.,:()\s]*(?:\w+[!\.,:()\s]*)?/,
+        /(?:(?:big\s+|many\s+)?th?ank(?:s|\s*you|\s*u)?(?:\s+a lot|\s+(?:very|so) much|\s+a mil+ion|\s+)?(?:\s*for (?:your|the)?(?:\s+help)?)?|th?anx|thx|cheers)(?:\s+\w+)*/,
         // it worked like a charm
         /(?:this\s+|that\s+|it\s+)?(?:solution\s+)?work(?:ed|s)?\s*(?:now|perfectly|great|for me|like a charm)?/,
         // you are welcome
-        /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+[!.:()\s]*/,
+        /(?:(?:you(?:'?re?|\s+are)\s+)?welcome)+/,
         // this was very helpful
-        /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+[!\.:()\s]*/,
+        /(?:(?:I\s+)?(?:hope\s+)?(?:your\s+|(?:this\s+|that\s+|it\s+)(?:was\s+|is\s+)?)?(?:very\s+)?help(?:ful|ed|s)|useful(?:\s+a lot|\s+(?:very|so) much)?)+/,
         // excitement
-        /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You\s+)?saved\s+my\s+\w+)/,
+        /(?:perfect|wonderful|brilliant|Excellent|Marvelous|awesome|(?:You\s+)?saved\s+m[ey](?:\s+\w+)*)/,
         // life saver
-        /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver[!.:()d=\s]*/,
+        /(?:You(?:'re|\s*are)\s+)?a\s+life\s+saver/,
         // please accept
         /(?:please(?:\s+\w+)*\s+)?accept(?:ed|ing)?\b(?:\s+the\s+answer)?/,
         // please upvote
