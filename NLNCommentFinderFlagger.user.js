@@ -264,7 +264,7 @@ GM_config.init({
         let response = await getComments(
             AUTH_STR,
             COMMENT_FILTER,
-            Math.floor(lastSuccessfulRead / 1000),
+            lastSuccessfulRead,
             toDate
         );
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
