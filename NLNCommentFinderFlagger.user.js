@@ -205,11 +205,11 @@ GM_config.init({
         // Glad to help/Happy I could help/Glad to hear
         /(?:happy|glad)\s*(?:\w+\s+)*?(he(?:ar|lp))/,
         // You're/that's awesome!
-        /(?:you(['’]?re|\s+are)?|that['’]?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
+        /(?:you(r|['’]?re|\s+are)?|that['’]?s)\s+(?:a(?:\s+rock\s+star|mazing|wesome)|incredible|brilliant|wonderful|rock|perfect)[.!]?/,
         // Any help would be appreciated
         /(?:Any\s+help\s+would\s+be\s+(?:a(?:ppreciated|wesome)|wonderful|great))/,
         // That's what I was looking for/that's it
-        /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s\s*it)[.!]?/,
+        /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
         // Happy coding
         /(?:happy\s+coding)/,
         /*
