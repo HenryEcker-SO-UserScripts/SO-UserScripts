@@ -257,7 +257,7 @@ GM_config.init({
     }
 
     // Prime last successful read
-    let lastSuccessfulRead = new Date(getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE());
+    let lastSuccessfulRead = Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE()) / 1000);
 
     const main = async (mainInterval) => {
         let toDate = Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000);
