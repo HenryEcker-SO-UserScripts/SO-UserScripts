@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.9
+// @version      1.6.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -79,6 +79,12 @@ const getOffset = (hours) => {
     return new Date() - (hours * 60 * 60 * 1000)
 }
 
+
+const displayErr = (err, msg, comment) => {
+    console.error(err);
+    console.log(msg);
+    console.log("Would've autoflagged", comment._id, "(", comment.link, ")");
+}
 
 /* Configurable Options */
 GM_config.init({
@@ -283,7 +289,7 @@ GM_config.init({
                 .filter(comment => {
                     if (comment.blacklist_matches && !comment.body.match(whitelist)) {
                         let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body_length);
-                        console.log(comment.blacklist_matches, noiseRatio, comment.link);
+                        // console.log(comment.blacklist_matches, noiseRatio, comment.link);
 
                         return noiseRatio >= GM_config.get('CERTAINTY');
                     } else {
@@ -296,7 +302,7 @@ GM_config.init({
                             // "Open" comment flagging dialog to get remaining Flag Count
                             getFlagQuota(comment._id).then(remainingFlags => {
                                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
-                                    console.log("Out of flags. Stopping script");
+                                    console.log("Remaining flags at or below specified limit. Stopping script");
                                     clearInterval(mainInterval);
                                     return; // Exit so nothing tries to be flagged
                                 }
@@ -306,15 +312,24 @@ GM_config.init({
                                         !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
                                         // Flag post
-                                        console.log("Would've autoflagged", comment._id, "(", comment.link, ")");
-                                        // flagComment(fkey, elem.comment_id); // Autoflagging
+                                        console.log("Simulated flag", comment._id, "(", comment.link, ")");
+                                        // Autoflagging
+                                        // flagComment(fkey, elem.comment_id)
+                                        //     .then(() => {
+                                        //         console.log("Successfully Flagged", comment._id, "(", comment.link, ")");
+                                        //     })
+                                        //     .catch(err => displayErr(
+                                        //         err,
+                                        //         "Most likely cause is due to a flagging rate limit of 5 seconds conflicting with another flag attempt",
+                                        //         comment
+                                        //     ));
                                     }
                                 });
-                            }).catch(err => {
-                                console.error(err);
-                                console.log("Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.");
-                                console.log("Would've autoflagged", comment._id, "(", comment.link, ")");
-                            });
+                            }).catch(err => displayErr(
+                                err,
+                                "Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.",
+                                comment
+                            ));
                         }, idx * FLAG_RATE);
                     }
                 });
