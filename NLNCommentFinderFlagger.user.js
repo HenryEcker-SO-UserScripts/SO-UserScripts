@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.5.8
+// @version      1.5.9
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -60,11 +60,11 @@ const flagComment = (fkey, commentID) => {
 };
 
 /* General Utility Functions */
-const calcNoiseRatio = (matches, body) => {
+const calcNoiseRatio = (matches, bodyLength) => {
     let lengthWeight = matches.reduce((total, match) => {
         return total + match.length
     }, 0);
-    return lengthWeight / body.length * 100;
+    return lengthWeight / bodyLength * 100;
 }
 
 const mergeRegexes = (arrRegex, flags) => {
@@ -269,10 +269,10 @@ GM_config.init({
                 .filter(comment => postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) // Easy excludes before doing regex
                 .map(comment => {
                     let decodedMarkdown = comment.body_markdown.htmlDecode();
-                    console.log(decodedMarkdown, comment.link);
                     return {
                         can_flag: comment.can_flag,
                         body: decodedMarkdown,
+                        body_length: decodedMarkdown.replace(/\B@\w+/g, '').length, // Don't include at mentions in length of string
                         link: comment.link,
                         _id: comment.comment_id,
                         post_id: comment.post_id,
@@ -282,7 +282,7 @@ GM_config.init({
                 })
                 .filter(comment => {
                     if (comment.blacklist_matches && !comment.body.match(whitelist)) {
-                        let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body);
+                        let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body_length);
                         console.log(comment.blacklist_matches, noiseRatio, comment.link);
 
                         return noiseRatio >= GM_config.get('CERTAINTY');
