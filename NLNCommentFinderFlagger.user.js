@@ -80,10 +80,14 @@ const getOffset = (hours) => {
 }
 
 
+const formatComment = (comment) => {
+    return `${comment.noise_ratio} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
+}
+
 const displayErr = (err, msg, comment) => {
     console.error(err);
     console.log(msg);
-    console.log("Would've autoflagged", comment.noise_ratio, "(", comment.link, ")");
+    console.log("Would've autoflagged", formatComment(comment));
 }
 
 /* Configurable Options */
@@ -313,11 +317,11 @@ GM_config.init({
                                         !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
                                         // Flag post
-                                        console.log("Simulated flag", comment.noise_ratio, "(", comment.link, ")");
+                                        console.log("Simulated flag", formatComment(comment));
                                         // Autoflagging
                                         // flagComment(fkey, elem.comment_id)
                                         //     .then(() => {
-                                        //         console.log("Successfully Flagged", comment._id, "(", comment.link, ")");
+                                        //         console.log("Successfully Flagged", formatComment(comment));
                                         //     })
                                         //     .catch(err => displayErr(
                                         //         err,
