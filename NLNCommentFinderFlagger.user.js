@@ -81,7 +81,7 @@ const getOffset = (hours) => {
 
 
 const formatComment = (comment) => {
-    return `${comment.noise_ratio} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
+    return `${comment.noise_ratio.toFixed(2)}% [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
 const displayErr = (err, msg, comment) => {
@@ -336,6 +336,8 @@ GM_config.init({
                                 comment
                             ));
                         }, idx * FLAG_RATE);
+                    } else {
+                        console.log("Flag candidate", formatComment(comment));
                     }
                 });
         }
