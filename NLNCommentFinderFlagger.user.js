@@ -319,7 +319,7 @@ GM_config.init({
                                         // Flag post
                                         console.log("Simulated flag", formatComment(comment));
                                         // Autoflagging
-                                        // flagComment(fkey, elem.comment_id)
+                                        // flagComment(fkey, comment._id)
                                         //     .then(() => {
                                         //         console.log("Successfully Flagged", formatComment(comment));
                                         //     })
