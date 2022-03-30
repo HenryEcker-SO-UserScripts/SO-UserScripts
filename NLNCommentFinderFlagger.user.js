@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.1
+// @version      1.6.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -188,11 +188,11 @@ GM_config.init({
     const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000; // Function call to allow changing delay without needing to reload the page
 
     // Add Config Button
-    const settingsButton = $('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="-link">⚙</span>');
+    const settingsButton = $('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
     settingsButton.on('click', () => GM_config.open());
-    const li = $('<li class="-item"></li>')
+    const li = $('<li></li>')
     li.append(settingsButton);
-    $('header ol.user-logged-in > li:nth-child(3)').before(li);
+    $('header ol.s-topbar--content > li:nth-child(2)').after(li);
     const fkey = StackExchange.options.user.fkey;
 
     const blacklist = mergeRegexes([
