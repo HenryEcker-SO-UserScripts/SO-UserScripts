@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.2
+// @version      1.6.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -260,11 +260,12 @@ GM_config.init({
     let lastSuccessfulRead = new Date(getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE());
 
     const main = async (mainInterval) => {
+        let toDate = Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000);
         let response = await getComments(
             AUTH_STR,
             COMMENT_FILTER,
             Math.floor(lastSuccessfulRead / 1000),
-            Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000)
+            toDate
         );
         if (response.quota_remaining <= GM_config.get('API_QUOTA_LIMIT')) {
             clearInterval(mainInterval);
@@ -273,7 +274,7 @@ GM_config.init({
         if (response.hasOwnProperty('items') && response.items.length > 0) {
 
             // Update last successful read time
-            lastSuccessfulRead = getOffset(GM_config.get('HOUR_OFFSET')) + 1;
+            lastSuccessfulRead = toDate + 1;
 
             response.items
                 .reduce((acc, comment) => {
