@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.0
+// @version      1.6.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -83,7 +83,7 @@ const getOffset = (hours) => {
 const displayErr = (err, msg, comment) => {
     console.error(err);
     console.log(msg);
-    console.log("Would've autoflagged", comment._id, "(", comment.link, ")");
+    console.log("Would've autoflagged", comment.noise_ratio, "(", comment.link, ")");
 }
 
 /* Configurable Options */
@@ -272,30 +272,31 @@ GM_config.init({
             lastSuccessfulRead = getOffset(GM_config.get('HOUR_OFFSET')) + 1;
 
             response.items
-                .filter(comment => postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) // Easy excludes before doing regex
-                .map(comment => {
-                    let decodedMarkdown = comment.body_markdown.htmlDecode();
-                    return {
-                        can_flag: comment.can_flag,
-                        body: decodedMarkdown,
-                        body_length: decodedMarkdown.replace(/\B@\w+/g, '').length, // Don't include at mentions in length of string
-                        link: comment.link,
-                        _id: comment.comment_id,
-                        post_id: comment.post_id,
-                        post_type: comment.post_type,
-                        blacklist_matches: decodedMarkdown.replace(/`.*`/g, '').match(blacklist) // exclude code from analysis
+                .reduce((acc, comment) => {
+                    if (postTypeFilter(comment.post_type) && comment.body_markdown.length <= GM_config.get('MAXIMUM_LENGTH_COMMENT')) {
+                        const decodedMarkdown = comment.body_markdown.htmlDecode();
+                        const blacklistMatches = decodedMarkdown.replace(/`.*`/g, '').match(blacklist); // exclude code from analysis
+                        if (blacklistMatches && !decodedMarkdown.match(whitelist)) {
+                            const noiseRatio = calcNoiseRatio(
+                                blacklistMatches,
+                                decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
+                            );
+                            if (noiseRatio >= GM_config.get('CERTAINTY')) {
+                                acc.push({
+                                    can_flag: comment.can_flag,
+                                    body: decodedMarkdown,
+                                    link: comment.link,
+                                    _id: comment.comment_id,
+                                    post_id: comment.post_id,
+                                    post_type: comment.post_type,
+                                    blacklist_matches: blacklistMatches,
+                                    noise_ratio: noiseRatio
+                                })
+                            }
+                        }
                     }
-                })
-                .filter(comment => {
-                    if (comment.blacklist_matches && !comment.body.match(whitelist)) {
-                        let noiseRatio = calcNoiseRatio(comment.blacklist_matches, comment.body_length);
-                        // console.log(comment.blacklist_matches, noiseRatio, comment.link);
-
-                        return noiseRatio >= GM_config.get('CERTAINTY');
-                    } else {
-                        return false;
-                    }
-                })
+                    return acc;
+                }, [])
                 .forEach((comment, idx) => {
                     if (GM_config.get('AUTO_FLAG')) {
                         setTimeout(() => {
@@ -312,7 +313,7 @@ GM_config.init({
                                         !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
                                         // Flag post
-                                        console.log("Simulated flag", comment._id, "(", comment.link, ")");
+                                        console.log("Simulated flag", comment.noise_ratio, "(", comment.link, ")");
                                         // Autoflagging
                                         // flagComment(fkey, elem.comment_id)
                                         //     .then(() => {
