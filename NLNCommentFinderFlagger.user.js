@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.3
+// @version      1.6.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -212,6 +212,8 @@ GM_config.init({
         /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
         // Happy coding
         /(?:happy\s+coding)/,
+        // TRE('bro', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'mate', 'sir')
+        /\b(?:b(?:ud(?:dy)?|ro)|ma(?:te|n)|friend|amigo|homie|dude|pal|sir)\b/,
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
