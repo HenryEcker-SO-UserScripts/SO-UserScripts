@@ -53,7 +53,7 @@ const flagComment = (fkey, commentID) => {
     fd.set('fkey', fkey);
     fd.set('otherText', "");
     fd.set('overrideWarning', true);
-    return fetch(`https://stackoverflow.com/flags/comments/${commentID}/add/39`, {
+    return fetch(`https://${location.hostname}/flags/comments/${commentID}/add/39`, {
         method: "POST",
         body: new URLSearchParams(fd)
     })
