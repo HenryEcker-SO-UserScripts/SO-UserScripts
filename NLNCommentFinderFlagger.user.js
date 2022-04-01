@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.4
+// @version      1.6.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -185,7 +185,7 @@ GM_config.init({
     const AUTH_STR = `site=${SITE_NAME}&access_token=${ACCESS_TOKEN}&key=${KEY}`;
     const COMMENT_FILTER = '!SVaJvZISgqg34qVVD)';
     const FLAG_RATE = 7 * 1000;
-    const API_REQUEST_RATE = () => GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000; // Function call to allow changing delay without needing to reload the page
+    const API_REQUEST_RATE = GM_config.get('DELAY_BETWEEN_API_CALLS') * 1000;
 
     // Add Config Button
     const settingsButton = $('<span title="NLN Comment Finder/Flagger Settings" style="font-size:15pt;cursor: pointer;" class="s-topbar--item">⚙</span>');
@@ -259,7 +259,7 @@ GM_config.init({
     }
 
     // Prime last successful read
-    let lastSuccessfulRead = Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE()) / 1000);
+    let lastSuccessfulRead = Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
 
     const main = async (mainInterval) => {
         let toDate = Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000);
@@ -349,6 +349,6 @@ GM_config.init({
         if (GM_config.get('RUN_IMMEDIATELY')) {
             main(undefined);
         }
-        let mainInterval = setInterval(() => main(mainInterval), API_REQUEST_RATE());
+        let mainInterval = setInterval(() => main(mainInterval), API_REQUEST_RATE);
     }
 })();
