@@ -27,11 +27,11 @@ const reduceObjectToSettableType = (o, t) => {
 }
 
 const getFormDataFromObject = (o) => {
-    return reduceObjectToSettableType(o, new URLSearchParams());
+    return reduceObjectToSettableType(o, new FormData());
 }
 
 const getURLSearchParamsFromObject = (o) => {
-    return reduceObjectToSettableType(o, new FormData());
+    return reduceObjectToSettableType(o, new URLSearchParams());
 }
 
 const mergeRegexes = (arrRegex, flags) => {
