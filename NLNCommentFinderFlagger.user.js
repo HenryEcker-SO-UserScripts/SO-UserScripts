@@ -19,11 +19,11 @@
 
 
 /* General Utility Functions */
-const reduceObjectToSettableType = (o, t) => {
-    return Object.entries(o).reduce((acc, [k, v]) => {
-        acc.set(k, v);
+const reduceObjectToSettableType = (obj, initialAcc) => {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+        acc.set(key, value);
         return acc;
-    }, t);
+    }, initialAcc);
 }
 
 const getFormDataFromObject = (o) => {
