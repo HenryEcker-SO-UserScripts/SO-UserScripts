@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.5
+// @version      1.6.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -18,17 +18,62 @@
 /* globals $, StackExchange, GM_config */
 
 
+/* General Utility Functions */
+const reduceObjectToSettableType = (o, t) => {
+    return Object.entries(o).reduce((acc, [k, v]) => {
+        acc.set(k, v);
+        return acc;
+    }, t);
+}
+
+const getFormDataFromObject = (o) => {
+    return reduceObjectToSettableType(o, new URLSearchParams());
+}
+
+const getURLSearchParamsFromObject = (o) => {
+    return reduceObjectToSettableType(o, new FormData());
+}
+
+const mergeRegexes = (arrRegex, flags) => {
+    return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
+}
+String.prototype.htmlDecode = function () {
+    return new DOMParser().parseFromString(this, "text/html").documentElement.textContent;
+}
+
+/* Script Specific Utility Functions */
+const calcNoiseRatio = (matches, bodyLength) => {
+    let lengthWeight = matches.reduce((total, match) => {
+        return total + match.length
+    }, 0);
+    return lengthWeight / bodyLength * 100;
+}
+
+const getOffset = (hours) => {
+    return new Date() - (hours * 60 * 60 * 1000)
+}
+
+const formatComment = (comment) => {
+    return `${comment.noise_ratio.toFixed(2)}% [${comment.blacklist_matches.join(',')}] (${comment.link})`;
+}
+
+const displayErr = (err, msg, comment) => {
+    console.error(err);
+    console.log(msg);
+    console.log("Would've autoflagged", formatComment(comment));
+}
+
+
 /* Functions that make external requests */
 const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) => {
-    let usp = new URLSearchParams();
-    usp.set('pagesize', '100');
-    usp.set('order', 'desc');
-    usp.set('sort', 'creation');
-    usp.set('filter', COMMENT_FILTER);
-    usp.set('fromdate', FROM_DATE);
-    if (TO_DATE) {
-        usp.set('todate', TO_DATE);
-    }
+    let usp = getURLSearchParamsFromObject({
+        'pagesize': 100,
+        'order': 'desc',
+        'sort': 'creation',
+        'filter': COMMENT_FILTER,
+        'fromdate': FROM_DATE,
+        ...(TO_DATE && {'todate': TO_DATE})
+    });
     return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`).then(res => res.json());
 };
 
@@ -49,46 +94,15 @@ const getFlagQuota = (commentID) => {
 }
 
 const flagComment = (fkey, commentID) => {
-    const fd = new FormData();
-    fd.set('fkey', fkey);
-    fd.set('otherText', "");
-    fd.set('overrideWarning', true);
     return fetch(`https://${location.hostname}/flags/comments/${commentID}/add/39`, {
         method: "POST",
-        body: new URLSearchParams(fd)
+        body: getFormDataFromObject({
+            'fkey': fkey,
+            'otherText': "",
+            'overrideWarning': true
+        })
     })
 };
-
-/* General Utility Functions */
-const calcNoiseRatio = (matches, bodyLength) => {
-    let lengthWeight = matches.reduce((total, match) => {
-        return total + match.length
-    }, 0);
-    return lengthWeight / bodyLength * 100;
-}
-
-const mergeRegexes = (arrRegex, flags) => {
-    return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
-}
-
-String.prototype.htmlDecode = function () {
-    return new DOMParser().parseFromString(this, "text/html").documentElement.textContent;
-}
-
-const getOffset = (hours) => {
-    return new Date() - (hours * 60 * 60 * 1000)
-}
-
-
-const formatComment = (comment) => {
-    return `${comment.noise_ratio.toFixed(2)}% [${comment.blacklist_matches.join(',')}] (${comment.link})`;
-}
-
-const displayErr = (err, msg, comment) => {
-    console.error(err);
-    console.log(msg);
-    console.log("Would've autoflagged", formatComment(comment));
-}
 
 /* Configurable Options */
 GM_config.init({
