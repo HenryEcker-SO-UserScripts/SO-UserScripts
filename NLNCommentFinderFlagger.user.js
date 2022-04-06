@@ -67,10 +67,6 @@ const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) =
     return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`).then(res => res.json());
 };
 
-const checkFlagOptions = (AUTH_STR, commentID) => {
-    return fetch(`https://api.stackexchange.com/2.3/comments/${commentID}/flags/options?${AUTH_STR}`).then(res => res.json())
-};
-
 const getFlagQuota = (commentID) => {
     return new Promise((resolve, reject) => {
         $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
@@ -517,32 +513,25 @@ class NLNUI {
                                     clearInterval(mainInterval);
                                     return; // Exit so nothing tries to be flagged
                                 }
-                                checkFlagOptions(AUTH_STR, comment._id).then((flagOptions) => {
-                                    if (
-                                        flagOptions.hasOwnProperty('items') &&
-                                        !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
-                                    ) {
-                                        // Autoflagging
-                                        flagComment(fkey, comment._id)
-                                            .then((res) => {
-                                                if (res.status === 200) {
-                                                    console.log("Successfully Flagged", formatComment(comment));
-                                                    UI.addComment(comment, true);
-                                                } else {
-                                                    UI.addComment(comment, false);
-                                                }
-                                            })
-                                            .catch(err => {
-                                                displayErr(
-                                                    err,
-                                                    "Some issue occurred when attempting to flag",
-                                                    comment
-                                                )
-                                                // Add to UI with can_flag false to render the 🚫
-                                                UI.addComment({...comment, can_flag: false}, true);
-                                            });
-                                    }
-                                });
+                                // Autoflagging
+                                flagComment(fkey, comment._id)
+                                    .then((res) => {
+                                        if (res.status === 200) {
+                                            console.log("Successfully Flagged", formatComment(comment));
+                                            UI.addComment(comment, true);
+                                        } else {
+                                            UI.addComment(comment, false);
+                                        }
+                                    })
+                                    .catch(err => {
+                                        displayErr(
+                                            err,
+                                            "Some issue occurred when attempting to flag",
+                                            comment
+                                        )
+                                        // Add to UI with can_flag false to render the 🚫
+                                        UI.addComment({...comment, can_flag: false}, true);
+                                    });
                             }).catch(err => displayErr(
                                 err,
                                 "Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.",
