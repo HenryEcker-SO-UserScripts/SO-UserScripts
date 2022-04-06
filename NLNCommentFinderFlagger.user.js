@@ -159,8 +159,15 @@ GM_config.init({
             'min': 0,
             'default': 0
         },
-        'CERTAINTY': {
-            'label': 'How certain should the script be to display comment (or autoflag if checked) (out of 100)',
+        'DISPLAY_CERTAINTY': {
+            'label': 'How certain should the script be to display in UI (out of 100)',
+            'type': 'unsigned float',
+            'min': 0,
+            'max': 100,
+            'default': 25
+        },
+        'AUTOFLAG_CERTAINTY': {
+            'label': 'How certain should the script be to autoflag if checked (out of 100)',
             'type': 'unsigned float',
             'min': 25,
             'max': 100,
@@ -480,25 +487,29 @@ class NLNUI {
                                 blacklistMatches,
                                 decodedMarkdown.replace(/\B@\w+/g, '').length// Don't include at mentions in length of string
                             );
-                            if (noiseRatio >= GM_config.get('CERTAINTY')) {
-                                acc.push({
-                                    can_flag: comment.can_flag,
-                                    body: decodedMarkdown,
-                                    link: comment.link,
-                                    _id: comment.comment_id,
-                                    post_id: comment.post_id,
-                                    post_type: comment.post_type,
-                                    blacklist_matches: blacklistMatches,
-                                    noise_ratio: noiseRatio
-                                });
+                            const newComment = {
+                                can_flag: comment.can_flag,
+                                body: decodedMarkdown,
+                                link: comment.link,
+                                _id: comment.comment_id,
+                                post_id: comment.post_id,
+                                post_type: comment.post_type,
+                                blacklist_matches: blacklistMatches,
+                                noise_ratio: noiseRatio
+                            };
+                            if (noiseRatio >= GM_config.get('AUTOFLAG_CERTAINTY')) {
+                                acc.push(newComment);
+                            } else if (noiseRatio >= GM_config.get('DISPLAY_CERTAINTY')) {
+                                // Isn't an autoflag_candidate
+                                UI.addComment(newComment, false);
                             }
                         }
                     }
                     return acc;
                 }, [])
                 .forEach((comment, idx) => {
-                    setTimeout(() => {
-                        if (GM_config.get('AUTO_FLAG')) {
+                    if (GM_config.get('AUTO_FLAG')) {
+                        setTimeout(() => {
                             // "Open" comment flagging dialog to get remaining Flag Count
                             getFlagQuota(comment._id).then(remainingFlags => {
                                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
@@ -540,11 +551,11 @@ class NLNUI {
                                 "Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.",
                                 comment
                             ));
-                        } else {
-                            console.log("Flag candidate", formatComment(comment));
-                            UI.addComment(comment, false);
-                        }
-                    }, idx * FLAG_RATE);
+                        }, idx * FLAG_RATE);
+                    } else {
+                        console.log("Flag candidate", formatComment(comment));
+                        UI.addComment(comment, false);
+                    }
                 });
         }
     };
