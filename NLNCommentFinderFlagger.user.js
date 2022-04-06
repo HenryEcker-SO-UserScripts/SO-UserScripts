@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.2
+// @version      1.7.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -160,7 +160,7 @@ GM_config.init({
             'default': 0
         },
         'CERTAINTY': {
-            'label': 'How Certain should the script be to autoflag (out of 100)',
+            'label': 'How certain should the script be to display comment (or autoflag if checked) (out of 100)',
             'type': 'unsigned float',
             'min': 25,
             'max': 100,
@@ -207,30 +207,55 @@ class NLNUI {
             tableId: "NLN_Comment_Reports_Table",
             tableBodyId: "NLN_Comment_Reports_Table_Body"
         };
+        this.SOClasses = {
+            tableContainerDiv: 's-table-container',
+            table: 's-table'
+        }
         this.tableData = {};
+        this.buildBaseStyles();
         this.buildBaseUI();
     }
 
+    buildBaseStyles() {
+        // Add Styles
+        const styles = document.createElement('style');
+        styles.innerHTML = `
+#${this.htmlIds.containerDivId} {
+    padding: 25px 0;
+}
+`;
+        document.body.appendChild(styles);
+    }
+
     buildBaseUI() {
-        const container = $(`<div id="${this.htmlIds.containerDivId}"></div>`);
-        this.table = $(`<table id="${this.htmlIds.tableId}"></table>`);
-        const thead = $('<thead></thead>')
-        const tr = $('<tr></tr>')
-        tr.append($('<th>Comment Text</th>'));
-        if (this.uiConfig.displayLink) {
-            tr.append($('<th>Link</th>'));
+        const container = $(`<div id="${this.htmlIds.containerDivId}""></div>`);
+        // Header Elements
+        {
+            container.append($(`<h2>NLN Comments</h2>`))
         }
-        if (this.uiConfig.displayNoiseRatio) {
-            tr.append($('<th>Noise Ratio</th>'));
+        // Build Table
+        {
+            const tableContainer = $(`<div class="${this.SOClasses.tableContainerDiv}"></div>`);
+            const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SOClasses.table}"></table>`);
+            const thead = $('<thead></thead>')
+            const tr = $('<tr></tr>')
+            tr.append($('<th>Comment Text</th>'));
+            if (this.uiConfig.displayLink) {
+                tr.append($('<th>Link</th>'));
+            }
+            if (this.uiConfig.displayNoiseRatio) {
+                tr.append($('<th>Noise Ratio</th>'));
+            }
+            if (this.uiConfig.displayFlagUI) {
+                tr.append($('<th>Flag</th>'));
+            }
+            tr.append($('<th>Clear</th>'));
+            thead.append(tr);
+            table.append(thead);
+            table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
+            tableContainer.append(table);
+            container.append(tableContainer);
         }
-        if (this.uiConfig.displayFlagUI) {
-            tr.append($('<th>Flag</th>'));
-        }
-        tr.append($('<th>Clear</th>'));
-        thead.append(tr);
-        this.table.append(thead);
-        this.table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
-        container.append(this.table);
         this.mountPoint.before(container);
     }
 
@@ -312,9 +337,10 @@ class NLNUI {
                 }
             }, 0);
 
-            let title = document.title.replace(/^\(\d+\)\s+/, '');
+
+            let title = document.title.replace(/^(\(\d+\)\s+)+/, '');
             if (pending > 0) {
-                title = `(${pending}) ${document.title}`;
+                title = `(${pending}) ${title}`;
             }
             document.title = title;
         }
@@ -467,8 +493,8 @@ class NLNUI {
                     return acc;
                 }, [])
                 .forEach((comment, idx) => {
-                    if (GM_config.get('AUTO_FLAG')) {
-                        setTimeout(() => {
+                    setTimeout(() => {
+                        if (GM_config.get('AUTO_FLAG')) {
                             // "Open" comment flagging dialog to get remaining Flag Count
                             getFlagQuota(comment._id).then(remainingFlags => {
                                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
@@ -506,11 +532,11 @@ class NLNUI {
                                 "Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.",
                                 comment
                             ));
-                        }, idx * FLAG_RATE);
-                    } else {
-                        console.log("Flag candidate", formatComment(comment));
-                        UI.addComment(comment, false);
-                    }
+                        } else {
+                            console.log("Flag candidate", formatComment(comment));
+                            UI.addComment(comment, false);
+                        }
+                    }, idx * FLAG_RATE);
                 });
         }
     };
