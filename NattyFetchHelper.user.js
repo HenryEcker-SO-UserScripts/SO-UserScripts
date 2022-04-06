@@ -3,7 +3,7 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.3
+// @version      1.1.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
@@ -22,6 +22,12 @@ GM_config.init({
     'id': 'Natty_Fetch_Helper_Config',
     'title': 'Natty Fetch Helper Config',
     'fields': {
+        'TYPE_TO_FETCH': {
+            'label': 'Type to fetch',
+            'type': 'select',
+            'options': ['links', 'sentinel'],
+            'default': 'links'
+        },
         'ROWS_TO_FETCH': {
             'label': 'Number of rows to request per message',
             'type': 'int',
@@ -36,7 +42,10 @@ GM_config.init({
     'use strict';
 
     const STATIC_CONFIG = {
-        'linksMaxRowLength': 11,
+        'maxRowLengths': {
+            'links': 11,
+            'sentinel': 8,
+        },
         'countAlias': ['count', 'amount', 'number']
     };
 
@@ -61,14 +70,18 @@ GM_config.init({
             // Do Nothing
         }).catch((res) => {
             // Log For Safety
-            console.log('Something went wrong!');
-            console.log(res);
+            console.error('Something went wrong!');
+            console.error(res);
         });
     };
 
     const makeButtons = () => {
         const fetchLinksButton = $('<button class="button" style="margin-left: 5px">Fetch Links</button>');
-        fetchLinksButton.on('click', sendMessageOnButtonClick(() => `@Natty fetch links ${GM_config.get('ROWS_TO_FETCH') * STATIC_CONFIG.linksMaxRowLength}`));
+        fetchLinksButton.on('click', sendMessageOnButtonClick(() => {
+            const fetchType = GM_config.get('TYPE_TO_FETCH');
+            const numberOfPosts = GM_config.get('ROWS_TO_FETCH') * STATIC_CONFIG.maxRowLengths[fetchType];
+            return `@Natty fetch ${fetchType} ${numberOfPosts}`;
+        }));
 
         const fetchCountButton = $('<button class="button" style="margin-left: 5px">Fetch Count</button>');
         fetchCountButton.on('click', sendMessageOnButtonClick(() => `@Natty fetch ${STATIC_CONFIG.countAlias.sample()}`));
