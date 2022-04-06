@@ -522,9 +522,6 @@ class NLNUI {
                                         flagOptions.hasOwnProperty('items') &&
                                         !flagOptions.items.some(e => e.has_flagged) // Ensure not already flagged in some way
                                     ) {
-                                        // Flag post
-                                        console.log("Simulated flag", formatComment(comment));
-                                        UI.addComment(comment, true);
                                         // Autoflagging
                                         flagComment(fkey, comment._id)
                                             .then((res) => {
