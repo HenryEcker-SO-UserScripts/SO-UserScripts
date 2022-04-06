@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.3
+// @version      1.7.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -91,7 +91,7 @@ const flagComment = (fkey, commentID) => {
             'otherText': "",
             'overrideWarning': true
         })
-    })
+    });
 };
 
 /* Configurable Options */
@@ -305,8 +305,12 @@ class NLNUI {
     }
 
     handleFlagComment(fkey, comment_id) {
-        flagComment(this.fkey, comment_id).then(() => {
-            this.tableData[comment_id].was_flagged = true;
+        flagComment(this.fkey, comment_id).then((res) => {
+            if (res.status === 200) {
+                this.tableData[comment_id].was_flagged = true;
+            } else if (res.status === 409) {
+                alert('Flagging too fast!');
+            }
         }).catch(() => {
             this.tableData[comment_id].can_flag = false;
         }).finally(() => {
@@ -512,14 +516,18 @@ class NLNUI {
                                         UI.addComment(comment, true);
                                         // Autoflagging
                                         flagComment(fkey, comment._id)
-                                            .then(() => {
-                                                console.log("Successfully Flagged", formatComment(comment));
-                                                UI.addComment(comment, true);
+                                            .then((res) => {
+                                                if (res.status === 200) {
+                                                    console.log("Successfully Flagged", formatComment(comment));
+                                                    UI.addComment(comment, true);
+                                                } else {
+                                                    UI.addComment(comment, false);
+                                                }
                                             })
                                             .catch(err => {
                                                 displayErr(
                                                     err,
-                                                    "Most likely cause is due to a flagging rate limit of 5 seconds conflicting with another flag attempt",
+                                                    "Some issue occurred when attempting to flag",
                                                     comment
                                                 )
                                                 // Add to UI with can_flag false to render the 🚫
