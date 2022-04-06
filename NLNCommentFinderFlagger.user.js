@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.4
+// @version      1.7.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -274,7 +274,7 @@ class NLNUI {
             tr.append(`<td>${comment.body}</td>`);
 
             if (this.uiConfig.displayLink) {
-                tr.append(`<td><a href="${comment.link}" target="_blank">Link</a></td>`);
+                tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
             }
 
             if (this.uiConfig.displayNoiseRatio) {
