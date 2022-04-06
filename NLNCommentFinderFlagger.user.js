@@ -101,7 +101,7 @@ GM_config.init({
     'fields': {
         'SITE_NAME': {
             'label': 'Site Name',
-            'section': ['API Information'],
+            'section': ['API Information (Changes will take affect on page refresh)'],
             'type': 'text',
             'default': 'stackoverflow'
         },
@@ -175,7 +175,7 @@ GM_config.init({
         },
         'DOCUMENT_TITLE_SHOULD_UPDATE': {
             'label': 'Update Title with number of pending comments for review: ',
-            'section': ['UI Config'],
+            'section': ['UI Config (Changes will take affect on page refresh)'],
             'type': 'checkbox',
             'default': true
         },
