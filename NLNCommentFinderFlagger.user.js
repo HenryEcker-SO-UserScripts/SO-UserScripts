@@ -418,7 +418,7 @@ class NLNUI {
     ], 'gi');
 
     const whitelist = mergeRegexes([
-        /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but)\b/,
+        /\b(?:n(?:eed|ot)|unfortunate(ly)?|persists?|require|but|unaccept(ed)?)\b/,
         /*
         bases = ["would", "could", "should",
                  "do", "did", "does",
@@ -428,7 +428,6 @@ class NLNUI {
          suffixes = ["n't", "n’t", "n'", "n’", "nt"]
          */
         /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|wouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
-        /\bunaccepted\b/,
         /[?]/
     ], 'gi');
 
