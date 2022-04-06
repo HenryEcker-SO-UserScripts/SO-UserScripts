@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.6
+// @version      1.7.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -192,6 +192,11 @@ GM_config.init({
             'type': 'checkbox',
             'default': true
         },
+        'UI_DISPLAY_BLACKLIST_MATCHES': {
+            'label': 'Display Blacklist Matches: ',
+            'type': 'checkbox',
+            'default': true
+        },
         'UI_DISPLAY_FLAG_BUTTON': {
             'label': 'Display Flag button: ',
             'type': 'checkbox',
@@ -246,6 +251,9 @@ class NLNUI {
             if (this.uiConfig.displayLink) {
                 tr.append($('<th>Link</th>'));
             }
+            if (this.uiConfig.displayBlacklistMatches) {
+                tr.append($('<th>Blacklist Matches</th>'));
+            }
             if (this.uiConfig.displayNoiseRatio) {
                 tr.append($('<th>Noise Ratio</th>'));
             }
@@ -258,6 +266,15 @@ class NLNUI {
             table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
             tableContainer.append(table);
             container.append(tableContainer);
+        }
+        // After
+        {
+            const clearAllButton = $('<button>Clear All</button>');
+            clearAllButton.on('click', () => {
+                this.tableData = {};
+                this.render();
+            })
+            container.append(clearAllButton);
         }
         this.mountPoint.before(container);
     }
@@ -272,7 +289,9 @@ class NLNUI {
             if (this.uiConfig.displayLink) {
                 tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
             }
-
+            if (this.uiConfig.displayBlacklistMatches) {
+                tr.append(`<td>${comment.blacklist_matches.map(e => `"${e}"`).join(', ')}</td>`);
+            }
             if (this.uiConfig.displayNoiseRatio) {
                 tr.append(`<td>${formatNoiseRatio(comment.noise_ratio)}</td>`);
             }
@@ -345,7 +364,7 @@ class NLNUI {
             }, 0);
 
 
-            let title = document.title.replace(/^(\(\d+\)\s+)+/, '');
+            let title = document.title.replace(/^\(\d+\)\s+/, '');
             if (pending > 0) {
                 title = `(${pending}) ${title}`;
             }
@@ -394,8 +413,8 @@ class NLNUI {
         /((?:\w+\s+)*?(?:looking\s*for)|that['’]?s?\s*it)[.!]?/,
         // Happy coding
         /(?:happy\s+coding)/,
-        // TRE('bro', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'mate', 'sir')
-        /\b(?:b(?:ud(?:dy)?|ro)|ma(?:te|n)|friend|amigo|homie|dude|pal|sir)\b/,
+        // TRE('bro', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'mate', 'sir', 'fam')
+        /\b(?:b(?:ud(?:dy)?|ro)|f(?:riend|am)|ma(?:te|n)|amigo|homie|dude|pal|sir)\b/,
         /*
          * Following rules modified from https://github.com/kamil-tekiela/commentBot/blob/master/src/Comment.php
          */
@@ -448,6 +467,7 @@ class NLNUI {
         displayLink: GM_config.get('UI_DISPLAY_LINK_TO_COMMENT'),
         displayNoiseRatio: GM_config.get('UI_DISPLAY_NOISE_RATIO'),
         displayFlagUI: GM_config.get('UI_DISPLAY_FLAG_BUTTON'),
+        displayBlacklistMatches: GM_config.get('UI_DISPLAY_BLACKLIST_MATCHES'),
         shouldUpdateTitle: GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE')
     });
     // Only Render if Active
