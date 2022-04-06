@@ -3,37 +3,23 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.6
+// @version      1.6.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
 // @include      *://stackoverflow.com/users/flag-summary/15497888?group=4*
 //
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @require      https://raw.githubusercontent.com/HenryEcker/SO-UserScripts/main/so_userscript_utils.js
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @run-at       document-end
 //
 // ==/UserScript==
-/* globals $, StackExchange, GM_config */
+/* globals $, StackExchange, GM_config, getURLSearchParamsFromObject, getFormDataFromObject */
 
 
 /* General Utility Functions */
-const reduceObjectToSettableType = (obj, initialAcc) => {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-        acc.set(key, value);
-        return acc;
-    }, initialAcc);
-}
-
-const getFormDataFromObject = (o) => {
-    return reduceObjectToSettableType(o, new FormData());
-}
-
-const getURLSearchParamsFromObject = (o) => {
-    return reduceObjectToSettableType(o, new URLSearchParams());
-}
-
 const mergeRegexes = (arrRegex, flags) => {
     return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
 }
