@@ -358,6 +358,7 @@ class NLNUI {
          suffixes = ["n't", "n’t", "n'", "n’", "nt"]
          */
         /(?:d(?:o(?:esn(?:'t?|’t?|t)|n(?:'t?|’t?|t))|idn(?:'t?|’t?|t))|c(?:ouldn(?:'t?|’t?|t)|an(?:'t?|’t?|t))|ha(?:ven(?:'t?|’t?|t)|sn(?:'t?|’t?|t))|a(?:ren(?:'t?|’t?|t)|in(?:'t?|’t?|t))|shouldn(?:'t?|’t?|t)|wouldn(?:'t?|’t?|t)|isn(?:'t?|’t?|t))/,
+        /\bunaccepted\b/,
         /[?]/
     ], 'gi');
 
@@ -444,8 +445,8 @@ class NLNUI {
                                         // Autoflagging
                                         flagComment(fkey, comment._id)
                                             .then(() => {
-                                                UI.addComment(comment, true);
                                                 console.log("Successfully Flagged", formatComment(comment));
+                                                UI.addComment(comment, true);
                                             })
                                             .catch(err => {
                                                 displayErr(
