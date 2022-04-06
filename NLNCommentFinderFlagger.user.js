@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.6.7
+// @version      1.7.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -39,14 +39,18 @@ const getOffset = (hours) => {
     return new Date() - (hours * 60 * 60 * 1000)
 }
 
+const formatNoiseRatio = (ratio) => {
+    return `${ratio.toFixed(2)}%`;
+}
+
 const formatComment = (comment) => {
-    return `${comment.noise_ratio.toFixed(2)}% [${comment.blacklist_matches.join(',')}] (${comment.link})`;
+    return `${formatNoiseRatio(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
 const displayErr = (err, msg, comment) => {
     console.error(err);
-    console.log(msg);
-    console.log("Would've autoflagged", formatComment(comment));
+    console.error(msg);
+    console.error("Would've autoflagged", formatComment(comment));
 }
 
 
@@ -172,6 +176,94 @@ GM_config.init({
     }
 });
 
+class NLNUI {
+    constructor(mountPoint, fkey, shouldUpdateTitle = true) {
+        this.mountPoint = mountPoint;
+        this.fkey = fkey;
+        this.shouldUpdateTitle = shouldUpdateTitle;
+        this.htmlIds = {
+            containerDivId: "NLN_Comment_Wrapper",
+            tableId: "NLN_Comment_Reports_Table",
+            tableBodyId: "NLN_Comment_Reports_Table_Body"
+        };
+        this.tableData = {};
+        this.buildBaseUI();
+    }
+
+    buildBaseUI() {
+        const container = $(`<div id="${this.htmlIds.containerDivId}"></div>`);
+        this.table = $(`<table id="${this.htmlIds.tableId}"></table>`);
+        this.table.append($(`<thead><tr><th>Comment Text</th><th>Link</th><th>Noise Ratio</th><th>Flag</th><th>Clear</th></tr></thead>`));
+        this.table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
+        container.append(this.table);
+        this.mountPoint.before(container);
+    }
+
+    render() {
+        const tbody = $(`#${this.htmlIds.tableBodyId}`);
+        tbody.empty();
+        Object.values(this.tableData).forEach(comment => {
+            const tr = $('<tr></tr>');
+            tr.append(`<td>${comment.body}</td>`);
+            tr.append(`<td><a href="${comment.link}" target="_blank">Link</a></td>`);
+            tr.append(`<td>${formatNoiseRatio(comment.noise_ratio)}</td>`);
+            // Flag Button/Indicators
+            if (!comment.can_flag) {
+                tr.append(`<td>🚫</td>`);
+            } else if (comment.hasOwnProperty('was_flagged') && comment.was_flagged) {
+                tr.append(`<td>✓</td>`);
+            } else {
+                const flagButton = $(`<button data-comment-id="${comment._id}">Flag</button>`);
+                flagButton.on('click', () => {
+                    flagButton.text('Flagging...');
+                    this.handleFlagComment(this.fkey, comment._id)
+                });
+                const td = $('<td></td>');
+                td.append(flagButton);
+                tr.append(td);
+            }
+            // Clear Button
+            {
+                const clearButton = $('<button>Clear</button>');
+                clearButton.on('click', () => this.removeComment(comment._id));
+                const clearButtonTD = $('<td></td>');
+                clearButtonTD.append(clearButton);
+                tr.append(clearButtonTD);
+            }
+            tbody.append(tr);
+        });
+    }
+
+    handleFlagComment(fkey, comment_id) {
+        flagComment(this.fkey, comment_id).then(() => {
+            this.tableData[comment_id].was_flagged = true;
+        }).catch(() => {
+            this.tableData[comment_id].can_flag = false;
+        }).finally(() => {
+            this.render();
+        });
+    }
+
+    addComment(comment, was_flagged = false) {
+        this.tableData[comment._id] = {
+            ...comment,
+            was_flagged: was_flagged
+        };
+        this.render();
+    }
+
+    removeComment(comment_id) {
+        delete this.tableData[comment_id];
+        this.render();
+    }
+
+    updatePageTitle() {
+        if (this.shouldUpdateTitle) {
+            // do something
+        }
+    }
+}
+
 (function () {
     'use strict';
 
@@ -261,6 +353,13 @@ GM_config.init({
     // Prime last successful read
     let lastSuccessfulRead = Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
 
+    // Build UI
+    let UI = new NLNUI($('#mainbar'), fkey, true);
+    // Only Render if Active
+    if (GM_config.get('ACTIVE')) {
+        UI.render();
+    }
+
     const main = async (mainInterval) => {
         let toDate = Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000);
         let response = await getComments(
@@ -298,7 +397,7 @@ GM_config.init({
                                     post_type: comment.post_type,
                                     blacklist_matches: blacklistMatches,
                                     noise_ratio: noiseRatio
-                                })
+                                });
                             }
                         }
                     }
@@ -321,16 +420,22 @@ GM_config.init({
                                     ) {
                                         // Flag post
                                         console.log("Simulated flag", formatComment(comment));
+                                        UI.addComment(comment, true);
                                         // Autoflagging
-                                        // flagComment(fkey, comment._id)
-                                        //     .then(() => {
-                                        //         console.log("Successfully Flagged", formatComment(comment));
-                                        //     })
-                                        //     .catch(err => displayErr(
-                                        //         err,
-                                        //         "Most likely cause is due to a flagging rate limit of 5 seconds conflicting with another flag attempt",
-                                        //         comment
-                                        //     ));
+                                        flagComment(fkey, comment._id)
+                                            .then(() => {
+                                                UI.addComment(comment, true);
+                                                console.log("Successfully Flagged", formatComment(comment));
+                                            })
+                                            .catch(err => {
+                                                displayErr(
+                                                    err,
+                                                    "Most likely cause is due to a flagging rate limit of 5 seconds conflicting with another flag attempt",
+                                                    comment
+                                                )
+                                                // Add to UI with can_flag false to render the 🚫
+                                                UI.addComment({...comment, can_flag: false}, true);
+                                            });
                                     }
                                 });
                             }).catch(err => displayErr(
@@ -341,6 +446,7 @@ GM_config.init({
                         }, idx * FLAG_RATE);
                     } else {
                         console.log("Flag candidate", formatComment(comment));
+                        UI.addComment(comment, false);
                     }
                 });
         }
