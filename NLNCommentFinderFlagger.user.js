@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.1
+// @version      1.7.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -179,14 +179,29 @@ GM_config.init({
             'type': 'checkbox',
             'default': true
         },
+        'UI_DISPLAY_LINK_TO_COMMENT': {
+            'label': 'Display Link to Comment: ',
+            'type': 'checkbox',
+            'default': true
+        },
+        'UI_DISPLAY_NOISE_RATIO': {
+            'label': 'Display Noise Ratio: ',
+            'type': 'checkbox',
+            'default': true
+        },
+        'UI_DISPLAY_FLAG_BUTTON': {
+            'label': 'Display Flag button: ',
+            'type': 'checkbox',
+            'default': true
+        },
     }
 });
 
 class NLNUI {
-    constructor(mountPoint, fkey, shouldUpdateTitle = true) {
+    constructor(mountPoint, fkey, uiConfig) {
         this.mountPoint = mountPoint;
         this.fkey = fkey;
-        this.shouldUpdateTitle = shouldUpdateTitle;
+        this.uiConfig = uiConfig;
         this.htmlIds = {
             containerDivId: "NLN_Comment_Wrapper",
             tableId: "NLN_Comment_Reports_Table",
@@ -199,7 +214,21 @@ class NLNUI {
     buildBaseUI() {
         const container = $(`<div id="${this.htmlIds.containerDivId}"></div>`);
         this.table = $(`<table id="${this.htmlIds.tableId}"></table>`);
-        this.table.append($(`<thead><tr><th>Comment Text</th><th>Link</th><th>Noise Ratio</th><th>Flag</th><th>Clear</th></tr></thead>`));
+        const thead = $('<thead></thead>')
+        const tr = $('<tr></tr>')
+        tr.append($('<th>Comment Text</th>'));
+        if (this.uiConfig.displayLink) {
+            tr.append($('<th>Link</th>'));
+        }
+        if (this.uiConfig.displayNoiseRatio) {
+            tr.append($('<th>Noise Ratio</th>'));
+        }
+        if (this.uiConfig.displayFlagUI) {
+            tr.append($('<th>Flag</th>'));
+        }
+        tr.append($('<th>Clear</th>'));
+        thead.append(tr);
+        this.table.append(thead);
         this.table.append($(`<tbody id="${this.htmlIds.tableBodyId}"></tbody>`));
         container.append(this.table);
         this.mountPoint.before(container);
@@ -211,22 +240,31 @@ class NLNUI {
         Object.values(this.tableData).forEach(comment => {
             const tr = $('<tr></tr>');
             tr.append(`<td>${comment.body}</td>`);
-            tr.append(`<td><a href="${comment.link}" target="_blank">Link</a></td>`);
-            tr.append(`<td>${formatNoiseRatio(comment.noise_ratio)}</td>`);
-            // Flag Button/Indicators
-            if (!comment.can_flag) {
-                tr.append(`<td>🚫</td>`);
-            } else if (comment.was_flagged) {
-                tr.append(`<td>✓</td>`);
-            } else {
-                const flagButton = $(`<button data-comment-id="${comment._id}">Flag</button>`);
-                flagButton.on('click', () => {
-                    flagButton.text('Flagging...');
-                    this.handleFlagComment(this.fkey, comment._id)
-                });
-                const td = $('<td></td>');
-                td.append(flagButton);
-                tr.append(td);
+
+            if (this.uiConfig.displayLink) {
+                tr.append(`<td><a href="${comment.link}" target="_blank">Link</a></td>`);
+            }
+
+            if (this.uiConfig.displayNoiseRatio) {
+                tr.append(`<td>${formatNoiseRatio(comment.noise_ratio)}</td>`);
+            }
+
+            if (this.uiConfig.displayFlagUI) {
+                // Flag Button/Indicators
+                if (!comment.can_flag) {
+                    tr.append(`<td>🚫</td>`);
+                } else if (comment.was_flagged) {
+                    tr.append(`<td>✓</td>`);
+                } else {
+                    const flagButton = $(`<button data-comment-id="${comment._id}">Flag</button>`);
+                    flagButton.on('click', () => {
+                        flagButton.text('Flagging...');
+                        this.handleFlagComment(this.fkey, comment._id)
+                    });
+                    const td = $('<td></td>');
+                    td.append(flagButton);
+                    tr.append(td);
+                }
             }
             // Clear Button
             {
@@ -265,7 +303,7 @@ class NLNUI {
     }
 
     updatePageTitle() {
-        if (this.shouldUpdateTitle) {
+        if (this.uiConfig.shouldUpdateTitle) {
             let pending = Object.values(this.tableData).reduce((acc, comment) => {
                 if (comment.can_flag && !comment.was_flagged) {
                     return acc + 1;
@@ -274,12 +312,11 @@ class NLNUI {
                 }
             }, 0);
 
-            if (pending === 0) {
-                // Remove any numbers
-                document.title = document.title.replace(/^\(\d+\)\s+/, '');
-            } else {
-                document.title = `(${pending}) ${document.title}`;
+            let title = document.title.replace(/^\(\d+\)\s+/, '');
+            if (pending > 0) {
+                title = `(${pending}) ${document.title}`;
             }
+            document.title = title;
         }
     }
 }
@@ -375,7 +412,12 @@ class NLNUI {
     let lastSuccessfulRead = Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
 
     // Build UI
-    let UI = new NLNUI($('#mainbar'), fkey, GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE'));
+    let UI = new NLNUI($('#mainbar'), fkey, {
+        displayLink: GM_config.get('UI_DISPLAY_LINK_TO_COMMENT'),
+        displayNoiseRatio: GM_config.get('UI_DISPLAY_NOISE_RATIO'),
+        displayFlagUI: GM_config.get('UI_DISPLAY_FLAG_BUTTON'),
+        shouldUpdateTitle: GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE')
+    });
     // Only Render if Active
     if (GM_config.get('ACTIVE')) {
         UI.render();
