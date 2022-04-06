@@ -3,19 +3,20 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.4
+// @version      1.1.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
 // @include      /^https?://chat.stackoverflow.com/rooms/111347/.*/
 // @run-at       document-end
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @require      https://raw.githubusercontent.com/HenryEcker/SO-UserScripts/main/so_userscript_utils.js
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        none
 //
 // ==/UserScript==
-/* globals CHAT, $, GM_config */
+/* globals CHAT, $, GM_config, getFormDataFromObject */
 
 
 GM_config.init({
@@ -55,12 +56,12 @@ GM_config.init({
 
 
     const sendMessagePOST = (messageText) => {
-        const parameters = new FormData();
-        parameters.append('text', messageText);
-        parameters.append('fkey', window.fkey().fkey);
         return fetch(`/chats/${CHAT.CURRENT_ROOM_ID}/messages/new`, {
             method: 'POST',
-            body: parameters
+            body: getFormDataFromObject({
+                'text': messageText,
+                'fkey': window.fkey().fkey
+            })
         });
     };
 
