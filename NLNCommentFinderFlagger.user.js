@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.0
+// @version      1.7.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -172,7 +172,13 @@ GM_config.init({
             'min': 0,
             'max': 100,
             'default': 0
-        }
+        },
+        'DOCUMENT_TITLE_SHOULD_UPDATE': {
+            'label': 'Update Title with number of pending comments for review: ',
+            'section': ['UI Config'],
+            'type': 'checkbox',
+            'default': true
+        },
     }
 });
 
@@ -210,7 +216,7 @@ class NLNUI {
             // Flag Button/Indicators
             if (!comment.can_flag) {
                 tr.append(`<td>🚫</td>`);
-            } else if (comment.hasOwnProperty('was_flagged') && comment.was_flagged) {
+            } else if (comment.was_flagged) {
                 tr.append(`<td>✓</td>`);
             } else {
                 const flagButton = $(`<button data-comment-id="${comment._id}">Flag</button>`);
@@ -232,6 +238,7 @@ class NLNUI {
             }
             tbody.append(tr);
         });
+        this.updatePageTitle();
     }
 
     handleFlagComment(fkey, comment_id) {
@@ -259,7 +266,20 @@ class NLNUI {
 
     updatePageTitle() {
         if (this.shouldUpdateTitle) {
-            // do something
+            let pending = Object.values(this.tableData).reduce((acc, comment) => {
+                if (comment.can_flag && !comment.was_flagged) {
+                    return acc + 1;
+                } else {
+                    return acc;
+                }
+            }, 0);
+
+            if (pending === 0) {
+                // Remove any numbers
+                document.title = document.title.replace(/^\(\d+\)\s+/, '');
+            } else {
+                document.title = `(${pending}) ${document.title}`;
+            }
         }
     }
 }
@@ -354,7 +374,7 @@ class NLNUI {
     let lastSuccessfulRead = Math.floor((getOffset(GM_config.get('HOUR_OFFSET')) - API_REQUEST_RATE) / 1000);
 
     // Build UI
-    let UI = new NLNUI($('#mainbar'), fkey, true);
+    let UI = new NLNUI($('#mainbar'), fkey, GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE'));
     // Only Render if Active
     if (GM_config.get('ACTIVE')) {
         UI.render();
