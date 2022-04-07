@@ -229,13 +229,13 @@ GM_config.init({
             'type': 'checkbox',
             'default': true
         },
-        'UI_DISPLAY_NOISE_RATIO': {
-            'label': 'Display Noise Ratio: ',
+        'UI_DISPLAY_BLACKLIST_MATCHES': {
+            'label': 'Display Blacklist Matches: ',
             'type': 'checkbox',
             'default': true
         },
-        'UI_DISPLAY_BLACKLIST_MATCHES': {
-            'label': 'Display Blacklist Matches: ',
+        'UI_DISPLAY_NOISE_RATIO': {
+            'label': 'Display Noise Ratio: ',
             'type': 'checkbox',
             'default': true
         },
