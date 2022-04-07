@@ -119,8 +119,9 @@ const flagComment = (fkey, commentID) => {
         if (resData.Success && resData.Outcome === 0) {
             return Promise.resolve();
         } else if (!resData.Success && resData.Outcome === 2) {
-            if (resData.Message === "You have already flagged this comment") {
-                // Consider already flagged is a successful flag attempt
+            if (resData.Message === "You have already flagged this comment" ||
+                resData.Message === "This comment is deleted and cannot be flagged") {
+                // Consider already flagged or already deleted as a successful flag attempt
                 return Promise.resolve();
             } else if (resData.Message.toLowerCase().includes('out of flag')) {
                 throw new OutOfFlagsError(resData.Message);
