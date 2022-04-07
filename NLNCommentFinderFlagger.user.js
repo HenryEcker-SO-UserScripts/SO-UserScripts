@@ -259,7 +259,9 @@ class NLNUI {
         };
         this.SOClasses = {
             tableContainerDiv: 's-table-container',
-            table: 's-table'
+            table: 's-table',
+            buttonPrimary: 's-btn s-btn__primary',
+            buttonGeneral: 's-btn'
         }
         this.tableData = {};
         this.buildBaseStyles();
@@ -311,7 +313,7 @@ class NLNUI {
         }
         // After
         {
-            const clearAllButton = $('<button>Clear All</button>');
+            const clearAllButton = $(`<button class="${this.SOClasses.buttonPrimary}">Clear All</button>`);
             clearAllButton.on('click', () => {
                 this.tableData = {};
                 this.render();
@@ -345,7 +347,7 @@ class NLNUI {
                 } else if (comment.was_flagged) {
                     tr.append(`<td>✓</td>`);
                 } else {
-                    const flagButton = $(`<button data-comment-id="${comment._id}">Flag</button>`);
+                    const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SOClasses.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
                         flagButton.text('Flagging...');
                         this.handleFlagComment(this.fkey, comment._id)
@@ -357,7 +359,7 @@ class NLNUI {
             }
             // Clear Button
             {
-                const clearButton = $('<button>Clear</button>');
+                const clearButton = $(`<button class="${this.SOClasses.buttonGeneral}">Clear</button>`);
                 clearButton.on('click', () => this.removeComment(comment._id));
                 const clearButtonTD = $('<td></td>');
                 clearButtonTD.append(clearButton);
