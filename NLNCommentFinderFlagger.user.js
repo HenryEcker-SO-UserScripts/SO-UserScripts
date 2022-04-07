@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.7
+// @version      1.7.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -47,9 +47,8 @@ const formatComment = (comment) => {
     return `${formatNoiseRatio(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
-const displayErr = (err, msg, comment) => {
+const displayErr = (err, comment) => {
     console.error(err);
-    console.error(msg);
     console.error("Would've autoflagged", formatComment(comment));
 }
 
@@ -67,6 +66,23 @@ const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) =
     return fetch(`https://api.stackexchange.com/2.3/comments?${usp.toString()}&${AUTH_STR}`).then(res => res.json());
 };
 
+
+class SelfNamedError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+    }
+}
+
+class FlagAttemptFailed extends SelfNamedError {
+}
+
+class RatedLimitedError extends SelfNamedError {
+}
+
+class OutOfFlagsError extends SelfNamedError {
+}
+
 const getFlagQuota = (commentID) => {
     return new Promise((resolve, reject) => {
         $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
@@ -75,7 +91,13 @@ const getFlagQuota = (commentID) => {
                 const flagsRemaining = Number($('div:contains("flags left today")', data).filter((idx, n) => n.childElementCount === 0 && n.innerText.match(pattern)).last().text().match(pattern)[1]);
                 resolve(flagsRemaining);
             })
-            .fail(reject);
+            .fail(err => {
+                if (err.status === 409) {
+                    throw new RatedLimitedError("You may only load the comment flag dialog every 3 seconds");
+                } else {
+                    return reject();
+                }
+            });
     });
 }
 
@@ -87,6 +109,25 @@ const flagComment = (fkey, commentID) => {
             'otherText': "",
             'overrideWarning': true
         })
+    }).then(res => {
+        if (res.status === 409) {
+            throw new RatedLimitedError("You can only flag once every 5 seconds");
+        } else if (res.status === 200) {
+            return res.json();
+        }
+    }).then(resData => {
+        if (resData.Success && resData.Outcome === 0) {
+            return Promise.resolve();
+        } else if (!resData.Success && resData.Outcome === 2) {
+            if (resData.Message === "You have already flagged this comment") {
+                // Consider already flagged is a successful flag attempt
+                return Promise.resolve();
+            } else if (resData.Message.toLowerCase().includes('out of flag')) {
+                throw new OutOfFlagsError(resData.Message);
+            } else {
+                throw new FlagAttemptFailed(resData.Message);
+            }
+        }
     });
 };
 
@@ -328,13 +369,16 @@ class NLNUI {
 
     handleFlagComment(fkey, comment_id) {
         flagComment(this.fkey, comment_id).then((res) => {
-            if (res.status === 200) {
-                this.tableData[comment_id].was_flagged = true;
-            } else if (res.status === 409) {
+            this.tableData[comment_id].was_flagged = true;
+        }).catch((err) => {
+            if (err instanceof RatedLimitedError) {
                 alert('Flagging too fast!');
+            } else if (err instanceof OutOfFlagsError) {
+                alert(err.message);
+            } else if (err instanceof FlagAttemptFailed) {
+                alert(err.message);
+                this.tableData[comment_id].can_flag = false;
             }
-        }).catch(() => {
-            this.tableData[comment_id].can_flag = false;
         }).finally(() => {
             this.render();
         });
@@ -475,6 +519,11 @@ class NLNUI {
         UI.render();
     }
 
+    const disableAutoFlagging = () => {
+        console.log("No more flags available for autoflagging. Disabling...");
+        GM_config.set('AUTO_FLAG', false);
+    }
+
     const main = async (mainInterval) => {
         let toDate = Math.floor(getOffset(GM_config.get('HOUR_OFFSET')) / 1000);
         let response = await getComments(
@@ -528,37 +577,31 @@ class NLNUI {
                             // "Open" comment flagging dialog to get remaining Flag Count
                             getFlagQuota(comment._id).then(remainingFlags => {
                                 if (remainingFlags <= GM_config.get('FLAG_QUOTA_LIMIT')) {
-                                    console.log("Remaining flags at or below specified limit. Stopping script");
-                                    clearInterval(mainInterval);
+                                    disableAutoFlagging();
                                     return; // Exit so nothing tries to be flagged
                                 }
                                 // Autoflagging
                                 flagComment(fkey, comment._id)
                                     .then((res) => {
-                                        if (res.status === 200) {
-                                            console.log("Successfully Flagged", formatComment(comment));
-                                            UI.addComment(comment, true);
-                                        } else {
-                                            UI.addComment(comment, false);
-                                        }
+                                        UI.addComment(comment, true);
                                     })
                                     .catch(err => {
-                                        displayErr(
-                                            err,
-                                            "Some issue occurred when attempting to flag",
-                                            comment
-                                        )
-                                        // Add to UI with can_flag false to render the 🚫
-                                        UI.addComment({...comment, can_flag: false}, true);
+                                        if (err instanceof RatedLimitedError) {
+                                            displayErr(err, comment);
+                                            UI.addComment(comment, false);
+                                        } else if (err instanceof OutOfFlagsError) {
+                                            displayErr(err, comment);
+                                            UI.addComment(comment, false);
+                                            disableAutoFlagging();
+                                        } else if (err instanceof FlagAttemptFailed) {
+                                            displayErr(err, comment);
+                                            // Add to UI with can_flag false to render the 🚫
+                                            UI.addComment({...comment, can_flag: false}, true);
+                                        }
                                     });
-                            }).catch(err => displayErr(
-                                err,
-                                "Most likely cause is the flagging window cannot be opened due to the 3 second rate limit.",
-                                comment
-                            ));
+                            }).catch(err => displayErr(err, comment));
                         }, idx * FLAG_RATE);
                     } else {
-                        console.log("Flag candidate", formatComment(comment));
                         UI.addComment(comment, false);
                     }
                 });
