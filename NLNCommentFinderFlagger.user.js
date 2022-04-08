@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.7.8
+// @version      1.7.9
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -117,12 +117,12 @@ const flagComment = (fkey, commentID) => {
         }
     }).then(resData => {
         if (resData.Success && resData.Outcome === 0) {
-            return Promise.resolve();
+            return Promise.resolve(resData.ResultChangedState);
         } else if (!resData.Success && resData.Outcome === 2) {
-            if (resData.Message === "You have already flagged this comment" ||
-                resData.Message === "This comment is deleted and cannot be flagged") {
-                // Consider already flagged or already deleted as a successful flag attempt
-                return Promise.resolve();
+            if (resData.Message === "You have already flagged this comment") {
+                return Promise.resolve(false);
+            } else if (resData.Message === "This comment is deleted and cannot be flagged") {
+                return Promise.resolve(true);
             } else if (resData.Message.toLowerCase().includes('out of flag')) {
                 throw new OutOfFlagsError(resData.Message);
             } else {
@@ -244,6 +244,11 @@ GM_config.init({
             'type': 'checkbox',
             'default': true
         },
+        'UI_DISPLAY_COMMENT_DELETE_STATE': {
+            'label': 'Display If comment was deleted or not: ',
+            'type': 'checkbox',
+            'default': true
+        },
     }
 });
 
@@ -261,7 +266,8 @@ class NLNUI {
             tableContainerDiv: 's-table-container',
             table: 's-table',
             buttonPrimary: 's-btn s-btn__primary',
-            buttonGeneral: 's-btn'
+            buttonGeneral: 's-btn',
+            pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
         }
         this.tableData = {};
         this.buildBaseStyles();
@@ -357,6 +363,18 @@ class NLNUI {
                     tr.append(td);
                 }
             }
+
+            if (this.uiConfig.displayCommentDeleteState) {
+                if (comment.hasOwnProperty('was_deleted')) {
+                    if (comment.was_deleted) {
+                        tr.append(`<td>✓</td>`);
+                    } else {
+                        tr.append(`<td>${this.SOClasses.pendingSpan}</td>`);
+                    }
+                } else {
+                    tr.append(`<td></td>`);
+                }
+            }
             // Clear Button
             {
                 const clearButton = $(`<button class="${this.SOClasses.buttonGeneral}">Clear</button>`);
@@ -373,6 +391,7 @@ class NLNUI {
     handleFlagComment(fkey, comment_id) {
         flagComment(this.fkey, comment_id).then((res) => {
             this.tableData[comment_id].was_flagged = true;
+            this.tableData[comment_id].was_deleted = res;
         }).catch((err) => {
             if (err instanceof RatedLimitedError) {
                 alert('Flagging too fast!');
@@ -515,7 +534,8 @@ class NLNUI {
         displayNoiseRatio: GM_config.get('UI_DISPLAY_NOISE_RATIO'),
         displayFlagUI: GM_config.get('UI_DISPLAY_FLAG_BUTTON'),
         displayBlacklistMatches: GM_config.get('UI_DISPLAY_BLACKLIST_MATCHES'),
-        shouldUpdateTitle: GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE')
+        displayCommentDeleteState: GM_config.get('UI_DISPLAY_COMMENT_DELETE_STATE'),
+        shouldUpdateTitle: GM_config.get('DOCUMENT_TITLE_SHOULD_UPDATE'),
     });
     // Only Render if Active
     if (GM_config.get('ACTIVE')) {
@@ -586,7 +606,7 @@ class NLNUI {
                                 // Autoflagging
                                 flagComment(fkey, comment._id)
                                     .then((res) => {
-                                        UI.addComment(comment, true);
+                                        UI.addComment({...comment, was_deleted: res}, true);
                                     })
                                     .catch(err => {
                                         if (err instanceof RatedLimitedError) {
