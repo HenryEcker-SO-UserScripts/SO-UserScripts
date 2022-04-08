@@ -310,6 +310,9 @@ class NLNUI {
             if (this.uiConfig.displayFlagUI) {
                 tr.append($('<th>Flag</th>'));
             }
+            if (this.uiConfig.displayCommentDeleteState) {
+                tr.append($('<th>Deleted</th>'));
+            }
             tr.append($('<th>Clear</th>'));
             thead.append(tr);
             table.append(thead);
