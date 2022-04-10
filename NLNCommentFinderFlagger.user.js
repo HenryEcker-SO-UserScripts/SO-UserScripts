@@ -146,12 +146,6 @@ class FlagAttemptFailed extends SelfNamedError {
 class RatedLimitedError extends SelfNamedError {
 }
 
-class OutOfFlagsError extends SelfNamedError {
-}
-
-class CommentAlreadyDeletedError extends SelfNamedError {
-}
-
 /**
  * Fetches the number of flags remaining by "opening" the flag dialogue popup and scraping the HTML
  *
