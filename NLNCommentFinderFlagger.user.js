@@ -308,13 +308,13 @@ GM_config.init({
             'type': 'checkbox',
             'default': true
         },
-        'UI_DISPLAY_LINK_TO_COMMENT': {
-            'label': 'Display Link to Comment: ',
+        'UI_DISPLAY_POST_TYPE': {
+            'label': 'Display Type of Post the comment is under: ',
             'type': 'checkbox',
             'default': true
         },
-        'UI_DISPLAY_POST_TYPE': {
-            'label': 'Display Type of Post the comment is under: ',
+        'UI_DISPLAY_LINK_TO_COMMENT': {
+            'label': 'Display Link to Comment: ',
             'type': 'checkbox',
             'default': true
         },
@@ -396,11 +396,11 @@ class NLNUI {
             const thead = $('<thead></thead>')
             const tr = $('<tr></tr>')
             tr.append($('<th>Comment Text</th>'));
-            if (this.uiConfig.displayLink) {
-                tr.append($('<th>Link</th>'));
-            }
             if (this.uiConfig.displayPostType) {
                 tr.append($('<th>Post Type</th>'));
+            }
+            if (this.uiConfig.displayLink) {
+                tr.append($('<th>Link</th>'));
             }
             if (this.uiConfig.displayBlacklistMatches) {
                 tr.append($('<th>Blacklist Matches</th>'));
@@ -442,11 +442,11 @@ class NLNUI {
             const tr = $('<tr></tr>');
             tr.append(`<td>${comment.body}</td>`);
 
-            if (this.uiConfig.displayLink) {
-                tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
-            }
             if (this.uiConfig.displayPostType) {
                 tr.append(`<td>${comment.post_type.capitalise()}</td>`);
+            }
+            if (this.uiConfig.displayLink) {
+                tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
             }
             if (this.uiConfig.displayBlacklistMatches) {
                 tr.append(`<td>${comment.blacklist_matches.map(e => `"${e}"`).join(', ')}</td>`);
