@@ -20,33 +20,76 @@
 
 
 /* General Utility Functions */
+/**
+ * Converts an array of distinct RegExp and joins them together using OR (|)
+ *
+ * @param {[RegExp]} arrRegex Array of RegExp that will be ORed (|) together
+ * @param {string} flags String representation of flags to apply to the joined RegExp (e.g. 'g', 'i', 'gi', etc.)
+ * @returns {RegExp} The joint RegExp
+ */
 const mergeRegexes = (arrRegex, flags) => {
     return new RegExp(arrRegex.map(p => p.source).join('|'), flags);
 }
+/**
+ * Adds an htmlDecode function to all Strings. This makes it easy to decode the response from the SE API
+ * @returns {string}
+ */
 String.prototype.htmlDecode = function () {
     return new DOMParser().parseFromString(this, "text/html").documentElement.textContent;
 }
 
+/**
+ * Formats a number to two decimal places with a percent sign
+ *
+ * @param {number} percent The value to format
+ * @param {number} precision The number of decimal places to round to. (Defaults to 2)
+ * @returns {`${string}%`} The rounded percent with % sign
+ */
+const formatPercentage = (percent, precision = 2) => {
+    return `${percent.toFixed(precision)}%`;
+}
+
 /* Script Specific Utility Functions */
-const calcNoiseRatio = (matches, bodyLength) => {
+/**
+ * Calculate what percentage of the comment is noise
+ *
+ * @param {[string]} matches Result from String.match
+ * @param {number} totalLength Total Length of the String
+ * @returns {number} The resulting noise percentage (out of 100)
+ */
+const calcNoiseRatio = (matches, totalLength) => {
     let lengthWeight = matches.reduce((total, match) => {
         return total + match.length
     }, 0);
-    return lengthWeight / bodyLength * 100;
+    return lengthWeight / totalLength * 100;
 }
 
+/**
+ * Get timestamp for now offset by a certain number of hours prior.
+ * hours=0 will just return the timestamp for now.
+ *
+ * @param {number} hours Number of hours to offset
+ * @returns {number} The timestamp relative to now
+ */
 const getOffset = (hours) => {
     return new Date() - (hours * 60 * 60 * 1000)
 }
 
-const formatNoiseRatio = (ratio) => {
-    return `${ratio.toFixed(2)}%`;
-}
-
+/**
+ * Easily format comment as a String. Includes noise ratio, blacklist matches, and link to comment
+ *
+ * @param {object} comment
+ * @returns {`${string}% [${*}] (${*})`}
+ */
 const formatComment = (comment) => {
-    return `${formatNoiseRatio(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
+    return `${formatPercentage(comment.noise_ratio)} [${comment.blacklist_matches.join(',')}] (${comment.link})`;
 }
 
+/**
+ * Easily output error messages and the comment they occurred on.
+ * @param {Error} err
+ * @param {object} comment
+ */
 const displayErr = (err, comment) => {
     console.error(err);
     console.error("Would've autoflagged", formatComment(comment));
@@ -54,6 +97,15 @@ const displayErr = (err, comment) => {
 
 
 /* Functions that make external requests */
+/**
+ * Get comments to analyse.
+ *
+ * @param {string} AUTH_STR Complete Auth String needed to make API requests including site, access_token, and key
+ * @param {string} COMMENT_FILTER API Filter to specify the returned fields
+ * @param {number} FROM_DATE Beginning of comment window (SE API Timestamp is in seconds not milliseconds)
+ * @param {number} TO_DATE End of comment window (SE API Timestamp is in seconds not milliseconds)
+ * @returns {Promise<JSON>} Fetch returns a JSON response
+ */
 const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) => {
     let usp = getURLSearchParamsFromObject({
         'pagesize': 100,
@@ -67,6 +119,9 @@ const getComments = (AUTH_STR, COMMENT_FILTER, FROM_DATE, TO_DATE = undefined) =
 };
 
 
+/**
+ * Base Class of Errors which share the name with their class name
+ */
 class SelfNamedError extends Error {
     constructor(message) {
         super(message);
@@ -74,6 +129,9 @@ class SelfNamedError extends Error {
     }
 }
 
+/**
+ * Errors used to differentiate the various failure modes
+ */
 class FlagAttemptFailed extends SelfNamedError {
 }
 
@@ -83,6 +141,14 @@ class RatedLimitedError extends SelfNamedError {
 class OutOfFlagsError extends SelfNamedError {
 }
 
+/**
+ * Fetches the number of flags remaining by "opening" the flag dialogue popup and scraping the HTML
+ *
+ * @param {number} commentID Any visible comment will work (it just needs a comment to be able to open the flagging dialogue)
+ * @returns {Promise<number>} The number of remaining flags
+ *
+ * @throws {RatedLimitedError} Throws a RateLimitedError when attempting to open the popup too quickly. The popup can only be opened once every 3 seconds (globally)
+ */
 const getFlagQuota = (commentID) => {
     return new Promise((resolve, reject) => {
         $.get(`https://${location.hostname}/flags/comments/${commentID}/popup`)
@@ -100,7 +166,17 @@ const getFlagQuota = (commentID) => {
             });
     });
 }
-
+/**
+ * Flag the comment using an HTML POST to the route. The NLN flag type is hard coded (39).
+ *
+ * @param {string} fkey Needed to identify the user
+ * @param {number} commentID The id of the comment to flag
+ * @returns {Promise<boolean>} Resolves true if the flag was successful, and the comment was deleted upon flagging. Resolves false if the flag was successful, but the comment is not yet deleted.
+ *
+ * @throws {RatedLimitedError} Throws a RateLimitedError when attempting to flag too quickly. The flags can only be added every 5 seconds (globally)
+ * @throws {OutOfFlagsError} Throws an OutOfFlagsError if there are no more available flags for the day.
+ * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason.
+ */
 const flagComment = (fkey, commentID) => {
     return fetch(`https://${location.hostname}/flags/comments/${commentID}/add/39`, {
         method: "POST",
@@ -346,7 +422,7 @@ class NLNUI {
                 tr.append(`<td>${comment.blacklist_matches.map(e => `"${e}"`).join(', ')}</td>`);
             }
             if (this.uiConfig.displayNoiseRatio) {
-                tr.append(`<td>${formatNoiseRatio(comment.noise_ratio)}</td>`);
+                tr.append(`<td>${formatPercentage(comment.noise_ratio)}</td>`);
             }
 
             if (this.uiConfig.displayFlagUI) {
@@ -400,6 +476,7 @@ class NLNUI {
                 alert('Flagging too fast!');
             } else if (err instanceof OutOfFlagsError) {
                 alert(err.message);
+                this.tableData[comment_id].can_flag = false;
             } else if (err instanceof FlagAttemptFailed) {
                 alert(err.message);
                 this.tableData[comment_id].can_flag = false;
