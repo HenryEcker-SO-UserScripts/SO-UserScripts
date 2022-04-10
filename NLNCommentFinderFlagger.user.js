@@ -372,6 +372,7 @@ class NLNUI {
     buildBaseStyles() {
         // Add Styles
         const styles = document.createElement('style');
+        styles.setAttribute('id', 'nln-comment-userscript-styles')
         styles.innerHTML = `
 #${this.htmlIds.containerDivId} {
     padding: 25px 0;
@@ -380,7 +381,7 @@ class NLNUI {
     grid-gap: 10px;
 }
 `;
-        document.body.appendChild(styles);
+        document.head.appendChild(styles);
     }
 
     buildBaseUI() {
