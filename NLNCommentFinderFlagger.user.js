@@ -3,7 +3,7 @@
 // @description  Find comments which may potentially be no longer needed and flag them for removal
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.8.1
+// @version      1.8.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NLNCommentFinderFlagger.user.js
 //
@@ -149,6 +149,9 @@ class RatedLimitedError extends SelfNamedError {
 class OutOfFlagsError extends SelfNamedError {
 }
 
+class CommentAlreadyDeletedError extends SelfNamedError {
+}
+
 /**
  * Fetches the number of flags remaining by "opening" the flag dialogue popup and scraping the HTML
  *
@@ -178,15 +181,14 @@ const getFlagQuota = (commentID) => {
  * Flag the comment using an HTML POST to the route. The NLN flag type is hard coded (39).
  *
  * @param {string} fkey Needed to identify the user
- * @param {number} commentID The id of the comment to flag
- * @returns {Promise<boolean>} Resolves true if the flag was successful, and the comment was deleted upon flagging. Resolves false if the flag was successful, but the comment is not yet deleted.
+ * @param {object} comment the complete comment object
+ * @returns {Promise<object>} Resolves with a new comment object with appropriate fields set to render in the table
  *
  * @throws {RatedLimitedError} Throws a RateLimitedError when attempting to flag too quickly. The flags can only be added every 5 seconds (globally)
- * @throws {OutOfFlagsError} Throws an OutOfFlagsError if there are no more available flags for the day.
- * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason.
+ * @throws {FlagAttemptFailed} Throws a FlagAttemptFailed if the flag attempt failed for some other reason than RateLimit, AlreadyFlagged, or Already Deleted.
  */
-const flagComment = (fkey, commentID) => {
-    return fetch(`https://${location.hostname}/flags/comments/${commentID}/add/39`, {
+const flagComment = (fkey, comment) => {
+    return fetch(`https://${location.hostname}/flags/comments/${comment._id}/add/39`, {
         method: "POST",
         body: getFormDataFromObject({
             'fkey': fkey,
@@ -201,18 +203,24 @@ const flagComment = (fkey, commentID) => {
         }
     }).then(resData => {
         if (resData.Success && resData.Outcome === 0) {
-            return Promise.resolve(resData.ResultChangedState);
+            comment.was_flagged = true;
+            comment.was_deleted = resData.ResultChangedState
         } else if (!resData.Success && resData.Outcome === 2) {
             if (resData.Message === "You have already flagged this comment") {
-                return Promise.resolve(false);
+                comment.was_flagged = true;
+                comment.was_deleted = false;
             } else if (resData.Message === "This comment is deleted and cannot be flagged") {
-                return Promise.resolve(true);
+                comment.can_flag = false;
+                comment.was_flagged = false; // This might have been previously flagged by you, but this flag attempt did not result in a flag
+                comment.was_deleted = true;
             } else if (resData.Message.toLowerCase().includes('out of flag')) {
-                throw new OutOfFlagsError(resData.Message);
+                comment.can_flag = false;
+                comment.was_flagged = false;
             } else {
                 throw new FlagAttemptFailed(resData.Message);
             }
         }
+        return Promise.resolve(comment);
     });
 };
 
@@ -465,7 +473,7 @@ class NLNUI {
                     const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
                         flagButton.text('Flagging...');
-                        this.handleFlagComment(this.fkey, comment._id)
+                        this.handleFlagComment(this.fkey, comment)
                     });
                     const td = $('<td></td>');
                     td.append(flagButton);
@@ -497,30 +505,23 @@ class NLNUI {
         this.updatePageTitle();
     }
 
-    handleFlagComment(fkey, comment_id) {
-        flagComment(this.fkey, comment_id).then((res) => {
-            this.tableData[comment_id].was_flagged = true;
-            this.tableData[comment_id].was_deleted = res;
+    handleFlagComment(fkey, comment) {
+        flagComment(this.fkey, comment).then((newComment) => {
+            this.tableData[newComment._id] = newComment;
         }).catch((err) => {
             if (err instanceof RatedLimitedError) {
                 alert('Flagging too fast!');
-            } else if (err instanceof OutOfFlagsError) {
-                alert(err.message);
-                this.tableData[comment_id].can_flag = false;
             } else if (err instanceof FlagAttemptFailed) {
                 alert(err.message);
-                this.tableData[comment_id].can_flag = false;
+                this.tableData[comment._id].can_flag = false;
             }
         }).finally(() => {
             this.render();
         });
     }
 
-    addComment(comment, was_flagged = false) {
-        this.tableData[comment._id] = {
-            ...comment,
-            was_flagged: was_flagged
-        };
+    addComment(comment) {
+        this.tableData[comment._id] = comment;
         this.render();
     }
 
@@ -718,22 +719,18 @@ class NLNUI {
                                     return; // Exit so nothing tries to be flagged
                                 }
                                 // Autoflagging
-                                flagComment(fkey, comment._id)
-                                    .then((res) => {
-                                        UI.addComment({...comment, was_deleted: res}, true);
+                                flagComment(fkey, comment)
+                                    .then((newComment) => {
+                                        UI.addComment(newComment);
                                     })
                                     .catch(err => {
                                         if (err instanceof RatedLimitedError) {
                                             displayErr(err, comment);
-                                            UI.addComment(comment, false);
-                                        } else if (err instanceof OutOfFlagsError) {
-                                            displayErr(err, comment);
-                                            UI.addComment(comment, false);
-                                            disableAutoFlagging();
+                                            UI.addComment({...comment, was_flagged: false});
                                         } else if (err instanceof FlagAttemptFailed) {
                                             displayErr(err, comment);
                                             // Add to UI with can_flag false to render the 🚫
-                                            UI.addComment({...comment, can_flag: false}, true);
+                                            UI.addComment({...comment, can_flag: false});
                                         }
                                     });
                             }).catch(err => displayErr(err, comment));
