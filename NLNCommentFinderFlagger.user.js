@@ -590,7 +590,7 @@ class NLNUI {
         // Happy coding
         /(?:happy\s+coding)/,
         // This solved my issue/This resolved my issue/This fixed my issue
-        /(it('?s)?|this)\s*((re)?solved?|fix(ed)?)\s*((m[ey]\s*(issue|problem))|it)/,
+        /(it('?s)?|this)\s*((re)?solved?|fix(ed)?)\s*(((m[ey]|the)\s*(issue|problem))|it)/,
         // TRE('bro', 'dude', 'man', 'bud', 'buddy', 'amigo', 'pal', 'homie', 'friend', 'friendio', 'friendo', 'mate', 'sir', 'fam')
         /\b(?:f(?:riend(?:io|o)?|am)|b(?:ud(?:dy)?|ro)|ma(?:te|n)|amigo|homie|dude|pal|sir)\b/,
         /*
