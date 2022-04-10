@@ -356,6 +356,9 @@ class NLNUI {
         styles.innerHTML = `
 #${this.htmlIds.containerDivId} {
     padding: 25px 0;
+    display: grid;
+    grid-template-rows: 40px 1fr 40px;
+    grid-gap: 10px;
 }
 `;
         document.body.appendChild(styles);
@@ -365,7 +368,9 @@ class NLNUI {
         const container = $(`<div id="${this.htmlIds.containerDivId}""></div>`);
         // Header Elements
         {
-            container.append($(`<h2>NLN Comments</h2>`))
+            const header = $('<nln-header></nln-header>');
+            header.append($(`<h2>NLN Comments</h2>`));
+            container.append(header);
         }
         // Build Table
         {
@@ -398,12 +403,14 @@ class NLNUI {
         }
         // After
         {
+            const footer = $('<nln-footer></nln-footer>');
             const clearAllButton = $(`<button class="${this.SOClasses.buttonPrimary}">Clear All</button>`);
             clearAllButton.on('click', () => {
                 this.tableData = {};
                 this.render();
             })
-            container.append(clearAllButton);
+            footer.append(clearAllButton);
+            container.append(footer);
         }
         this.mountPoint.before(container);
     }
