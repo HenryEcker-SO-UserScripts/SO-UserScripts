@@ -39,6 +39,14 @@ String.prototype.htmlDecode = function () {
 }
 
 /**
+ * Easily capitalise the first letter of any string
+ * @returns {string}
+ */
+String.prototype.capitalise = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+/**
  * Formats a number to two decimal places with a percent sign
  *
  * @param {number} percent The value to format
@@ -305,6 +313,11 @@ GM_config.init({
             'type': 'checkbox',
             'default': true
         },
+        'UI_DISPLAY_POST_TYPE': {
+            'label': 'Display Type of Post the comment is under: ',
+            'type': 'checkbox',
+            'default': true
+        },
         'UI_DISPLAY_BLACKLIST_MATCHES': {
             'label': 'Display Blacklist Matches: ',
             'type': 'checkbox',
@@ -338,12 +351,16 @@ class NLNUI {
             tableId: "NLN_Comment_Reports_Table",
             tableBodyId: "NLN_Comment_Reports_Table_Body"
         };
-        this.SOClasses = {
-            tableContainerDiv: 's-table-container',
-            table: 's-table',
-            buttonPrimary: 's-btn s-btn__primary',
-            buttonGeneral: 's-btn',
-            pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
+        this.SO = {
+            'CSS': {
+                tableContainerDiv: 's-table-container',
+                table: 's-table',
+                buttonPrimary: 's-btn s-btn__primary',
+                buttonGeneral: 's-btn',
+            },
+            'HTML': {
+                pendingSpan: '<span class="supernovabg mod-flag-indicator">pending</span>'
+            }
         }
         this.tableData = {};
         this.buildBaseStyles();
@@ -374,13 +391,16 @@ class NLNUI {
         }
         // Build Table
         {
-            const tableContainer = $(`<div class="${this.SOClasses.tableContainerDiv}"></div>`);
-            const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SOClasses.table}"></table>`);
+            const tableContainer = $(`<div class="${this.SO.CSS.tableContainerDiv}"></div>`);
+            const table = $(`<table id="${this.htmlIds.tableId}" class="${this.SO.CSS.table}"></table>`);
             const thead = $('<thead></thead>')
             const tr = $('<tr></tr>')
             tr.append($('<th>Comment Text</th>'));
             if (this.uiConfig.displayLink) {
                 tr.append($('<th>Link</th>'));
+            }
+            if (this.uiConfig.displayPostType) {
+                tr.append($('<th>Post Type</th>'));
             }
             if (this.uiConfig.displayBlacklistMatches) {
                 tr.append($('<th>Blacklist Matches</th>'));
@@ -404,7 +424,7 @@ class NLNUI {
         // After
         {
             const footer = $('<nln-footer></nln-footer>');
-            const clearAllButton = $(`<button class="${this.SOClasses.buttonPrimary}">Clear All</button>`);
+            const clearAllButton = $(`<button class="${this.SO.CSS.buttonPrimary}">Clear All</button>`);
             clearAllButton.on('click', () => {
                 this.tableData = {};
                 this.render();
@@ -425,6 +445,9 @@ class NLNUI {
             if (this.uiConfig.displayLink) {
                 tr.append(`<td><a href="${comment.link}" target="_blank">${comment._id}</a></td>`);
             }
+            if (this.uiConfig.displayPostType) {
+                tr.append(`<td>${comment.post_type.capitalise()}</td>`);
+            }
             if (this.uiConfig.displayBlacklistMatches) {
                 tr.append(`<td>${comment.blacklist_matches.map(e => `"${e}"`).join(', ')}</td>`);
             }
@@ -439,7 +462,7 @@ class NLNUI {
                 } else if (comment.was_flagged) {
                     tr.append(`<td>✓</td>`);
                 } else {
-                    const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SOClasses.buttonPrimary}">Flag</button>`);
+                    const flagButton = $(`<button data-comment-id="${comment._id}" class="${this.SO.CSS.buttonPrimary}">Flag</button>`);
                     flagButton.on('click', () => {
                         flagButton.text('Flagging...');
                         this.handleFlagComment(this.fkey, comment._id)
@@ -455,7 +478,7 @@ class NLNUI {
                     if (comment.was_deleted) {
                         tr.append(`<td>✓</td>`);
                     } else {
-                        tr.append(`<td>${this.SOClasses.pendingSpan}</td>`);
+                        tr.append(`<td>${this.SO.HTML.pendingSpan}</td>`);
                     }
                 } else {
                     tr.append(`<td></td>`);
@@ -463,7 +486,7 @@ class NLNUI {
             }
             // Clear Button
             {
-                const clearButton = $(`<button class="${this.SOClasses.buttonGeneral}">Clear</button>`);
+                const clearButton = $(`<button class="${this.SO.CSS.buttonGeneral}">Clear</button>`);
                 clearButton.on('click', () => this.removeComment(comment._id));
                 const clearButtonTD = $('<td></td>');
                 clearButtonTD.append(clearButton);
@@ -621,6 +644,7 @@ class NLNUI {
     // Build UI
     let UI = new NLNUI($('#mainbar'), fkey, {
         displayLink: GM_config.get('UI_DISPLAY_LINK_TO_COMMENT'),
+        displayPostType: GM_config.get('UI_DISPLAY_POST_TYPE'),
         displayNoiseRatio: GM_config.get('UI_DISPLAY_NOISE_RATIO'),
         displayFlagUI: GM_config.get('UI_DISPLAY_FLAG_BUTTON'),
         displayBlacklistMatches: GM_config.get('UI_DISPLAY_BLACKLIST_MATCHES'),
