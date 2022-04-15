@@ -7,7 +7,7 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
-// @match        *://chat.stackoverflow.com/rooms/111347/*/
+// @match        *://chat.stackoverflow.com/rooms/111347/*
 // @run-at       document-end
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @require      https://raw.githubusercontent.com/HenryEcker/SO-UserScripts/main/so_userscript_utils.js
