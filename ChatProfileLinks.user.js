@@ -20,8 +20,6 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
 // @grant        none
-//
-// @run-at       document-end
 // ==/UserScript==
 
 'use strict';
