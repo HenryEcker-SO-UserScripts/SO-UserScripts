@@ -4,7 +4,7 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       @samliew
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.42
+// @version      1.50
 //
 // @match       *://*stackoverflow.com/users*
 // @match       *://*serverfault.com/users*
@@ -20,24 +20,32 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
 // @grant        none
+//
+// @run-at       document-end
 // ==/UserScript==
 
 'use strict';
 
-(function() {
-
+(function () {
     // Check if profile menu exists
     const isUserPage = document.body.classList.contains('user-page');
     const profilesMenu = document.getElementById('profiles-menu');
-    if(!isUserPage || !profilesMenu) {
+    if (!isUserPage || !profilesMenu) {
         console.log('User network profile dropdown not found.');
         return;
     }
 
-    // Add chat profile links to menu
+    // Find network profile link
     const list = profilesMenu.querySelector('ul');
     const links = list.querySelectorAll('a');
-    const aid = Number(links[links.length - 1].getAttribute('href').match(/\/users\/(\d+)\//)[1]); // user account id
+    const networkProfileLink = [...links].filter(e => e.innerText.trim() === 'Network profile');
+
+    if (networkProfileLink.length !== 1) {
+        console.log('Network profile ID not found.');
+        return;
+    }
+    // Get Network ID from networkProfileLink
+    const aid = Number(networkProfileLink[0].getAttribute('href').match(/\/users\/(\d+)\//)[1]); // user account id
 
     list.innerHTML += `
 <li class="s-menu--divider"></li>
@@ -60,5 +68,4 @@
   </a>
 </li>
 `;
-
 })();
