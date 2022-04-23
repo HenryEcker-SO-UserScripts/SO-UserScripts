@@ -8,7 +8,7 @@
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
 // @match        *://chat.stackoverflow.com/rooms/111347/*
-// @run-at       document-end
+//
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // @grant        GM_getValue
 // @grant        GM_setValue
