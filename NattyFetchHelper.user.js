@@ -3,20 +3,26 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.6
+// @version      1.1.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
 // @match        *://chat.stackoverflow.com/rooms/111347/*
 // @run-at       document-end
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
-// @require      https://raw.githubusercontent.com/HenryEcker/SO-UserScripts/main/so_userscript_utils.js
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        none
 //
 // ==/UserScript==
-/* globals CHAT, $, GM_config, getFormDataFromObject */
+/* globals CHAT, $, GM_config */
+
+const getFormDataFromObject = (obj) => {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+        acc.set(key, value);
+        return acc;
+    }, new FormData());
+}
 
 
 GM_config.init({
