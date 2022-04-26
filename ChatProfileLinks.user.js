@@ -4,18 +4,18 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       @samliew
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.50
+// @version      1.51
 //
-// @match       *://*stackoverflow.com/users*
-// @match       *://*serverfault.com/users*
-// @match       *://*superuser.com/users*
-// @match       *://*askubuntu.com/users*
-// @match       *://*mathoverflow.net/users*
-// @match       *://*stackexchange.com/users*
+// @match       *://*.stackoverflow.com/users*
+// @match       *://*.serverfault.com/users*
+// @match       *://*.superuser.com/users*
+// @match       *://*.askubuntu.com/users*
+// @match       *://*.mathoverflow.net/users*
+// @match       *://*.stackexchange.com/users*
 //
 // @exclude      *chat.*
 // @exclude      *blog.*
-// @exclude      *://*stackoverflow.com/c/*
+// @exclude      *://*.stackoverflow.com/c/*
 //
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
