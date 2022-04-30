@@ -4,8 +4,8 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.1
-// @downloadURL
-// @updateURL
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 //
 // @match        *://*stackoverflow.com/questions/*
 // @match        *://*stackoverflow.com/review/*
