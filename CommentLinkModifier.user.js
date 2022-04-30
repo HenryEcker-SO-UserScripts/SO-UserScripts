@@ -8,7 +8,6 @@
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 //
 // @match        *://*stackoverflow.com/questions/*
-// @match        *://*stackoverflow.com/review/*
 // @grant        none
 //
 // ==/UserScript==
