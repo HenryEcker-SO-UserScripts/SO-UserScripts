@@ -30,14 +30,13 @@
     }
 
     // Watch for the addition of the dno class to the comment selector
-    // This indicates that the comments have been loaded so we can replace the links once again
+    // This indicates that the comments have been loaded, so we can replace the links once again
     const classNameObserver = new MutationObserver((mutationsList, observer) => {
         for (let mutation of mutationsList) {
-            console.log(mutation);
             if (mutation.attributeName === "class") {
                 if (/dno/.exec(mutation.target.className)) {
                     updateCommentLinks('.comment-link');
-                    observer.disconnect(); // It's no longer visible and not a repeatable operation so we don't care
+                    observer.disconnect(); // It's no longer visible and not a repeatable operation, so we don't care
                 }
             }
         }
