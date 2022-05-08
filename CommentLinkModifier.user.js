@@ -16,10 +16,14 @@
 (function () {
     'use strict';
 
+    const commentLinkSelector = '.comment-link';
+    const commentComponentContainerSelector = '.js-post-comments-component';
+    const showMoreCommentsButtonSelector = '.js-show-link.comments-link:not(.dno)';
+
     const buildNewPath = (commentId) => `/posts/comments/${commentId}`;
 
-    const updateCommentLinks = (commentSelector) => {
-        $(commentSelector).each((idx, elem) => {
+    const updateCommentLinks = (jQueryElems) => {
+        jQueryElems.each((idx, elem) => {
             const jQElem = $(elem);
             const newHREF = buildNewPath(jQElem.closest('li').attr('data-comment-id'));
             // Only update if not previously replaced
@@ -35,7 +39,10 @@
         for (let mutation of mutationsList) {
             if (mutation.attributeName === "class") {
                 if (/dno/.exec(mutation.target.className)) {
-                    updateCommentLinks('.comment-link');
+                    updateCommentLinks(
+                        $(mutation.target).closest(commentComponentContainerSelector) // Only check comments in this container
+                            .find(commentLinkSelector)
+                    );
                     observer.disconnect(); // It's no longer visible and not a repeatable operation, so we don't care
                 }
             }
@@ -44,10 +51,7 @@
 
 
     StackExchange.ready(() => {
-        const commentSelector = '.comment-link';
-        const showMoreCommentsButtonSelector = '.js-show-link.comments-link:not(.dno)';
-
-        updateCommentLinks(commentSelector);
+        updateCommentLinks($(commentLinkSelector));
         // Bind the observer to all Show More buttons
         $(showMoreCommentsButtonSelector).each((i, e) => classNameObserver.observe(e, {
             attributes: true,
