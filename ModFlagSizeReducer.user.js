@@ -17,36 +17,50 @@
 (function () {
     'use strict';
 
-    const patterns = [
+    const baseShortQAPattern = new RegExp(`(${window.location.origin})?\/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
+
+    const shortQAPattern = new RegExp(`\\[(.*)\\]\\(${baseShortQAPattern.source}\\)`, 'g');
+    const fullQPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/(\\d+)\/[^/]+\\)`, 'g');
+    const fullAPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\/(\\d+)#\\d+\\)`, 'g');
+    const fullCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
+    const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(\/posts\/comments\/\\d+)\\)`, 'g');
+    const commaSeparatedPostsPattern = new RegExp(`(${baseShortQAPattern.source}(,\\s*|$))+`, 'g');
+    const reducers = [
         // Shorten domain/qa/postid/userid to just /qa/postid
         (s) => s.replace(
-            new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/([qa])\/(\\d+)(?:\/\\d+)?\\)`, 'g'),
+            shortQAPattern,
             "[$1](/$3/$4)"
         ),
+        // Bulk Enumerate and reduce domain?/qa/post1id/userid?,domain?/qa/post2id/userid? to [1](/qa/post1id), [2](/qa/post2id),...
+        (s) => s.replace(commaSeparatedPostsPattern, (substring) => {
+            return substring.match(baseShortQAPattern).map((match, idx) => {
+                return match.replace(baseShortQAPattern, `[${idx + 1}](/$2/$3)`)
+            }).join(',')
+        }),
         // Shorten domain/questions/postid/title to just /q/postid
         (s) => s.replace(
-            new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/(\\d+)\/[^/]+\\)`, 'g'),
+            fullQPattern,
             "[$1](/q/$3)"
         ),
         // Shorten domain/questions/questionid/title/answerid#answerid to just /a/answerid
         (s) => s.replace(
-            new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\/(\\d+)#\\d+\\)`, 'g'),
+            fullAPattern,
             "[$1](/a/$3)"
         ),
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
         (s) => s.replace(
-            new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g'),
+            fullCommentPattern,
             "[$1](/posts/comments/$3)"
         ),
         // Shorten domain/posts/comments/commentid to just /posts/comments/commentid
         (s) => s.replace(
-            new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(\/posts\/comments\/\\d+)\\)`, 'g'),
+            shortCommentPattern,
             "[$1]($3)"
         )
     ];
 
     const patternReducer = (text) => {
-        for (let reducer of patterns) {
+        for (let reducer of reducers) {
             text = reducer(text);
         }
         return text;
