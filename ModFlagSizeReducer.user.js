@@ -29,7 +29,7 @@
     const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(\/posts\/comments\/\\d+)\\)`, 'g');
 
     // Bulk
-    const commaSeparatedPostsPattern = new RegExp(`(${baseShortQAPattern.source}(,\\s*|$))+`, 'g');
+    const commaSeparatedPostsPattern = new RegExp(`(${baseShortQAPattern.source}(,\\s*))+(${baseShortQAPattern.source})`, 'g');
     const reducers = [
         // Shorten domain/qa/postid/userid to just /qa/postid
         (s) => s.replace(
@@ -49,16 +49,13 @@
         // Bulk Enumerate and reduce domain?/qa/post1id/userid?,domain?/qa/post2id/userid? to [1](/qa/post1id), [2](/qa/post2id),...
         (s) => s.replace(commaSeparatedPostsPattern, (substring) => {
             let ids = new Map();
-            return substring.match(baseShortQAPattern).map((match) => {
-                return match.replace(baseShortQAPattern, (sub, p1, p2, p3) => {
-                    if (!ids.has(p3)) {
-                        ids.set(p3, Math.max(0, ...ids.values()) + 1);
-                    }
-                    return `[${ids.get(p3)}](/${p2}/${p3})`;
-                });
-            }).join(',')
+            return substring.replace(baseShortQAPattern, (sub, p1, p2, p3) => {
+                if (!ids.has(p3)) {
+                    ids.set(p3, Math.max(0, ...ids.values()) + 1);
+                }
+                return `[${ids.get(p3)}](/${p2}/${p3})`;
+            });
         }),
-
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
         (s) => s.replace(
             fullCommentPattern,
