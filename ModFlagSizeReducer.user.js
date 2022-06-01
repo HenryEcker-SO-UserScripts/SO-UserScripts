@@ -30,27 +30,27 @@
     // Q & A patterns
     const baseShortQAPattern = new RegExp(`(${window.location.origin})?/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
 
-    const shortQAPattern = new RegExp(`\\[(.*)\\]\\(${baseShortQAPattern.source}\\)`, 'g');
-    const fullQPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/questions/(\\d+)/[^/]+\\)`, 'g');
-    const fullAPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/questions/\\d+/[^/]+/(\\d+)#\\d+\\)`, 'g');
+    const shortQAPattern = new RegExp(`\\[(.*)]\\(${baseShortQAPattern.source}\\)`, 'g');
+    const fullQPattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?/questions/(\\d+)/[^/]+\\)`, 'g');
+    const fullAPattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?/questions/\\d+/[^/]+/(\\d+)#\\d+\\)`, 'g');
 
     // Comment Patterns
-    const fullCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/questions/\\d+/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
-    const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(/posts/comments/\\d+)\\)`, 'g');
+    const fullCommentPattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?/questions/\\d+/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
+    const shortCommentPattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?(/posts/comments/\\d+)\\)`, 'g');
 
     // Bulk
     const enumeratedShortPattern = /\[\d+]\(\/[qa]\/\d+\)/g;
     const commaSeparatedPostsPattern = new RegExp(`((?:${baseShortQAPattern.source}|${enumeratedShortPattern.source})(,\\s*))+(${baseShortQAPattern.source})`, 'g');
 
     // User
-    const userProfilePattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/users/(\\d+)(/[^/]+)?\\)`, 'g');
+    const userProfilePattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?/users/(\\d+)(/[^/]+)?\\)`, 'g');
 
     // Excess Space
-    const excessSpace = /\s{2,}/g;
+    const excessSpacePattern = /\s{2,}/g;
     const reducers = [
         // Remove excess space
         (s) => s.replace(
-            excessSpace,
+            excessSpacePattern,
             ' '
         ),
         // Shorten domain/qa/postid/userid to just /qa/postid
