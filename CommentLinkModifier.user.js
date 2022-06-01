@@ -31,13 +31,13 @@
                 jQElem.attr('href', newHREF);
             }
         });
-    }
+    };
 
     // Watch for the addition of the dno class to the comment selector
     // This indicates that the comments have been loaded, so we can replace the links once again
     const classNameObserver = new MutationObserver((mutationsList, observer) => {
         for (let mutation of mutationsList) {
-            if (mutation.attributeName === "class") {
+            if (mutation.attributeName === 'class') {
                 if (/dno/.exec(mutation.target.className)) {
                     updateCommentLinks(
                         $(mutation.target).closest(commentComponentContainerSelector) // Only check comments in this container

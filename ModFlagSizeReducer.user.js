@@ -12,41 +12,41 @@
 // @grant        none
 //
 // ==/UserScript==
-/* globals StackExchange, $ */
+/* globals $ */
 
 (function () {
     'use strict';
 
     const selectors = {
         css: {
-            flagDialoguePopupClass: "popup"
+            flagDialoguePopupClass: 'popup'
         },
         ids: {
-            flagDialogueId: "popup-flag-post",
-            reduceButton: "mfsr-reduce-pattern-btn"
+            flagDialogueId: 'popup-flag-post',
+            reduceButton: 'mfsr-reduce-pattern-btn'
         }
-    }
+    };
 
     // Q & A patterns
-    const baseShortQAPattern = new RegExp(`(${window.location.origin})?\/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
+    const baseShortQAPattern = new RegExp(`(${window.location.origin})?/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
 
     const shortQAPattern = new RegExp(`\\[(.*)\\]\\(${baseShortQAPattern.source}\\)`, 'g');
-    const fullQPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/(\\d+)\/[^/]+\\)`, 'g');
-    const fullAPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\/(\\d+)#\\d+\\)`, 'g');
+    const fullQPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/questions/(\\d+)/[^/]+\\)`, 'g');
+    const fullAPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/questions/\\d+/[^/]+/(\\d+)#\\d+\\)`, 'g');
 
     // Comment Patterns
-    const fullCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
-    const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(\/posts\/comments\/\\d+)\\)`, 'g');
+    const fullCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/questions/\\d+/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
+    const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(/posts/comments/\\d+)\\)`, 'g');
 
     // Bulk
-    const enumeratedShortPattern = /\[\d+]\(\/[qa]\/\d+\)/g
+    const enumeratedShortPattern = /\[\d+]\(\/[qa]\/\d+\)/g;
     const commaSeparatedPostsPattern = new RegExp(`((?:${baseShortQAPattern.source}|${enumeratedShortPattern.source})(,\\s*))+(${baseShortQAPattern.source})`, 'g');
 
     // User
-    const userProfilePattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/users\/(\\d+)(\/[^/]+)?\\)`, 'g');
+    const userProfilePattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?/users/(\\d+)(/[^/]+)?\\)`, 'g');
 
     // Excess Space
-    const excessSpace = /\s{2,}/g
+    const excessSpace = /\s{2,}/g;
     const reducers = [
         // Remove excess space
         (s) => s.replace(
@@ -56,17 +56,17 @@
         // Shorten domain/qa/postid/userid to just /qa/postid
         (s) => s.replace(
             shortQAPattern,
-            "[$1](/$3/$4)"
+            '[$1](/$3/$4)'
         ),
         // Shorten domain/questions/postid/title to just /q/postid
         (s) => s.replace(
             fullQPattern,
-            "[$1](/q/$3)"
+            '[$1](/q/$3)'
         ),
         // Shorten domain/questions/questionid/title/answerid#answerid to just /a/answerid
         (s) => s.replace(
             fullAPattern,
-            "[$1](/a/$3)"
+            '[$1](/a/$3)'
         ),
         // Bulk Enumerate and reduce domain?/qa/post1id/userid?,domain?/qa/post2id/userid? to [1](/qa/post1id), [2](/qa/post2id),...
         (s) => s.replace(commaSeparatedPostsPattern, (substring) => {
@@ -85,17 +85,17 @@
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
         (s) => s.replace(
             fullCommentPattern,
-            "[$1](/posts/comments/$3)"
+            '[$1](/posts/comments/$3)'
         ),
         // Shorten domain/posts/comments/commentid to just /posts/comments/commentid
         (s) => s.replace(
             shortCommentPattern,
-            "[$1]($3)"
+            '[$1]($3)'
         ),
         // Shorten domain/users/userid/uname to /users/userid
         (s) => s.replace(
             userProfilePattern,
-            "[$1](/users/$3)"
+            '[$1](/users/$3)'
         )
     ];
 
@@ -109,25 +109,25 @@
     const testIsFlagPopup = (nodeEvent) => {
         return (
             $(nodeEvent.target).hasClass(selectors.css.flagDialoguePopupClass) && // Popup added
-            $(nodeEvent.target).attr("id") === selectors.ids.flagDialogueId // Check is Flag popup
+            $(nodeEvent.target).attr('id') === selectors.ids.flagDialogueId // Check is Flag popup
         );
-    }
+    };
 
     $('.js-flag-post-link').on('click', () => {
-        $(document).on("DOMNodeInserted", (nodeEvent) => {
+        $(document).on('DOMNodeInserted', (nodeEvent) => {
             if (testIsFlagPopup(nodeEvent)) {
                 const textArea = $('textarea[name="otherText"]');
                 textArea.on('input propertychange', (ev) => {
                     textArea.val(patternReducer(ev.target.value));
-                })
+                });
             }
         });
 
-        $(document).on("DOMNodeRemoved", function (nodeEvent) {
+        $(document).on('DOMNodeRemoved', function (nodeEvent) {
             if (testIsFlagPopup(nodeEvent)) {
                 // Clear listeners when closed
-                $(document).off("DOMNodeInserted");
-                $(document).off("DOMNodeRemoved");
+                $(document).off('DOMNodeInserted');
+                $(document).off('DOMNodeRemoved');
             }
         });
     });

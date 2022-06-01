@@ -22,7 +22,7 @@ const getFormDataFromObject = (obj) => {
         acc.set(key, value);
         return acc;
     }, new FormData());
-}
+};
 
 
 GM_config.init({
@@ -58,7 +58,7 @@ GM_config.init({
 
     Array.prototype.sample = function () {
         return this[Math.floor(Math.random() * this.length)];
-    }
+    };
 
 
     const sendMessagePOST = (messageText) => {
@@ -71,9 +71,8 @@ GM_config.init({
         });
     };
 
-    const sendMessageOnButtonClick = (messageTextBuilder) => (ev) => {
-        sendMessagePOST(messageTextBuilder()).then((res) => {
-            // console.log(res);
+    const sendMessageOnButtonClick = (messageTextBuilder) => () => {
+        sendMessagePOST(messageTextBuilder()).then(() => {
             // Do Nothing
         }).catch((res) => {
             // Log For Safety

@@ -1,0 +1,56 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "greasemonkey": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "root": true,
+  "rules": {
+    "arrow-parens": [
+      "error",
+      "always"
+    ],
+    "arrow-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "block-spacing": [
+      "error",
+      "always"
+    ],
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "comma-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    "comma-style": [
+      "error",
+      "last"
+    ],
+    "func-call-spacing": [
+      "error",
+      "never"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "space-before-function-paren": "error"
+  }
+}
