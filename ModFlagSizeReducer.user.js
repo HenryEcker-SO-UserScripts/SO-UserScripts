@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         ModFlagSizeReducer
-// @description  Tries to makes mod flags smaller where possible
+// @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.5
