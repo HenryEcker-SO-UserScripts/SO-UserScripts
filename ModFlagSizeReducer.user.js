@@ -7,8 +7,12 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 //
-// @match        *://*stackoverflow.com/questions/*
-// @exclude      *://*stackoverflow.com/c/*
+// @match        *://*.stackoverflow.com/questions/*
+// @match        *://*.askubuntu.com/questions/*
+// @match        *://*.mathoverflow.net/questions/*
+// @match        *://*.serverfault.com/questions/*
+// @match        *://*.stackapps.com/questions/*
+// @match        *://*.stackexchange.com/questions/*
 // @grant        none
 //
 // ==/UserScript==
