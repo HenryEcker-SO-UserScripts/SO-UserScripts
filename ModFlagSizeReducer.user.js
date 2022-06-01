@@ -17,13 +17,18 @@
 (function () {
     'use strict';
 
+    // Q & A patterns
     const baseShortQAPattern = new RegExp(`(${window.location.origin})?\/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
 
     const shortQAPattern = new RegExp(`\\[(.*)\\]\\(${baseShortQAPattern.source}\\)`, 'g');
     const fullQPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/(\\d+)\/[^/]+\\)`, 'g');
     const fullAPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\/(\\d+)#\\d+\\)`, 'g');
+
+    // Comment Patterns
     const fullCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/questions\/\\d+\/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
     const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(\/posts\/comments\/\\d+)\\)`, 'g');
+
+    // Bulk
     const commaSeparatedPostsPattern = new RegExp(`(${baseShortQAPattern.source}(,\\s*|$))+`, 'g');
     const reducers = [
         // Shorten domain/qa/postid/userid to just /qa/postid
@@ -31,12 +36,6 @@
             shortQAPattern,
             "[$1](/$3/$4)"
         ),
-        // Bulk Enumerate and reduce domain?/qa/post1id/userid?,domain?/qa/post2id/userid? to [1](/qa/post1id), [2](/qa/post2id),...
-        (s) => s.replace(commaSeparatedPostsPattern, (substring) => {
-            return substring.match(baseShortQAPattern).map((match, idx) => {
-                return match.replace(baseShortQAPattern, `[${idx + 1}](/$2/$3)`)
-            }).join(',')
-        }),
         // Shorten domain/questions/postid/title to just /q/postid
         (s) => s.replace(
             fullQPattern,
@@ -47,6 +46,19 @@
             fullAPattern,
             "[$1](/a/$3)"
         ),
+        // Bulk Enumerate and reduce domain?/qa/post1id/userid?,domain?/qa/post2id/userid? to [1](/qa/post1id), [2](/qa/post2id),...
+        (s) => s.replace(commaSeparatedPostsPattern, (substring) => {
+            let ids = new Map();
+            return substring.match(baseShortQAPattern).map((match) => {
+                return match.replace(baseShortQAPattern, (sub, p1, p2, p3) => {
+                    if (!ids.has(p3)) {
+                        ids.set(p3, Math.max(0, ...ids.values()) + 1);
+                    }
+                    return `[${ids.get(p3)}](/${p2}/${p3})`;
+                });
+            }).join(',')
+        }),
+
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
         (s) => s.replace(
             fullCommentPattern,
