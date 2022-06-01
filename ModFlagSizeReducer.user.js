@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
+// @version      0.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 //
@@ -38,10 +38,6 @@
     const fullCommentPattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?/questions/\\d+/[^/]+\\/\\d+#comment(\\d+)_\\d+\\)`, 'g');
     const shortCommentPattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?(/posts/comments/\\d+)\\)`, 'g');
 
-    // Bulk
-    const enumeratedShortPattern = /\[\d+]\(\/[qa]\/\d+\)/g;
-    const commaSeparatedPostsPattern = new RegExp(`((?:${baseShortQAPattern.source}|${enumeratedShortPattern.source})(,\\s*))+(${baseShortQAPattern.source})`, 'g');
-
     // User
     const userProfilePattern = new RegExp(`\\[(.*)]\\((${window.location.origin})?/users/(\\d+)(/[^/]+)?\\)`, 'g');
 
@@ -68,10 +64,11 @@
             fullAPattern,
             '[$1](/a/$3)'
         ),
-        // Bulk Enumerate and reduce domain?/qa/post1id/userid?,domain?/qa/post2id/userid? to [1](/qa/post1id), [2](/qa/post2id),...
-        (s) => s.replace(commaSeparatedPostsPattern, (substring) => {
+        // Auto-Enumerate any bare post links
+        // reduce domain?/qa/post1id/userid? domain?/qa/post2id/userid? to [1](/qa/post1id) [2](/qa/post2id),...
+        (s) => {
             let ids = new Map();
-            return substring.replace(baseShortQAPattern, (sub, p1, p2, p3) => {
+            return s.replace(baseShortQAPattern, (sub, p1, p2, p3) => {
                 if (!ids.has(p3)) {
                     ids.set(p3, Math.max(0, ...ids.values()) + 1);
                 }
@@ -80,7 +77,7 @@
                 }
                 return `[${ids.get(p3)}](/${p2}/${p3})`;
             });
-        }),
+        },
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
         (s) => s.replace(
             fullCommentPattern,
