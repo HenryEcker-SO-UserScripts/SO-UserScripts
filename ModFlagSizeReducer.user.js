@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.7
+// @version      0.0.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 //
@@ -112,8 +112,9 @@
     $('.js-flag-post-link').on('click', () => {
         $(document).on('DOMNodeInserted', (nodeEvent) => {
             if (testIsFlagPopup(nodeEvent)) {
-                ids = new Map(); // Clear map on load
+                console.log(flagText);
                 const textArea = $('textarea[name="otherText"]');
+                ids = new Map(); // Clear map on load
                 textArea.on('input propertychange', (ev) => {
                     const reducedText = patternReducer(ev.target.value);
                     ev.target.value = reducedText;
@@ -121,7 +122,12 @@
                 });
 
                 if (flagText !== undefined) {
+                    const inputButton = $('input[value="PostOther"]');
+                    inputButton.trigger('click');
+                    inputButton.trigger('change');
                     textArea.val(flagText);
+                    textArea.trigger('input');
+                    textArea.focus();
                 }
             }
         });
