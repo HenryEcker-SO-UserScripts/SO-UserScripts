@@ -17,6 +17,16 @@
 (function () {
     'use strict';
 
+    const selectors = {
+        css: {
+            flagDialoguePopupClass: "popup"
+        },
+        ids: {
+            flagDialogueId: "popup-flag-post",
+            reduceButton: "mfsr-reduce-pattern-btn"
+        }
+    }
+
     // Q & A patterns
     const baseShortQAPattern = new RegExp(`(${window.location.origin})?\/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
 
@@ -75,16 +85,34 @@
         return text;
     };
 
+    const testIsFlagPopup = (nodeEvent) => {
+        return (
+            $(nodeEvent.target).hasClass(selectors.css.flagDialoguePopupClass) && // Popup added
+            $(nodeEvent.target).attr("id") === selectors.ids.flagDialogueId // Check is Flag popup
+        );
+    }
+
     $('.js-flag-post-link').on('click', () => {
         $(document).on("DOMNodeInserted", (nodeEvent) => {
-            if ($(nodeEvent.target).hasClass("popup") && $(nodeEvent.target).attr("id") === "popup-flag-post") {
+            if (
+                testIsFlagPopup(nodeEvent) &&
+                $(`#${selectors.ids.reduceButton}`).length === 0  // Button has not already been added
+            ) {
                 const textArea = $('textarea[name="otherText"]');
-                const reduceButton = $('<button type="button" class="s-btn">Try Reducing Patterns</button>');
+                const reduceButton = $(`<button id="${selectors.ids.reduceButton}" type="button" class="s-btn">Try Reducing Patterns</button>`);
                 reduceButton.on('click', () => {
                     const val = textArea.val();
                     textArea.val(patternReducer(val));
                 });
                 textArea.parent().append(reduceButton);
+            }
+        });
+
+        $(document).on("DOMNodeRemoved", function (nodeEvent) {
+            if (testIsFlagPopup(nodeEvent)) {
+                // Clear listeners when closed
+                $(document).off("DOMNodeInserted");
+                $(document).off("DOMNodeRemoved");
             }
         });
     });
