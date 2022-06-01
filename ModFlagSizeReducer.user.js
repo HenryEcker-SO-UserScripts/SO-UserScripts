@@ -39,7 +39,8 @@
     const shortCommentPattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?(\/posts\/comments\/\\d+)\\)`, 'g');
 
     // Bulk
-    const commaSeparatedPostsPattern = new RegExp(`(${baseShortQAPattern.source}(,\\s*))+(${baseShortQAPattern.source})`, 'g');
+    const enumeratedShortPattern = /\[\d+]\(\/[qa]\/\d+\)/g
+    const commaSeparatedPostsPattern = new RegExp(`((?:${baseShortQAPattern.source}|${enumeratedShortPattern.source})(,\\s*))+(${baseShortQAPattern.source})`, 'g');
     const reducers = [
         // Shorten domain/qa/postid/userid to just /qa/postid
         (s) => s.replace(
@@ -63,7 +64,11 @@
                 if (!ids.has(p3)) {
                     ids.set(p3, Math.max(0, ...ids.values()) + 1);
                 }
-                return `[${ids.get(p3)}](/${p2}/${p3})`;
+                if (!p1) {
+                    return sub;
+                } else {
+                    return `[${ids.get(p3)}](/${p2}/${p3})`;
+                }
             });
         }),
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
@@ -94,17 +99,11 @@
 
     $('.js-flag-post-link').on('click', () => {
         $(document).on("DOMNodeInserted", (nodeEvent) => {
-            if (
-                testIsFlagPopup(nodeEvent) &&
-                $(`#${selectors.ids.reduceButton}`).length === 0  // Button has not already been added
-            ) {
+            if (testIsFlagPopup(nodeEvent)) {
                 const textArea = $('textarea[name="otherText"]');
-                const reduceButton = $(`<button id="${selectors.ids.reduceButton}" type="button" class="s-btn">Try Reducing Patterns</button>`);
-                reduceButton.on('click', () => {
-                    const val = textArea.val();
-                    textArea.val(patternReducer(val));
-                });
-                textArea.parent().append(reduceButton);
+                textArea.on('input propertychange', (ev) => {
+                    textArea.val(patternReducer(ev.target.value));
+                })
             }
         });
 
