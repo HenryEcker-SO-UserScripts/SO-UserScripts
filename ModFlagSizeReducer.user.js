@@ -115,7 +115,7 @@
             }
         });
 
-        $(document).on('DOMNodeRemoved', function (nodeEvent) {
+        $(document).on('DOMNodeRemoved', (nodeEvent) => {
             if (testIsFlagPopup(nodeEvent)) {
                 // Clear listeners when closed
                 $(document).off('DOMNodeInserted');
