@@ -41,7 +41,18 @@
     // Bulk
     const enumeratedShortPattern = /\[\d+]\(\/[qa]\/\d+\)/g
     const commaSeparatedPostsPattern = new RegExp(`((?:${baseShortQAPattern.source}|${enumeratedShortPattern.source})(,\\s*))+(${baseShortQAPattern.source})`, 'g');
+
+    // User
+    const userProfilePattern = new RegExp(`\\[(.*)\\]\\((${window.location.origin})?\/users\/(\\d+)(\/[^/]+)?\\)`, 'g');
+
+    // Excess Space
+    const excessSpace = /\s{2,}/g
     const reducers = [
+        // Remove excess space
+        (s) => s.replace(
+            excessSpace,
+            ' '
+        ),
         // Shorten domain/qa/postid/userid to just /qa/postid
         (s) => s.replace(
             shortQAPattern,
@@ -80,6 +91,11 @@
         (s) => s.replace(
             shortCommentPattern,
             "[$1]($3)"
+        ),
+        // Shorten domain/users/userid/uname to /users/userid
+        (s) => s.replace(
+            userProfilePattern,
+            "[$1](/users/$3)"
         )
     ];
 
