@@ -39,7 +39,7 @@
     const fullAPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/questions/\\d+/[^\\/]+/(\\d+)#\\d+\\)`, 'g');
 
     // Comment Patterns
-    const fullCommentPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/questions/\\d+/[^\\/]+#comment(\\d+)_\\d+\\)`, 'g');
+    const fullCommentPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/questions/\\d+(?:/[^\\/]+|/[^\\/]+/\\d+)#comment(\\d+)_\\d+\\)`, 'g');
     const shortCommentPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?(/posts/comments/\\d+)\\)`, 'g');
 
     // User
