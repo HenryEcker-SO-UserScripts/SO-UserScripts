@@ -24,6 +24,9 @@
       "error",
       "always"
     ],
+    "camelcase": [
+      "error"
+    ],
     "comma-dangle": [
       "error",
       "never"

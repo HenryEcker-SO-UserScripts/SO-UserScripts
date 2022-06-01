@@ -77,9 +77,8 @@
                 }
                 if (!p1) {
                     return sub;
-                } else {
-                    return `[${ids.get(p3)}](/${p2}/${p3})`;
                 }
+                return `[${ids.get(p3)}](/${p2}/${p3})`;
             });
         }),
         // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
@@ -100,10 +99,7 @@
     ];
 
     const patternReducer = (text) => {
-        for (let reducer of reducers) {
-            text = reducer(text);
-        }
-        return text;
+        return reducers.reduce((newText, reducer) => reducer(newText), text);
     };
 
     const testIsFlagPopup = (nodeEvent) => {
@@ -116,9 +112,8 @@
     $('.js-flag-post-link').on('click', () => {
         $(document).on('DOMNodeInserted', (nodeEvent) => {
             if (testIsFlagPopup(nodeEvent)) {
-                const textArea = $('textarea[name="otherText"]');
-                textArea.on('input propertychange', (ev) => {
-                    textArea.val(patternReducer(ev.target.value));
+                $('textarea[name="otherText"]').on('input propertychange', (ev) => {
+                    ev.target.value = patternReducer(ev.target.value);
                 });
             }
         });
