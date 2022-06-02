@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         ModFlagSizeReducer
+// @name         ModFlagAndCommentSizeReducer
 // @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.2
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
+// @version      1.0.3
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
 // @match        *://*.stackoverflow.com/questions/*
 // @match        *://*.askubuntu.com/questions/*
@@ -16,7 +16,7 @@
 // @grant        none
 //
 // ==/UserScript==
-/* globals $ */
+/* globals StackExchange, $ */
 
 (function () {
     'use strict';
@@ -27,7 +27,10 @@
         },
         ids: {
             flagDialogueId: 'popup-flag-post',
-            reduceButton: 'mfsr-reduce-pattern-btn'
+            reduceButton: 'mfacsr-reduce-pattern-btn'
+        },
+        attrs: {
+            monitoredTextArea: 'data-mfacsr-monitored'
         }
     };
 
@@ -46,7 +49,7 @@
         // Shorten /questions/postid/title to just /q/postid
         {
             pattern: /\[(.*)]\(\/questions\/(\d+)\/[^/#]+\)/g,
-            eplacer: '[$1](/q/$2)'
+            replacer: '[$1](/q/$2)'
         },
         // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
         {
@@ -101,19 +104,36 @@
         );
     };
 
-    let flagText = undefined; // Keep flag text (fragile save)
+    const testIsCommentBox = (nodeEvent) => {
+        return (
+            $(nodeEvent.target).is('textarea.s-textarea.js-comment-text-input')
+        );
+    };
 
-    $('.js-flag-post-link').on('click', () => {
+    const textAreaMonitor = (textArea, cb = undefined) => {
+        if (textArea.attr(selectors.attrs.monitoredTextArea) !== true) { // prevent adding the listener multiple times
+            textArea.on('input propertychange', (ev) => {
+                const [reducedText, selectionStart] = patternReducer(ev.target.value, ev.target.selectionStart);
+                ev.target.value = reducedText;
+                // Fix Cursor Position
+                ev.target.selectionStart = selectionStart;
+                ev.target.selectionEnd = selectionStart;
+
+                // Optionally do something else with reducedText and selectionStart
+                if (cb) cb(reducedText, selectionStart);
+            });
+            textArea.attr('data-mfacsr-monitored', true);
+        }
+    };
+
+    StackExchange.ready(() => {
+        let flagText = undefined; // Keep flag text (fragile save)
         $(document).on('DOMNodeInserted', (nodeEvent) => {
             if (testIsFlagPopup(nodeEvent)) {
                 const textArea = $('textarea[name="otherText"]');
-                textArea.on('input propertychange', (ev) => {
-                    const [reducedText, selectionStart] = patternReducer(ev.target.value, ev.target.selectionStart);
-                    ev.target.value = reducedText;
+
+                textAreaMonitor(textArea, (reducedText) => {
                     flagText = reducedText;
-                    // Fix Cursor Position
-                    ev.target.selectionStart = selectionStart;
-                    ev.target.selectionEnd = selectionStart;
                 });
 
                 if (flagText !== undefined) {
@@ -126,14 +146,8 @@
                     textArea.trigger('propertychange');
                     textArea.focus();
                 }
-            }
-        });
-
-        $(document).on('DOMNodeRemoved', (nodeEvent) => {
-            if (testIsFlagPopup(nodeEvent)) {
-                // Clear listeners when closed
-                $(document).off('DOMNodeInserted');
-                $(document).off('DOMNodeRemoved');
+            } else if (testIsCommentBox(nodeEvent)) {
+                textAreaMonitor($(nodeEvent.target));
             }
         });
     });
