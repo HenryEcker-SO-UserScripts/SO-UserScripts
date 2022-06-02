@@ -125,6 +125,7 @@
                     inputButton.trigger('change');
                     textArea.val(flagText);
                     textArea.trigger('input');
+                    textArea.trigger('propertychange');
                     textArea.focus();
                 }
             }
