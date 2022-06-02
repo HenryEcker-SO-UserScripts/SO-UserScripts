@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         ModFlagAndCommentSizeReducer
-// @description  Tries to make mod flags smaller where possible
+// @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      1.0.4
