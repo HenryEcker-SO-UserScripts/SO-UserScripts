@@ -46,6 +46,7 @@
       "error",
       "never"
     ],
+    "guard-for-in": "error",
     "semi": [
       "error",
       "always"
