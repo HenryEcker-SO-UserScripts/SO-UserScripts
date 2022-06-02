@@ -39,7 +39,7 @@
     };
 
     // let ids = new Map();
-    const absoluteLinkPattern = new RegExp(`\\[([^]]*)]\\((?:${window.location.origin})/([^)]+)\\)`);
+    const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
     const bareLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}\\/([qa])\\/(\\d+)(\\/\\d+)?`, 'g');
 
     const reducerTiers = [
@@ -48,9 +48,9 @@
             // Convert any absolute links to relative links
             (s) => s.replace(absoluteLinkPattern, '[$1](/$2)'),
             // Shorten /questions/postid/title to just /q/postid
-            (s) => s.replace(/\[([^]]*)]\(\/questions\/(\d+)\/[^/#]+\)/g, '[$1](/q/$2)'),
+            (s) => s.replace(/\[(.*?)]\(\/questions\/(\d+)\/[^/#]+\)/g, '[$1](/q/$2)'),
             // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
-            (s) => s.replace(/\[([^]]*)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)'),
+            (s) => s.replace(/\[(.*?)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)'),
             // Convert any bare post links to [1](/qa/postid/userid)
             (s) => s.replace(bareLinkPattern, '[1](/$1/$2$3)'),
             // Enumerate numbered links (Goes back through to renumber any existing short-links when needed
@@ -64,14 +64,14 @@
                 });
             },
             // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
-            (s) => s.replace(/\[([^]]*)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)'),
+            (s) => s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)'),
             // Shorten /users/userid/uname to /users/userid
-            (s) => s.replace(/\[([^]]*)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)')
+            (s) => s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)')
         ],
         // Tier Two Reducers
         [
             // Shorten /qa/postid/userid to just /qa/postid
-            (s) => s.replace(/\[([^]]*)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)'),
+            (s) => s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)'),
             // Remove any excess whitespace
             (s) => s.replace(/\s{2,}/g, ' ')
         ]
@@ -112,7 +112,7 @@
                 let reducedText = ev.target.value;
                 let selectionStart = ev.target.selectionStart;
                 for (const reducers of reducerTiers) {
-                    let [reducedText, selectionStart] = patternReducer(reducers, reducedText, selectionStart);
+                    [reducedText, selectionStart] = patternReducer(reducers, reducedText, selectionStart);
                     // If reducedText is under maxLen stop reducing
                     if (reducedText.length <= maxLen) {
                         break;
