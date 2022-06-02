@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.3
+// @version      1.0.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -34,54 +34,40 @@
         }
     };
 
-    let ids = new Map();
+    // let ids = new Map();
+    const absoluteLinkPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})/([^)]+)\\)`);
+    const bareLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}\\/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
     const reducers = [
         // Convert any absolute links to relative links
-        {
-            pattern: new RegExp(`\\[(.*)]\\((?:${window.location.origin})/([^)]+)\\)`),
-            replacer: '[$1](/$2)'
-        },
+        (s) => s.replace(absoluteLinkPattern, '[$1](/$2)'),
         // Shorten /qa/postid/userid to just /qa/postid
-        {
-            pattern: /\[(.*)]\(\/([qa])\/(\d+)\/(\d+)?\)/g,
-            replacer: '[$1](/$2/$3)'
-        },
+        (s) => s.replace(/\[(.*)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)'),
         // Shorten /questions/postid/title to just /q/postid
-        {
-            pattern: /\[(.*)]\(\/questions\/(\d+)\/[^/#]+\)/g,
-            replacer: '[$1](/q/$2)'
-        },
+        (s) => s.replace(/\[(.*)]\(\/questions\/(\d+)\/[^/#]+\)/g, '[$1](/q/$2)'),
         // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
-        {
-            pattern: /\[(.*)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g,
-            replacer: '[$1](/a/$2)'
-        },
-        // Auto-Enumerate any bare post links
-        {
-            pattern: new RegExp(`(?:(?<!]\\())(?:${window.location.origin})/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g'),
-            replacer: (sub, p1, p2) => {
+        (s) => s.replace(/\[(.*)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)'),
+        // Convert any bare post links to [1](/qa/postid)
+        (s) => s.replace(bareLinkPattern, '[1](/$1/$2)'),
+        // Enumerate numbered links (Goes back through to renumber any existing short-links when needed
+        (s) => {
+            const ids = new Map();
+            return s.replace(/\[\d+]\(\/([qa])\/(\d+)\)/g, (sub, p1, p2) => {
                 if (!ids.has(p2)) {
                     ids.set(p2, Math.max(0, ...ids.values()) + 1);
                 }
                 return `[${ids.get(p2)}](/${p1}/${p2})`;
-            }
+            });
         },
         // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
-        {
-            pattern: /\[(.*)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g,
-            replacer: '[$1](/posts/comments/$2)'
-        },
+        (s) => s.replace(/\[(.*)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)'),
         // Shorten /users/userid/uname to /users/userid
-        {
-            pattern: /\[(.*)]\(\/users\/(\d+)\/[^/#]+\)/g,
-            replacer: '[$1](/users/$2)'
-        }
+        (s) => s.replace(/\[(.*)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)')
     ];
 
-    const posTrackingReplace = (pattern, text, replacer, pos) => {
+    const posTrackingReplace = (text, reducer, pos) => {
         let sLength = text.length;
         // Replace Text
-        text = text.replace(pattern, replacer);
+        text = reducer(text);
         // Assumes pattern always reduces size (which is the point)
         pos = Math.max(0, pos - (sLength - text.length));
         // Return the string and the updated position
@@ -89,12 +75,9 @@
     };
 
     const patternReducer = (text, pos) => {
-        return reducers.reduce(
-            (
-                [newText, newPos], reducer
-            ) => posTrackingReplace(reducer.pattern, newText, reducer.replacer, newPos),
-            [text, pos]
-        );
+        return reducers.reduce((
+            [newText, newPos], reducer
+        ) => posTrackingReplace(newText, reducer, newPos), [text, pos]);
     };
 
     const testIsFlagPopup = (nodeEvent) => {
