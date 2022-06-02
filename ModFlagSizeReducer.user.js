@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.1
+// @version      1.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 //
@@ -31,75 +31,67 @@
         }
     };
 
-    // Relative Link Eligible
-    const absoluteLinkPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})/([^)]+)\\)`);
-
-    // Q & A patterns
-    const bareShareQAPattern = new RegExp(`(?:(?<!]\\())(?:${window.location.origin})/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
-
-    const shortQAPattern = /\[(.*)]\(\/([qa])\/(\d+)\/(\d+)?\)/g;
-    const fullQPattern = /\[(.*)]\(\/questions\/(\d+)\/[^/#]+\)/g;
-    const fullAPattern = /\[(.*)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g;
-
-    // Comment Patterns
-    const fullCommentPattern = /\[(.*)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g;
-
-    // User
-    const userProfilePattern = /\[(.*)]\(\/users\/(\d+)(\/[^/#]+)?\)/g
-
-    // Excess Space
-    const excessSpacePattern = /\s{2,}/g;
     let ids = new Map();
     const reducers = [
-        // Remove excess space
-        (s) => s.replace(
-            excessSpacePattern,
-            ' '
-        ),
         // Convert any absolute links to relative links
-        (s) => s.replace(
-            absoluteLinkPattern,
-            '[$1](/$2)'
-        ),
+        {
+            pattern: new RegExp(`\\[(.*)]\\((?:${window.location.origin})/([^)]+)\\)`),
+            replacer: '[$1](/$2)'
+        },
         // Shorten /qa/postid/userid to just /qa/postid
-        (s) => s.replace(
-            shortQAPattern,
-            '[$1](/$2/$3)'
-        ),
+        {
+            pattern: /\[(.*)]\(\/([qa])\/(\d+)\/(\d+)?\)/g,
+            replacer: '[$1](/$2/$3)'
+        },
         // Shorten /questions/postid/title to just /q/postid
-        (s) => s.replace(
-            fullQPattern,
-            '[$1](/q/$2)'
-        ),
+        {
+            pattern: /\[(.*)]\(\/questions\/(\d+)\/[^/#]+\)/g,
+            eplacer: '[$1](/q/$2)'
+        },
         // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
-        (s) => s.replace(
-            fullAPattern,
-            '[$1](/a/$2)'
-        ),
+        {
+            pattern: /\[(.*)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g,
+            replacer: '[$1](/a/$2)'
+        },
         // Auto-Enumerate any bare post links
-        // reduce domain/qa/post1id/userid? domain/qa/post2id/userid? to [1](/qa/post1id) [2](/qa/post2id),...
-        (s) => {
-            return s.replace(bareShareQAPattern, (sub, p1, p2) => {
+        {
+            pattern: new RegExp(`(?:(?<!]\\())(?:${window.location.origin})/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g'),
+            replacer: (sub, p1, p2) => {
                 if (!ids.has(p2)) {
                     ids.set(p2, Math.max(0, ...ids.values()) + 1);
                 }
                 return `[${ids.get(p2)}](/${p1}/${p2})`;
-            });
+            }
         },
         // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
-        (s) => s.replace(
-            fullCommentPattern,
-            '[$1](/posts/comments/$2)'
-        ),
+        {
+            pattern: /\[(.*)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g,
+            replacer: '[$1](/posts/comments/$2)'
+        },
         // Shorten /users/userid/uname to /users/userid
-        (s) => s.replace(
-            userProfilePattern,
-            '[$1](/users/$2)'
-        )
+        {
+            pattern: /\[(.*)]\(\/users\/(\d+)\/[^/#]+\)/g,
+            replacer: '[$1](/users/$2)'
+        }
     ];
 
-    const patternReducer = (text) => {
-        return reducers.reduce((newText, reducer) => reducer(newText), text);
+    const posTrackingReplace = (pattern, text, replacer, pos) => {
+        let sLength = text.length;
+        // Replace Text
+        text = text.replace(pattern, replacer);
+        // Assumes pattern always reduces size (which is the point)
+        pos = Math.max(0, pos - (sLength - text.length));
+        // Return the string and the updated position
+        return [text, pos];
+    };
+
+    const patternReducer = (text, pos) => {
+        return reducers.reduce(
+            (
+                [newText, newPos], reducer
+            ) => posTrackingReplace(reducer.pattern, newText, reducer.replacer, newPos),
+            [text, pos]
+        );
     };
 
     const testIsFlagPopup = (nodeEvent) => {
@@ -116,15 +108,19 @@
             if (testIsFlagPopup(nodeEvent)) {
                 const textArea = $('textarea[name="otherText"]');
                 textArea.on('input propertychange', (ev) => {
-                    const reducedText = patternReducer(ev.target.value);
+                    const [reducedText, selectionStart] = patternReducer(ev.target.value, ev.target.selectionStart);
                     ev.target.value = reducedText;
                     flagText = reducedText;
+                    // Fix Cursor Position
+                    ev.target.selectionStart = selectionStart;
+                    ev.target.selectionEnd = selectionStart;
                 });
 
                 if (flagText !== undefined) {
                     const inputButton = $('input[value="PostOther"]');
                     inputButton.trigger('click');
                     inputButton.trigger('change');
+
                     textArea.val(flagText);
                     textArea.trigger('input');
                     textArea.trigger('propertychange');
