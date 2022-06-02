@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.0
+// @version      1.0.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagSizeReducer.user.js
 //
@@ -31,19 +31,21 @@
         }
     };
 
+    // Relative Link Eligible
+    const absoluteLinkPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})/([^)]+)\\)`);
+
     // Q & A patterns
     const bareShareQAPattern = new RegExp(`(?:(?<!]\\())(?:${window.location.origin})/([qa])\\/(\\d+)(?:\\/\\d+)?`, 'g');
 
-    const shortQAPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/([qa])\\/(\\d+)(?:\\/\\d+)?\\)`, 'g');
-    const fullQPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/questions/(\\d+)/[^\\/#]+\\)`, 'g');
-    const fullAPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/questions/\\d+/[^\\/]+/(\\d+)#\\d+\\)`, 'g');
+    const shortQAPattern = /\[(.*)]\(\/([qa])\/(\d+)\/(\d+)?\)/g;
+    const fullQPattern = /\[(.*)]\(\/questions\/(\d+)\/[^/#]+\)/g;
+    const fullAPattern = /\[(.*)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g;
 
     // Comment Patterns
-    const fullCommentPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/questions/\\d+(?:/[^\\/]+|/[^\\/]+/\\d+)#comment(\\d+)_\\d+\\)`, 'g');
-    const shortCommentPattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?(/posts/comments/\\d+)\\)`, 'g');
+    const fullCommentPattern = /\[(.*)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g;
 
     // User
-    const userProfilePattern = new RegExp(`\\[(.*)]\\((?:${window.location.origin})?/users/(\\d+)(/[^\\/]+)?\\)`, 'g');
+    const userProfilePattern = /\[(.*)]\(\/users\/(\d+)(\/[^/#]+)?\)/g
 
     // Excess Space
     const excessSpacePattern = /\s{2,}/g;
@@ -54,17 +56,22 @@
             excessSpacePattern,
             ' '
         ),
-        // Shorten domain/qa/postid/userid to just /qa/postid
+        // Convert any absolute links to relative links
+        (s) => s.replace(
+            absoluteLinkPattern,
+            '[$1](/$2)'
+        ),
+        // Shorten /qa/postid/userid to just /qa/postid
         (s) => s.replace(
             shortQAPattern,
             '[$1](/$2/$3)'
         ),
-        // Shorten domain/questions/postid/title to just /q/postid
+        // Shorten /questions/postid/title to just /q/postid
         (s) => s.replace(
             fullQPattern,
             '[$1](/q/$2)'
         ),
-        // Shorten domain/questions/questionid/title/answerid#answerid to just /a/answerid
+        // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
         (s) => s.replace(
             fullAPattern,
             '[$1](/a/$2)'
@@ -79,17 +86,12 @@
                 return `[${ids.get(p2)}](/${p1}/${p2})`;
             });
         },
-        // Shorten domain/questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
+        // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
         (s) => s.replace(
             fullCommentPattern,
             '[$1](/posts/comments/$2)'
         ),
-        // Shorten domain/posts/comments/commentid to just /posts/comments/commentid
-        (s) => s.replace(
-            shortCommentPattern,
-            '[$1]($2)'
-        ),
-        // Shorten domain/users/userid/uname to /users/userid
+        // Shorten /users/userid/uname to /users/userid
         (s) => s.replace(
             userProfilePattern,
             '[$1](/users/$2)'
