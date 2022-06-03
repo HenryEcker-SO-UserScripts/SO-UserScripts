@@ -41,8 +41,9 @@
     // let ids = new Map();
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
     const barePostLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}\\/([qa])\\/(\\d+)(\\/\\d+)?`, 'g');
-    const bareReviewLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}(\\/review\\/.*?\\/\\d+)`, 'g');
+    const bareReviewLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}(\\/review\\/.+?\\/\\d+)`, 'g');
 
+    const enumeratedLinkPattern = /\[([QAR])\d+]\((\/.+?)\)/g;
     const reducerTiers = [
         // Tier One Reducers
         [
@@ -71,7 +72,7 @@
             // Enumerate numbered links prefixed with QAR (Goes back through to renumber any existing short-links when needed)
             (s) => {
                 const ids = {};
-                return s.replace(/\[([QAR])\d+]\((\/.*?)\)/g, (sub, p1, p2) => {
+                return s.replace(enumeratedLinkPattern, (sub, p1, p2) => {
                     if (!(p1 in ids)) {
                         ids[p1] = new Map();
                         ids[p1].set(p2, 1);
@@ -99,7 +100,7 @@
             // Further shorten enumerated links by removing the link type prefix letter and re-enumerating
             (s) => {
                 const idMap = new Map();
-                return s.replace(/\[[QAR]\d+]\((\/.*?)\)/g, (sub, p1) => {
+                return s.replace(enumeratedLinkPattern, (sub, p1) => {
                     if (!idMap.has(p1)) {
                         idMap.set(p1, Math.max(0, ...idMap.values()) + 1);
                     }
