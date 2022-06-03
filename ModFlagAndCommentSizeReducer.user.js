@@ -94,7 +94,7 @@
             (s) => {
                 return s.replace(/\[1]\((\/users\/\d+)\)/g, '[U1]($1)');
             },
-            // Enumerate numbered links prefixed with QAR (Goes back through to renumber any existing short-links when needed)
+            // Enumerate numbered links prefixed with link type (QARCU) (Goes back through to renumber any existing short-links when needed)
             (s) => {
                 const ids = {};
                 return s.replace(/\[([QARCU])\d+]\((\/.+?)\)/g, (sub, p1, p2) => {
