@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.5
+// @version      1.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -40,7 +40,8 @@
 
     // let ids = new Map();
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
-    const bareLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}\\/([qa])\\/(\\d+)(\\/\\d+)?`, 'g');
+    const barePostLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}\\/([qa])\\/(\\d+)(\\/\\d+)?`, 'g');
+    const bareReviewLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}(\\/review\\/.*?\\/\\d+)`, 'g');
 
     const reducerTiers = [
         // Tier One Reducers
@@ -59,16 +60,25 @@
             },
             // Convert any bare post links to [1](/qa/postid/userid)
             (s) => {
-                return s.replace(bareLinkPattern, '[1](/$1/$2$3)');
+                return s.replace(barePostLinkPattern, (sub, p1, p2, p3) => {
+                    return `[${p1.toUpperCase()}1](/${p1}/${p2}${p3})`;
+                });
             },
-            // Enumerate numbered links (Goes back through to renumber any existing short-links when needed
+            // Convert any bare review links to [1](/review/queueName/reviewId)
             (s) => {
-                const ids = new Map();
-                return s.replace(/\[\d+]\(\/([qa])\/(\d+)(\/\d+)?\)/g, (sub, p1, p2, p3) => {
-                    if (!ids.has(p2)) {
-                        ids.set(p2, Math.max(0, ...ids.values()) + 1);
+                return s.replace(bareReviewLinkPattern, '[R1]($1)');
+            },
+            // Enumerate numbered links prefixed with QAR (Goes back through to renumber any existing short-links when needed)
+            (s) => {
+                const ids = {};
+                return s.replace(/\[([QAR])\d+]\((\/.*?)\)/g, (sub, p1, p2) => {
+                    if (!(p1 in ids)) {
+                        ids[p1] = new Map();
+                        ids[p1].set(p2, 1);
+                    } else if (!ids[p1].has(p2)) {
+                        ids[p1].set(p2, Math.max(0, ...ids[p1].values()) + 1);
                     }
-                    return `[${ids.get(p2)}](/${p1}/${p2}${p3 || ''})`;
+                    return `[${p1}${ids[p1].get(p2)}](${p2})`;
                 });
             },
             // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
@@ -85,6 +95,16 @@
             // Shorten /qa/postid/userid to just /qa/postid
             (s) => {
                 return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)');
+            },
+            // Further shorten enumerated links by removing the link type prefix letter and re-enumerating
+            (s) => {
+                const idMap = new Map();
+                return s.replace(/\[[QAR]\d+]\((\/.*?)\)/g, (sub, p1) => {
+                    if (!idMap.has(p1)) {
+                        idMap.set(p1, Math.max(0, ...idMap.values()) + 1);
+                    }
+                    return `[${idMap.get(p1)}](${p1})`;
+                });
             }
         ]
     ];
