@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.8
+// @version      1.1.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -38,9 +38,8 @@
         }
     };
 
-    // let ids = new Map();
+    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w-#%?=]+)+`, 'g');
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
-    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w-#%]+)+`, 'g');
 
     const reducerTiers = [
         // Tier One Reducers
@@ -61,15 +60,20 @@
             },
             // Shorten /questions/questionId/title/answerId#answerId to just /a/answerId
             (s) => {
-                return s.replace(/\[(.*?)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)');
+                return s.replace(/\[(.*?)]\(\/questions\/\d+\/.+?#\d+\)/g, '[$1](/a/$2)');
             },
             // Shorten /questions/postId/title#comment[commentId]_[postId] to just /posts/comments/commentId
             (s) => {
-                return s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)');
+                return s.replace(/\[(.*?)]\(\/questions\/\d+\/.+?#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)');
             },
             // Shorten /users/userid/uname to /users/userid
             (s) => {
-                return s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)');
+                return s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^?]+(\?tab=.+?)?\)/g, (sub, p1, p2, p3) => {
+                    if (p3 === undefined || p3 === '?tab=profile') { // profile tab is default
+                        return `[${p1}](/users/${p2})`;
+                    }
+                    return `[${p1}](/users/${p2}${p3})`;
+                });
             },
             //----- BARE LINK ENUMERATION ------//
             // Convert any post links from [1](/qa/postId/userid) to [QA1](/qa/postId/userid)
