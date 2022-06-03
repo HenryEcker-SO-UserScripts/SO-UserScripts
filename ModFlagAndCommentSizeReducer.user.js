@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.6
+// @version      1.0.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -40,13 +40,18 @@
 
     // let ids = new Map();
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
-    const barePostLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}\\/([qa])\\/(\\d+)(\\/\\d+)?`, 'g');
-    const bareReviewLinkPattern = new RegExp(`(?<!]\\()${window.location.origin}(\\/review\\/.+?\\/\\d+)`, 'g');
+    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w-#%]+)+`, 'g');
 
-    const enumeratedLinkPattern = /\[([QAR])\d+]\((\/.+?)\)/g;
+    const enumeratedLinkPattern = /\[([QARCU])\d+]\((\/.+?)\)/g;
     const reducerTiers = [
         // Tier One Reducers
         [
+            // Convert any bare link
+            (s) => {
+                return s.replace(bareDomainLink, (sub) => {
+                    return `[1](${sub})`;
+                });
+            },
             // Convert any absolute links to relative links
             (s) => {
                 return s.replace(absoluteLinkPattern, '[$1](/$2)');
@@ -59,15 +64,32 @@
             (s) => {
                 return s.replace(/\[(.*?)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)');
             },
-            // Convert any bare post links to [1](/qa/postid/userid)
+            // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
             (s) => {
-                return s.replace(barePostLinkPattern, (sub, p1, p2, p3) => {
-                    return `[${p1.toUpperCase()}1](/${p1}/${p2}${p3})`;
+                return s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)');
+            },
+            // Shorten /users/userid/uname to /users/userid
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)');
+            },
+            //----- BARE LINK ENUMERATION ------//
+            // Convert any post links from [1](/qa/postid/userid) to [QA1](/qa/postid/userid)
+            (s) => {
+                return s.replace(/\[\d+]\(\/([qa])\/(\d+)(\/(\d+))?\)/g, (sub, p1, p2, p3) => {
+                    return `[${p1.toUpperCase()}1](/${p1}/${p2}${p3 || ''})`;
                 });
             },
-            // Convert any bare review links to [1](/review/queueName/reviewId)
+            // Convert any review links from [1](/review/queueName/reviewId) to [R1](/review/queueName/reviewId)
             (s) => {
-                return s.replace(bareReviewLinkPattern, '[R1]($1)');
+                return s.replace(/\[1]\((\/review\/.+?\/\d+)\)/g, '[R1]($1)');
+            },
+            // Convert any comment links from [1](/posts/comments/commentId) to [C1](/posts/comments/commentId)
+            (s) => {
+                return s.replace(/\[1]\((\/posts\/comments\/\d+)\)/g, '[C1]($1)');
+            },
+            // Convert any user links from [1](/users/userId) to [U1](/users/userId)
+            (s) => {
+                return s.replace(/\[1]\((\/users\/\d+)\)/g, '[U1]($1)');
             },
             // Enumerate numbered links prefixed with QAR (Goes back through to renumber any existing short-links when needed)
             (s) => {
@@ -81,14 +103,6 @@
                     }
                     return `[${p1}${ids[p1].get(p2)}](${p2})`;
                 });
-            },
-            // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
-            (s) => {
-                return s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)');
-            },
-            // Shorten /users/userid/uname to /users/userid
-            (s) => {
-                return s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)');
             }
         ],
         // Tier Two Reducers
@@ -96,15 +110,18 @@
             // Shorten /qa/postid/userid to just /qa/postid
             (s) => {
                 return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)');
-            },
+            }
+        ],
+        // Tier Three Reducers
+        [
             // Further shorten enumerated links by removing the link type prefix letter and re-enumerating
             (s) => {
                 const idMap = new Map();
-                return s.replace(enumeratedLinkPattern, (sub, p1) => {
-                    if (!idMap.has(p1)) {
-                        idMap.set(p1, Math.max(0, ...idMap.values()) + 1);
+                return s.replace(enumeratedLinkPattern, (sub, p1, p2) => {
+                    if (!idMap.has(p2)) {
+                        idMap.set(p2, Math.max(0, ...idMap.values()) + 1);
                     }
-                    return `[${idMap.get(p1)}](${p1})`;
+                    return `[${idMap.get(p2)}](${p2})`;
                 });
             }
         ]
