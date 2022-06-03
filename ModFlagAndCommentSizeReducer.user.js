@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.7
+// @version      1.0.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -21,7 +21,7 @@
 (function () {
     'use strict';
 
-    const config = {
+    const textAreaMaxLens = {
         postFlagMaxLen: 500,
         commentMaxLen: 600
     };
@@ -42,7 +42,6 @@
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
     const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w-#%]+)+`, 'g');
 
-    const enumeratedLinkPattern = /\[([QARCU])\d+]\((\/.+?)\)/g;
     const reducerTiers = [
         // Tier One Reducers
         [
@@ -56,15 +55,15 @@
             (s) => {
                 return s.replace(absoluteLinkPattern, '[$1](/$2)');
             },
-            // Shorten /questions/postid/title to just /q/postid
+            // Shorten /questions/postId/title to just /q/postId
             (s) => {
                 return s.replace(/\[(.*?)]\(\/questions\/(\d+)\/[^/#]+\)/g, '[$1](/q/$2)');
             },
-            // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
+            // Shorten /questions/questionId/title/answerId#answerId to just /a/answerId
             (s) => {
                 return s.replace(/\[(.*?)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)');
             },
-            // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
+            // Shorten /questions/postId/title#comment[commentId]_[postId] to just /posts/comments/commentId
             (s) => {
                 return s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)');
             },
@@ -73,7 +72,7 @@
                 return s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)');
             },
             //----- BARE LINK ENUMERATION ------//
-            // Convert any post links from [1](/qa/postid/userid) to [QA1](/qa/postid/userid)
+            // Convert any post links from [1](/qa/postId/userid) to [QA1](/qa/postId/userid)
             (s) => {
                 return s.replace(/\[\d+]\(\/([qa])\/(\d+)(\/(\d+))?\)/g, (sub, p1, p2, p3) => {
                     return `[${p1.toUpperCase()}1](/${p1}/${p2}${p3 || ''})`;
@@ -94,7 +93,7 @@
             // Enumerate numbered links prefixed with QAR (Goes back through to renumber any existing short-links when needed)
             (s) => {
                 const ids = {};
-                return s.replace(enumeratedLinkPattern, (sub, p1, p2) => {
+                return s.replace(/\[([QARCU])\d+]\((\/.+?)\)/g, (sub, p1, p2) => {
                     if (!(p1 in ids)) {
                         ids[p1] = new Map();
                         ids[p1].set(p2, 1);
@@ -107,21 +106,21 @@
         ],
         // Tier Two Reducers
         [
-            // Shorten /qa/postid/userid to just /qa/postid
+            // Shorten /qa/postId/userid to just /qa/postId
             (s) => {
                 return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)');
             }
         ],
         // Tier Three Reducers
         [
-            // Further shorten enumerated links by removing the link type prefix letter and re-enumerating
+            // Further shorten the enumerated links by removing the link type prefix letter and re-enumerating
             (s) => {
                 const idMap = new Map();
-                return s.replace(enumeratedLinkPattern, (sub, p1, p2) => {
-                    if (!idMap.has(p2)) {
-                        idMap.set(p2, Math.max(0, ...idMap.values()) + 1);
+                return s.replace(/\[[QARCU]?\d+]\((\/.+?)\)/g, (sub, p1) => {
+                    if (!idMap.has(p1)) {
+                        idMap.set(p1, Math.max(0, ...idMap.values()) + 1);
                     }
-                    return `[${idMap.get(p2)}](${p2})`;
+                    return `[${idMap.get(p1)}](${p1})`;
                 });
             }
         ]
@@ -186,7 +185,7 @@
             if (testIsFlagPopup(nodeEvent)) {
                 const textArea = $('textarea[name="otherText"]');
 
-                textAreaMonitor(textArea, config.postFlagMaxLen, (reducedText) => {
+                textAreaMonitor(textArea, textAreaMaxLens.postFlagMaxLen, (reducedText) => {
                     flagText = reducedText;
                 });
 
@@ -201,7 +200,7 @@
                     textArea.focus();
                 }
             } else if (testIsCommentBox(nodeEvent)) {
-                textAreaMonitor($(nodeEvent.target), config.commentMaxLen);
+                textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen);
             }
         });
     });
