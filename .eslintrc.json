@@ -9,6 +9,10 @@
   ],
   "root": true,
   "rules": {
+    "arrow-body-style": [
+      "error",
+      "always"
+    ],
     "arrow-parens": [
       "error",
       "always"
@@ -20,12 +24,19 @@
         "after": true
       }
     ],
+    "block-scoped-var": "error",
     "block-spacing": [
       "error",
       "always"
     ],
     "camelcase": [
-      "error"
+      "error",
+      {
+        "allow": [
+          "StackExchange",
+          "GM_config"
+        ]
+      }
     ],
     "comma-dangle": [
       "error",
@@ -42,19 +53,22 @@
       "error",
       "last"
     ],
+    "curly": "error",
+    "eqeqeq": "error",
     "func-call-spacing": [
       "error",
       "never"
     ],
     "guard-for-in": "error",
-    "semi": [
-      "error",
-      "always"
-    ],
     "quotes": [
       "error",
       "single"
     ],
-    "space-before-function-paren": "error"
+    "prefer-const": "error",
+    "space-before-function-paren": "error",
+    "semi": [
+      "error",
+      "always"
+    ]
   }
 }

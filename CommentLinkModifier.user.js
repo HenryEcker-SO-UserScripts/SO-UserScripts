@@ -20,7 +20,9 @@
     const commentComponentContainerSelector = '.js-post-comments-component';
     const showMoreCommentsButtonSelector = '.js-show-link.comments-link:not(.dno)';
 
-    const buildNewPath = (commentId) => `/posts/comments/${commentId}`;
+    const buildNewPath = (commentId) => {
+        return `/posts/comments/${commentId}`;
+    };
 
     const updateCommentLinks = (jQueryElems) => {
         jQueryElems.each((idx, elem) => {
@@ -36,7 +38,7 @@
     // Watch for the addition of the dno class to the comment selector
     // This indicates that the comments have been loaded, so we can replace the links once again
     const classNameObserver = new MutationObserver((mutationsList, observer) => {
-        for (let mutation of mutationsList) {
+        for (const mutation of mutationsList) {
             if (mutation.attributeName === 'class') {
                 if (/dno/.exec(mutation.target.className)) {
                     updateCommentLinks(
@@ -53,11 +55,13 @@
     StackExchange.ready(() => {
         updateCommentLinks($(commentLinkSelector));
         // Bind the observer to all Show More buttons
-        $(showMoreCommentsButtonSelector).each((i, e) => classNameObserver.observe(e, {
-            attributes: true,
-            childList: false,
-            subtree: false,
-            attributeFilter: ['class']
-        }));
+        $(showMoreCommentsButtonSelector).each((i, e) => {
+            return classNameObserver.observe(e, {
+                attributes: true,
+                childList: false,
+                subtree: false,
+                attributeFilter: ['class']
+            });
+        });
     });
 }());

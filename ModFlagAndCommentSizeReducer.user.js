@@ -46,13 +46,21 @@
         // Tier One Reducers
         [
             // Convert any absolute links to relative links
-            (s) => s.replace(absoluteLinkPattern, '[$1](/$2)'),
+            (s) => {
+                return s.replace(absoluteLinkPattern, '[$1](/$2)');
+            },
             // Shorten /questions/postid/title to just /q/postid
-            (s) => s.replace(/\[(.*?)]\(\/questions\/(\d+)\/[^/#]+\)/g, '[$1](/q/$2)'),
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/questions\/(\d+)\/[^/#]+\)/g, '[$1](/q/$2)');
+            },
             // Shorten /questions/questionid/title/answerid#answerid to just /a/answerid
-            (s) => s.replace(/\[(.*?)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)'),
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/questions\/\d+\/[^/]+\/(\d+)#\d+\)/g, '[$1](/a/$2)');
+            },
             // Convert any bare post links to [1](/qa/postid/userid)
-            (s) => s.replace(bareLinkPattern, '[1](/$1/$2$3)'),
+            (s) => {
+                return s.replace(bareLinkPattern, '[1](/$1/$2$3)');
+            },
             // Enumerate numbered links (Goes back through to renumber any existing short-links when needed
             (s) => {
                 const ids = new Map();
@@ -64,33 +72,35 @@
                 });
             },
             // Shorten /questions/postid/title#comment[commentid]_[postid] to just /posts/comments/commentid
-            (s) => s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)'),
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/questions\/\d+(?:\/[^/]+|\/[^/]+\/\d+)#comment(\d+)_\d+\)/g, '[$1](/posts/comments/$2)');
+            },
             // Shorten /users/userid/uname to /users/userid
-            (s) => s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)')
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/users\/(\d+)\/[^/#]+\)/g, '[$1](/users/$2)');
+            }
         ],
         // Tier Two Reducers
         [
             // Shorten /qa/postid/userid to just /qa/postid
-            (s) => s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)'),
-            // Remove any excess whitespace
-            (s) => s.replace(/\s{2,}/g, ' ')
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)');
+            }
         ]
     ];
-
-    const posTrackingReplace = (text, reducer, pos) => {
-        let sLength = text.length;
-        // Replace Text
-        text = reducer(text);
-        // Assumes pattern always reduces size (which is the point)
-        pos = Math.max(0, pos - (sLength - text.length));
-        // Return the string and the updated position
-        return [text, pos];
-    };
 
     const patternReducer = (reducers, text, pos) => {
         return reducers.reduce((
             [newText, newPos], reducer
-        ) => posTrackingReplace(newText, reducer, newPos), [text, pos]);
+        ) => {
+            const sLength = newText.length;
+            // Replace Text
+            newText = reducer(newText);
+            // Assumes pattern always reduces size (which is the point)
+            newPos = Math.max(0, newPos - (sLength - newText.length));
+            // Return the string and the updated position
+            return [newText, newPos];
+        }, [text, pos]);
     };
 
     const testIsFlagPopup = (nodeEvent) => {
@@ -124,7 +134,9 @@
                 ev.target.selectionEnd = selectionStart;
 
                 // Optionally do something else with reducedText and selectionStart
-                if (cb) cb(reducedText, selectionStart);
+                if (cb) {
+                    cb(reducedText, selectionStart);
+                }
             });
             textArea.attr(selectors.attrs.monitoredTextArea, true);
         }

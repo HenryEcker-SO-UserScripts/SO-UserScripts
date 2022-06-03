@@ -36,7 +36,9 @@
     // Find network profile link
     const list = profilesMenu.querySelector('ul');
     const links = list.querySelectorAll('a');
-    const networkProfileLink = [...links].filter(e => e.innerText.trim() === 'Network profile');
+    const networkProfileLink = [...links].filter((e) => {
+        return e.innerText.trim() === 'Network profile';
+    });
 
     if (networkProfileLink.length !== 1) {
         console.log('Network profile ID not found.');
