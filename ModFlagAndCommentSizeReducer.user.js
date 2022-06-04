@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.1
+// @version      1.1.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -23,14 +23,29 @@
 
     const textAreaMaxLens = {
         postFlagMaxLen: 500,
+        commentFlagMaxLen: 200,
         commentMaxLen: 600
     };
+
     const selectors = {
+        jquerySelector: {
+            commentTextArea: 'textarea.s-textarea.js-comment-text-input',
+            commentFlagDialogue: {
+                textArea: 'textarea.s-textarea',
+                inputButton: 'input#comment-flag-type-CommentOther'
+            },
+            postFlagDialogue: {
+                textArea: 'textarea[name="otherText"]',
+                inputButton: 'input[value="PostOther"]'
+            }
+        },
         css: {
-            flagDialoguePopupClass: 'popup'
+            flagDialoguePopupClass: 'popup',
+            commentFlagDialoguePopupClass: 's-modal'
         },
         ids: {
-            flagDialogueId: 'popup-flag-post',
+            flagDialogue: 'popup-flag-post',
+            commentFlagDDialogue: 'modal-base',
             reduceButton: 'mfacsr-reduce-pattern-btn'
         },
         attrs: {
@@ -147,13 +162,20 @@
     const testIsFlagPopup = (nodeEvent) => {
         return (
             $(nodeEvent.target).hasClass(selectors.css.flagDialoguePopupClass) && // Popup added
-            $(nodeEvent.target).attr('id') === selectors.ids.flagDialogueId // Check is Flag popup
+            $(nodeEvent.target).attr('id') === selectors.ids.flagDialogue // Check is Flag popup
+        );
+    };
+
+    const testIsCommentFlagPopup = (nodeEvent) => {
+        return (
+            $(nodeEvent.target).hasClass(selectors.css.commentFlagDialoguePopupClass) &&
+            $(nodeEvent.target).attr('id') === selectors.ids.commentFlagDDialogue
         );
     };
 
     const testIsCommentBox = (nodeEvent) => {
         return (
-            $(nodeEvent.target).is('textarea.s-textarea.js-comment-text-input')
+            $(nodeEvent.target).is(selectors.jquerySelector.commentTextArea)
         );
     };
 
@@ -183,28 +205,52 @@
         }
     };
 
+    const handlePopulateText = (inputButton, textArea, text) => {
+        inputButton.trigger('click');
+        inputButton.trigger('change');
+
+        textArea.val(text);
+        textArea.trigger('input');
+        textArea.trigger('propertychange');
+        textArea.focus();
+    };
+
     StackExchange.ready(() => {
         let flagText = undefined; // Keep flag text (fragile save)
+        let commentFlagText = undefined; // Keep flag text (fragile save)
         $(document).on('DOMNodeInserted', (nodeEvent) => {
             if (testIsFlagPopup(nodeEvent)) {
-                const textArea = $('textarea[name="otherText"]');
+                const textArea = $(selectors.jquerySelector.postFlagDialogue.textArea);
 
                 textAreaMonitor(textArea, textAreaMaxLens.postFlagMaxLen, (reducedText) => {
                     flagText = reducedText;
                 });
 
                 if (flagText !== undefined) {
-                    const inputButton = $('input[value="PostOther"]');
-                    inputButton.trigger('click');
-                    inputButton.trigger('change');
-
-                    textArea.val(flagText);
-                    textArea.trigger('input');
-                    textArea.trigger('propertychange');
-                    textArea.focus();
+                    handlePopulateText(
+                        $(selectors.jquerySelector.postFlagDialogue.inputButton),
+                        textArea,
+                        flagText
+                    );
                 }
             } else if (testIsCommentBox(nodeEvent)) {
                 textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen);
+            } else if (testIsCommentFlagPopup(nodeEvent)) {
+                const textArea = $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea);
+                textAreaMonitor(
+                    textArea,
+                    textAreaMaxLens.commentFlagMaxLen,
+                    (reducedText) => {
+                        commentFlagText = reducedText;
+                    }
+                );
+                if (commentFlagText !== undefined) {
+                    handlePopulateText(
+                        $(selectors.jquerySelector.commentFlagDialogue.inputButton),
+                        textArea,
+                        commentFlagText
+                    );
+                }
             }
         });
     });
