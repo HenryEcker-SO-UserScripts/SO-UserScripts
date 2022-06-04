@@ -60,7 +60,7 @@
             },
             // Shorten /questions/questionId/title/answerId#answerId to just /a/answerId
             (s) => {
-                return s.replace(/\[(.*?)]\(\/questions\/\d+\/.+?#\d+\)/g, '[$1](/a/$2)');
+                return s.replace(/\[(.*?)]\(\/questions\/\d+\/.+?#(\d+)/g, '[$1](/a/$2)');
             },
             // Shorten /questions/postId/title#comment[commentId]_[postId] to just /posts/comments/commentId
             (s) => {
