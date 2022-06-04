@@ -38,7 +38,7 @@
         }
     };
 
-    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w-#%?=]+)+`, 'g');
+    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w#$&+,/:;=?@\\-%.]+)`, 'g');
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
 
     const reducerTiers = [
