@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.2
+// @version      1.1.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -54,7 +54,7 @@
     };
 
     const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w#$&+,/:;=?@\\-%.]+)`, 'g');
-    const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`);
+    const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`, 'g');
 
     const reducerTiers = [
         // Tier One Reducers
