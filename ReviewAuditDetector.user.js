@@ -28,18 +28,18 @@
 
     'use strict';
 
-    const reviewInstructionQuerySelector = '.js-review-instructions > .s-notice.s-notice__info';
+    const postTitleSelector = '.s-post-summary--content-title';
 
     $(document).on('ajaxComplete', (event, {responseJSON}, {url}) => {
-        if (
-            (
-                url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')
-            ) && responseJSON.reviewTaskId
-        ) {
-            const reviewInstructionBanner = document.querySelector(reviewInstructionQuerySelector);
+        if ((
+            url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')
+        ) && (
+            responseJSON?.reviewTaskId !== undefined
+        )) {
+            const postTitleBanner = document.querySelector(postTitleSelector);
             if (responseJSON.isAudit) {
-                reviewInstructionBanner.innerText = '(Audit) ' + reviewInstructionBanner.innerText;
-                reviewInstructionBanner.style.backgroundColor = 'var(--red-200)';
+                postTitleBanner.innerHTML = '<span>(Audit) </span>' + postTitleBanner.innerHTML;
+                postTitleBanner.style.backgroundColor = 'var(--red-200)';
             }
         }
     });
