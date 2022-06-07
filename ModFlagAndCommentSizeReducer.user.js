@@ -132,7 +132,7 @@
         [
             // Shorten /qa/postId/userid to just /qa/postId
             (s) => {
-                return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/(\d+)?\)/g, '[$1](/$2/$3)');
+                return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/\d+\)/g, '[$1](/$2/$3)');
             }
         ],
         // Tier Three Reducers
