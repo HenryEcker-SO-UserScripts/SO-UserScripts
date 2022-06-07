@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.3
+// @version      1.1.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -29,6 +29,7 @@
 
     const selectors = {
         jquerySelector: {
+            addCommentButton: '.js-add-link.comments-link',
             commentTextArea: 'textarea.s-textarea.js-comment-text-input',
             commentFlagDialogue: {
                 textArea: 'textarea.s-textarea',
@@ -37,6 +38,10 @@
             postFlagDialogue: {
                 textArea: 'textarea[name="otherText"]',
                 inputButton: 'input[value="PostOther"]'
+            },
+            flagButtons: {
+                postFlag: '.js-flag-post-link.s-btn',
+                commentFlag: '.js-comment-flag.s-btn'
             }
         },
         css: {
@@ -215,43 +220,78 @@
         textArea.focus();
     };
 
+
     StackExchange.ready(() => {
         let flagText = undefined; // Keep flag text (fragile save)
         let commentFlagText = undefined; // Keep flag text (fragile save)
-        $(document).on('DOMNodeInserted', (nodeEvent) => {
-            if (testIsFlagPopup(nodeEvent)) {
-                const textArea = $(selectors.jquerySelector.postFlagDialogue.textArea);
 
-                textAreaMonitor(textArea, textAreaMaxLens.postFlagMaxLen, (reducedText) => {
-                    flagText = reducedText;
-                });
-
-                if (flagText !== undefined) {
-                    handlePopulateText(
-                        $(selectors.jquerySelector.postFlagDialogue.inputButton),
-                        textArea,
-                        flagText
-                    );
-                }
-            } else if (testIsCommentBox(nodeEvent)) {
-                textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen);
-            } else if (testIsCommentFlagPopup(nodeEvent)) {
-                const textArea = $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea);
-                textAreaMonitor(
-                    textArea,
-                    textAreaMaxLens.commentFlagMaxLen,
-                    (reducedText) => {
-                        commentFlagText = reducedText;
+        const attachDOMNodeListenerToButton = (evaluateNode, action) => {
+            return (ev) => {
+                ev.preventDefault();
+                $(document).on('DOMNodeInserted', (nodeEvent) => {
+                    if (evaluateNode(nodeEvent)) {
+                        action(nodeEvent);
+                        // Remove Listener since we've found the node we want
+                        $(document).off('DOMNodeInserted');
                     }
-                );
-                if (commentFlagText !== undefined) {
-                    handlePopulateText(
-                        $(selectors.jquerySelector.commentFlagDialogue.inputButton),
+                });
+            };
+        };
+
+        // Add post flag listener to post flag buttons
+        $(selectors.jquerySelector.flagButtons.postFlag).on(
+            'click',
+            attachDOMNodeListenerToButton(
+                testIsFlagPopup,
+                () => {
+                    const textArea = $(selectors.jquerySelector.postFlagDialogue.textArea);
+
+                    textAreaMonitor(textArea, textAreaMaxLens.postFlagMaxLen, (reducedText) => {
+                        flagText = reducedText || undefined;
+                    });
+
+                    if (flagText !== undefined) {
+                        handlePopulateText(
+                            $(selectors.jquerySelector.postFlagDialogue.inputButton),
+                            textArea,
+                            flagText
+                        );
+                    }
+                })
+        );
+
+        // Add comment flag listener to comment flag buttons
+        $(selectors.jquerySelector.flagButtons.commentFlag).on(
+            'click',
+            attachDOMNodeListenerToButton(
+                testIsCommentFlagPopup,
+                (nodeEvent) => {
+                    const textArea = $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea);
+                    textAreaMonitor(
                         textArea,
-                        commentFlagText
+                        textAreaMaxLens.commentFlagMaxLen,
+                        (reducedText) => {
+                            commentFlagText = reducedText || undefined;
+                        }
                     );
-                }
-            }
-        });
+                    if (commentFlagText !== undefined) {
+                        handlePopulateText(
+                            $(selectors.jquerySelector.commentFlagDialogue.inputButton),
+                            textArea,
+                            commentFlagText
+                        );
+                    }
+                })
+        );
+
+        // Add comment textarea listener to add comment  buttons
+        $(selectors.jquerySelector.addCommentButton).on(
+            'click',
+            attachDOMNodeListenerToButton(
+                testIsCommentBox,
+                (nodeEvent) => {
+                    textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen);
+                })
+        );
     });
 }());
