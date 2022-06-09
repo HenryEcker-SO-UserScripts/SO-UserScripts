@@ -7,12 +7,13 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
-// @match        *://*.stackoverflow.com/questions/*
 // @match        *://*.askubuntu.com/questions/*
-// @match        *://*.mathoverflow.net/questions/*
 // @match        *://*.serverfault.com/questions/*
 // @match        *://*.stackapps.com/questions/*
 // @match        *://*.stackexchange.com/questions/*
+// @match        *://*.stackoverflow.com/questions/*
+// @match        *://*.superuser.com/questions/*
+// @match        *://*.mathoverflow.net/questions/*
 // @grant        none
 //
 // ==/UserScript==

@@ -7,15 +7,28 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ReviewAuditDetector.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ReviewAuditDetector.user.js
 //
-// @match        *://*.stackoverflow.com/review/*
 // @match        *://*.askubuntu.com/review/*
-// @match        *://*.mathoverflow.net/review/*
 // @match        *://*.serverfault.com/review/*
 // @match        *://*.stackapps.com/review/*
 // @match        *://*.stackexchange.com/review/*
+// @match        *://*.stackoverflow.com/review/*
+// @match        *://*.superuser.com/review/*
+// @match        *://*.mathoverflow.net/review/*
 //
-// @exclude      *://*.com/review/*/stats
-// @exclude      *://*.com/review/*/history
+// @exclude      *://*.askubuntu.com/review/*/stats
+// @exclude      *://*.askubuntu.com/review/*/history
+// @exclude      *://*.serverfault.com/review/*/stats
+// @exclude      *://*.serverfault.com/review/*/history
+// @exclude      *://*.stackapps.com/review/*/stats
+// @exclude      *://*.stackapps.com/review/*/history
+// @exclude      *://*.stackexchange.com/review/*/stats
+// @exclude      *://*.stackexchange.com/review/*/history
+// @exclude      *://*.stackoverflow.com/review/*/stats
+// @exclude      *://*.stackoverflow.com/review/*/history
+// @exclude      *://*.superuser.com/review/*/stats
+// @exclude      *://*.superuser.com/review/*/history
+// @exclude      *://*.mathoverflow.net/review/*/stats
+// @exclude      *://*.mathoverflow.net/review/*/history
 //
 // @run-at       document-start
 //

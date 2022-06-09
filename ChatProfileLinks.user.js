@@ -6,12 +6,13 @@
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      1.51
 //
-// @match       *://*.stackoverflow.com/users*
-// @match       *://*.serverfault.com/users*
-// @match       *://*.superuser.com/users*
 // @match       *://*.askubuntu.com/users*
-// @match       *://*.mathoverflow.net/users*
+// @match       *://*.serverfault.com/users*
+// @match       *://*.stackapps.com/users*
 // @match       *://*.stackexchange.com/users*
+// @match       *://*.stackoverflow.com/users*
+// @match       *://*.superuser.com/users*
+// @match       *://*.mathoverflow.net/users*
 //
 // @exclude      *chat.*
 // @exclude      *blog.*

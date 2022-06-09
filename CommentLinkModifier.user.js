@@ -7,7 +7,13 @@
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 //
+// @match        *://*.askubuntu.com/questions/*
+// @match        *://*.serverfault.com/questions/*
+// @match        *://*.stackapps.com/questions/*
+// @match        *://*.stackexchange.com/questions/*
 // @match        *://*.stackoverflow.com/questions/*
+// @match        *://*.superuser.com/questions/*
+// @match        *://*.mathoverflow.net/questions/*
 // @grant        none
 //
 // ==/UserScript==
