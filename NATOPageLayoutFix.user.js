@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -18,40 +18,52 @@
 // @grant        none
 //
 // ==/UserScript==
-/* globals $ */
+/* globals $, StackExchange */
 
 (function () {
     'use strict';
 
-    const mainbarSelector = '#mainbar';
-    const tableSelector = '.default-view-post-table';
-    const containerClass = 'grid-nato-display';
-    const rowClass = 'nato-grid-row';
+    const config = {
+        selector: {
+            mainbar: '#mainbar',
+            table: '.default-view-post-table'
+        },
+        css: {
+            container: 'grid-nato-display',
+            rowCell: 'nato-grid-row'
+        }
+    };
 
-    const style = document.createElement('style');
-    style.id = 'NATOPageLayoutStyles';
-    style.innerHTML = `
-    .${containerClass} {
-        display: grid;
-        grid-template-columns: calc(100% - 300px - var(--su-static24)) max-content;
-        width: 100% !important;
-    }
+    const buildStyle = () => {
+        const style = document.createElement('style');
+        style.id = 'NATOPageLayoutStyles';
+        style.innerHTML = `
+            .${config.css.container} {
+                display: grid;
+                grid-template-columns: calc(100% - 172px - var(--su-static24)) max-content;
+                width: 100% !important;
+            }
+        
+            .${config.css.container} > .${config.css.rowCell} {
+                padding: 5px;
+                border-bottom: 1px dotted silver;
+                padding-bottom: 10px;
+                overflow: hidden;
+            }
+        `;
+        document.head.append(style);
+    };
+    const rebuildNATOLayout = () => {
+        $(`${config.selector.mainbar}`).attr('class', config.css.container);
+        const table = $(`${config.selector.table}`);
+        for (const node of $(`${config.selector.table} td`)) {
+            $(`<div class="${config.css.rowCell}"/>`).html(node.children).insertBefore(table);
+        }
+        table.remove();
+    };
 
-    .${containerClass} .${rowClass} {
-        padding: 5px;
-        border-bottom: 1px dotted silver;
-        padding-bottom: 10px;
-    }
-    `;
-    document.head.append(style);
-
-    $(`${tableSelector} td`).replaceWith((i, e) => {
-        return $(`<div class="${rowClass}"/>`).append(e);
+    StackExchange.ready(() => {
+        buildStyle();
+        rebuildNATOLayout();
     });
-
-    $(`${tableSelector}`).replaceWith(() => {
-        return $(`${tableSelector} div.${rowClass}`);
-    });
-
-    $(`${mainbarSelector}`).attr('class', containerClass);
 }());
