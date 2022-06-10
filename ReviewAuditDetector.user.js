@@ -3,7 +3,7 @@
 // @description  Tries to detect audits when reviewing
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ReviewAuditDetector.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ReviewAuditDetector.user.js
 //
@@ -35,25 +35,26 @@
 // @grant        none
 //
 // ==/UserScript==
-/* globals $ */
+/* globals $, StackExchange */
 
 (function () {
 
     'use strict';
+    StackExchange.ready(() => {
+        const postTitleSelector = '.s-post-summary--content-title';
 
-    const postTitleSelector = '.s-post-summary--content-title';
-
-    $(document).on('ajaxComplete', (event, {responseJSON}, {url}) => {
-        if ((
-            url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')
-        ) && (
-            responseJSON?.reviewTaskId !== undefined
-        )) {
-            const postTitleBanner = document.querySelector(postTitleSelector);
-            if (responseJSON.isAudit) {
-                postTitleBanner.innerHTML = '<span>(Audit) </span>' + postTitleBanner.innerHTML;
-                postTitleBanner.style.backgroundColor = 'var(--red-200)';
+        $(document).on('ajaxComplete', (event, {responseJSON}, {url}) => {
+            if ((
+                url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')
+            ) && (
+                responseJSON?.reviewTaskId !== undefined
+            )) {
+                const postTitleBanner = document.querySelector(postTitleSelector);
+                if (responseJSON.isAudit) {
+                    postTitleBanner.innerHTML = '<span>(Audit) </span>' + postTitleBanner.innerHTML;
+                    postTitleBanner.style.backgroundColor = 'var(--red-200)';
+                }
             }
-        }
+        });
     });
 })();
