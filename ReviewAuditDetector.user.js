@@ -30,8 +30,6 @@
 // @exclude      *://*.mathoverflow.net/review/*/stats
 // @exclude      *://*.mathoverflow.net/review/*/history
 //
-// @run-at       document-start
-//
 // @grant        none
 //
 // ==/UserScript==
