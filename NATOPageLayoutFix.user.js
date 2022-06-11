@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -26,7 +26,7 @@
     const config = {
         selector: {
             mainbar: '#mainbar',
-            table: '.default-view-post-table'
+            table: 'table.default-view-post-table'
         },
         css: {
             container: 'grid-nato-display',
@@ -56,7 +56,7 @@
     const rebuildNATOLayout = () => {
         $(`${config.selector.mainbar}`).attr('class', config.css.container);
         const table = $(`${config.selector.table}`);
-        for (const node of $(`${config.selector.table} td`)) {
+        for (const node of $(`${config.selector.table} > tbody > tr > td`)) {
             $(`<div class="${config.css.rowCell}"/>`).html(node.children).insertBefore(table);
         }
         table.remove();
