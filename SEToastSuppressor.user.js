@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Toast Suppressor
+// @name         SE Toast Suppressor
 // @description  Suppress just the "You haven&#39;t voted on questions in a while; questions need votes too!" toast
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
