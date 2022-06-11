@@ -4,8 +4,8 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuppressVoteNotice.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuppressVoteNotice.user.js
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 //
 // @match        *://*.askubuntu.com/questions/*
 // @match        *://*.serverfault.com/questions/*
