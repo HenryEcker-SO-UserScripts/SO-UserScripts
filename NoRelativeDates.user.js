@@ -37,7 +37,10 @@
             $(e).css('width', '205px'); // Make big enough to handle full date
         });
         $('.relativetime').each((i, e) => {
-            $(e).text(formatter.format(new Date($(e).attr('title'))));
+            const j = $(e);
+            const timestamp = new Date(j.attr('title'));
+            j.attr('title', j.text());
+            j.text(formatter.format(timestamp));
         });
     });
 }());
