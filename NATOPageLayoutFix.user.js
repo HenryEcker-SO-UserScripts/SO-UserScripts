@@ -57,8 +57,6 @@
             }
             
             .${config.css.container} > .${config.css.rowCell} > .${config.css.flagControls} {
-               border-top:  1px dotted silver;
-               padding-top: 5px;
                margin-top: 10px;
             }
         `;
