@@ -74,7 +74,9 @@
     const buildFlagButtons = () => {
         $(`.${config.css.rowCell}:nth-child(odd)`).each((i, e) => {
             const div = $(e);
-            const answerId = div.find('a').attr('href').split('#')[1];
+            const link = div.find('a');
+            link.attr('target', '_blank');
+            const answerId = link.attr('href').split('#')[1];
             div.attr('data-answer-id', answerId);
             div.append($(`<div class="${config.css.flagControls} flex--item mr16" style="flex: 1 1 100px;">
     <div class="js-post-menu pt2" data-post-id="${answerId}">
