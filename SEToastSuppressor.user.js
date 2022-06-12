@@ -3,7 +3,7 @@
 // @description  Suppress just the "You haven&#39;t voted on questions in a while; questions need votes too!" toast
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.3
+// @version      0.0.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 //
@@ -38,7 +38,7 @@
     StackExchange.ready(() => {
         StackExchange.helpers.showToast = new Proxy(StackExchange.helpers.showToast, {
             apply: (target, thisArg, [message, config]) => {
-                if (messagesToSuppress.has(message)) {
+                if (!messagesToSuppress.has(message)) {
                     target(message, config);
                 }
             }
