@@ -15,7 +15,7 @@
 // @match        *://*.superuser.com/review/*
 // @match        *://*.mathoverflow.net/review/*
 //
-// @exclude      /^https?://.*((askubuntu|serverfault|stackapps|stackexchange|stackoverflow|superuser)\.com|mathoverflow\.net)/review/.*(stats|history)/
+// @exclude      /^https?:\/\/.*((askubuntu|serverfault|stackapps|stackexchange|stackoverflow|superuser)\.com|mathoverflow\.net)\/review\/.*\/(stats|history)/
 //
 // @grant        none
 //
