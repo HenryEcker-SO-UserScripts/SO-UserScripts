@@ -102,8 +102,9 @@
                     StackExchange.highlightjs.instance.highlightElement(this);
                 }
             ));
-        }));
-        window.hljs.highlightAll();
+        })).then(() => {
+            window.hljs.highlightAll();
+        });
     };
 
 
