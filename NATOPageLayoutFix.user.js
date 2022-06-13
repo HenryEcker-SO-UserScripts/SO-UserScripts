@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.6
+// @version      0.0.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -96,15 +96,13 @@
         StackExchange.vote_closingAndFlagging.init();
     };
 
-    const enableHighlighting = () => {
-        StackExchange.using('highlightjs', (function () {
-            $('pre.s-code-block code:not(.hljs)').each((function () {
-                    StackExchange.highlightjs.instance.highlightElement(this);
-                }
-            ));
-        })).then(() => {
-            window.hljs.highlightAll();
+    const enableCodeSupport = () => {
+        // Some Syntax Highlighting
+        StackExchange.using('highlightjs', () => {
+            StackExchange.highlightjs.instance.highlightAll();
         });
+        // Make snippets runnable
+        StackExchange.snippets.init();
     };
 
 
@@ -112,6 +110,6 @@
         buildStyle();
         rebuildNATOLayout();
         buildFlagButtons();
-        enableHighlighting();
+        enableCodeSupport();
     });
 }());
