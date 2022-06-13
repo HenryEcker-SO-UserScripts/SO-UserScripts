@@ -3,25 +3,17 @@
 // @description  Suppress just the "You haven&#39;t voted on questions in a while; questions need votes too!" toast
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.4
+// @version      0.0.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 //
-// @match        *://*.askubuntu.com/questions/*
-// @match        *://*.serverfault.com/questions/*
-// @match        *://*.stackapps.com/questions/*
-// @match        *://*.stackexchange.com/questions/*
-// @match        *://*.stackoverflow.com/questions/*
-// @match        *://*.superuser.com/questions/*
-// @match        *://*.mathoverflow.net/questions/*
-//
-// @match        *://*.askubuntu.com/review/*
-// @match        *://*.serverfault.com/review/*
-// @match        *://*.stackapps.com/review/*
-// @match        *://*.stackexchange.com/review/*
-// @match        *://*.stackoverflow.com/review/*
-// @match        *://*.superuser.com/review/*
-// @match        *://*.mathoverflow.net/review/*
+// @match        *://*.askubuntu.com/*
+// @match        *://*.serverfault.com/*
+// @match        *://*.stackapps.com/*
+// @match        *://*.stackexchange.com/*
+// @match        *://*.stackoverflow.com/*
+// @match        *://*.superuser.com/*
+// @match        *://*.mathoverflow.net/*
 //
 // @grant        none
 //
