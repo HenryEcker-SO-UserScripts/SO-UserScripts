@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.4
+// @version      1.1.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -14,6 +14,23 @@
 // @match        *://*.stackoverflow.com/questions/*
 // @match        *://*.superuser.com/questions/*
 // @match        *://*.mathoverflow.net/questions/*
+//
+// @match        *://*.askubuntu.com/review/*
+// @match        *://*.serverfault.com/review/*
+// @match        *://*.stackapps.com/review/*
+// @match        *://*.stackexchange.com/review/*
+// @match        *://*.stackoverflow.com/review/*
+// @match        *://*.superuser.com/review/*
+// @match        *://*.mathoverflow.net/review/*
+//
+// @match        *://*.askubuntu.com/tools/new-answers-old-questions*
+// @match        *://*.serverfault.com/tools/new-answers-old-questions*
+// @match        *://*.stackapps.com/tools/new-answers-old-questions*
+// @match        *://*.stackexchange.com/tools/new-answers-old-questions*
+// @match        *://*.stackoverflow.com/tools/new-answers-old-questions*
+// @match        *://*.superuser.com/tools/new-answers-old-questions*
+// @match        *://*.mathoverflow.net/tools/new-answers-old-questions*
+//
 // @grant        none
 //
 // ==/UserScript==
