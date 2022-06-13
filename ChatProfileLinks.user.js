@@ -4,7 +4,7 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       @samliew
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.51
+// @version      1.52
 //
 // @match       *://*.askubuntu.com/users*
 // @match       *://*.serverfault.com/users*
@@ -16,7 +16,7 @@
 //
 // @exclude      *chat.*
 // @exclude      *blog.*
-// @exclude      *://*.stackoverflow.com/c/*
+// @exclude      *://*stackoverflow.com/c/*
 //
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatProfileLinks.user.js
