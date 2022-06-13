@@ -15,20 +15,7 @@
 // @match        *://*.superuser.com/review/*
 // @match        *://*.mathoverflow.net/review/*
 //
-// @exclude      *://*askubuntu.com/review/*/stats
-// @exclude      *://*askubuntu.com/review/*/history
-// @exclude      *://*serverfault.com/review/*/stats
-// @exclude      *://*serverfault.com/review/*/history
-// @exclude      *://*stackapps.com/review/*/stats
-// @exclude      *://*stackapps.com/review/*/history
-// @exclude      *://*stackexchange.com/review/*/stats
-// @exclude      *://*stackexchange.com/review/*/history
-// @exclude      *://*stackoverflow.com/review/*/stats
-// @exclude      *://*stackoverflow.com/review/*/history
-// @exclude      *://*superuser.com/review/*/stats
-// @exclude      *://*superuser.com/review/*/history
-// @exclude      *://*mathoverflow.net/review/*/stats
-// @exclude      *://*mathoverflow.net/review/*/history
+// @exclude      /^https?://.*((askubuntu|serverfault|stackapps|stackexchange|stackoverflow|superuser)\.com|mathoverflow\.net)/review/.*(stats|history)/
 //
 // @grant        none
 //
