@@ -3,7 +3,7 @@
 // @description  Suppress just the "You haven&#39;t voted on questions in a while; questions need votes too!" toast
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
+// @version      0.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 //
@@ -24,7 +24,8 @@
     'use strict';
 
     const messagesToSuppress = new Set([
-        'You haven&#39;t voted on questions in a while; questions need votes too!'
+        'You haven&#39;t voted on questions in a while; questions need votes too!',
+        'Please consider adding a comment if you think this post can be improved.'
     ]);
 
     StackExchange.ready(() => {
