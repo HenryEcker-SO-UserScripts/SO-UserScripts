@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.0
+// @version      1.0.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -35,6 +35,7 @@
             container: 'grid-nato-display',
             rowCell: 'nato-grid-row',
             answerHyperlink: 'answer-hyperlink',
+            deletedAnswer: 'deleted-answer',
             // needed for inline editing
             answer: 'answer',
             answerCell: 'answercell',
@@ -66,6 +67,11 @@
             .${config.css.rowCell} > .${config.css.questionTime} {
                 margin-left: 5px;
             }
+            
+            .${config.css.rowCell} > .${config.css.deletedAnswer} {
+                margin: 0 !important;
+                padding-left: 5px !important;
+            }
         `;
         document.head.append(style);
     };
@@ -92,6 +98,10 @@
             const answerCell = $(`<div class="${config.css.answerCell}"/>`);
             // Answer Body
             const answerBody = answerNode.find(`> ${config.selector.postBody}`);
+            if (answerBody.hasClass(config.css.deletedAnswer)) {
+                answerBody.removeClass(config.css.deletedAnswer);
+                answerWrapper.addClass(config.css.deletedAnswer);
+            }
             answerCell.append(answerBody);
             const footer = $(`<div class="mt24">
     <div class="d-flex fw-wrap ai-start jc-end gs8 gsy">
