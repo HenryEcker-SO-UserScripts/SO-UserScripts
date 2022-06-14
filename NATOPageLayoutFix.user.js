@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.9
+// @version      1.0.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -29,14 +29,18 @@
             table: 'table.default-view-post-table',
             answerLink: 'a.answer-hyperlink',
             postBody: 'div.s-prose.js-post-body',
-            userCard: 'div.user-info'
+            relativeTime: 'span.relativetime'
         },
         css: {
             container: 'grid-nato-display',
             rowCell: 'nato-grid-row',
+            answerHyperlink: 'answer-hyperlink',
             // needed for inline editing
             answer: 'answer',
-            answerCell: 'answercell'
+            answerCell: 'answercell',
+            // needed for Natty in AF
+            questionTime: 'nato-question-time',
+            userInfo: 'user-info'
         },
         flagNames: {
             NAA: 'AnswerNotAnAnswer',
@@ -58,7 +62,9 @@
                 padding: 5px;
                 border-bottom: 1px dotted silver;
                 padding-bottom: 10px;
-                overflow: hidden;
+            }
+            .${config.css.rowCell} > .${config.css.questionTime} {
+                margin-left: 5px;
             }
         `;
         document.head.append(style);
@@ -69,17 +75,20 @@
         $(`${config.selector.table} > tbody > tr`).each((idx, tr) => {
             const tds = $(tr).find('td');
             const answerNode = $(tds[0]);
-            const userCard = $(tds[1]).find(config.selector.userCard);
+            const rightTd = $(tds[1]);
+            const userCard = rightTd.find(`div.${config.css.userInfo}`);
             userCard.find('a').attr('target', '_blank');
+            const questionTime = rightTd.find(`> ${config.selector.relativeTime}`);
+            questionTime.addClass(config.css.questionTime);
 
             // Answer Link
             const answerLink = answerNode.find(`> ${config.selector.answerLink}`);
+            answerLink.removeClass(config.css.answerHyperlink);
             answerLink.attr('target', '_blank');
             const answerId = answerLink.attr('href').split('#')[1];
-            answerNode.attr('data-answer-id', answerId);
 
             // Build New Container for Answer Body and Answer Controls
-            const answerWrapper = $(`<div class="${config.css.answer}">`);
+            const answerWrapper = $(`<div class="${config.css.answer}"  data-answerid="${answerId}">`);
             const answerCell = $(`<div class="${config.css.answerCell}"/>`);
             // Answer Body
             const answerBody = answerNode.find(`> ${config.selector.postBody}`);
@@ -113,6 +122,7 @@
             // Top Level component
             const NATOWrapper = $(`<div class="${config.css.rowCell}"/>`);
             NATOWrapper.append(answerLink);
+            NATOWrapper.append(questionTime);
             NATOWrapper.append(answerWrapper);
             // Add to DOM
             NATOWrapper.insertBefore(table);
