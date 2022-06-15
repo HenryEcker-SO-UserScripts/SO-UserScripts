@@ -3,7 +3,7 @@
 // @description  Changes comment links to user /posts/comments/:comment_id instead of the standard long link that includes the title
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.4
+// @version      0.0.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 //
@@ -31,27 +31,29 @@
     };
 
     const updateCommentLinks = (jQueryElems) => {
-        jQueryElems.each((idx, elem) => {
-            const jQElem = $(elem);
-            const newHREF = buildNewPath(jQElem.closest('li').attr('data-comment-id'));
-            // Only update if not previously replaced
-            if (newHREF !== jQElem.attr('href')) {
-                jQElem.attr('href', newHREF);
-            }
-        });
+        setTimeout(() => {
+            jQueryElems.each((idx, elem) => {
+                const jQElem = $(elem);
+                const newHREF = buildNewPath(jQElem.closest('li').attr('data-comment-id'));
+                // Only update if not previously replaced
+                if (newHREF !== jQElem.attr('href')) {
+                    jQElem.attr('href', newHREF);
+                }
+            });
+        }, 50);
     };
 
     // Watch for the addition of the dno class to the comment selector
     // This indicates that the comments have been loaded, so we can replace the links once again
-    const classNameObserver = new MutationObserver((mutationsList, observer) => {
+    const classNameObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.attributeName === 'class') {
                 if (/dno/.exec(mutation.target.className)) {
                     updateCommentLinks(
-                        $(mutation.target).closest(commentComponentContainerSelector) // Only check comments in this container
+                        $(mutation.target)
+                            .closest(commentComponentContainerSelector) // Only check comments in this container
                             .find(commentLinkSelector)
                     );
-                    observer.disconnect(); // It's no longer visible and not a repeatable operation, so we don't care
                 }
             }
         }
@@ -66,6 +68,7 @@
                 attributes: true,
                 childList: false,
                 subtree: false,
+                characterData: false,
                 attributeFilter: ['class']
             });
         });
