@@ -3,7 +3,7 @@
 // @description  Changes comment links to user /posts/comments/:comment_id instead of the standard long link that includes the title
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
+// @version      0.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 //
@@ -23,8 +23,7 @@
     'use strict';
 
     const commentLinkSelector = '.comment-link';
-    const commentComponentContainerSelector = '.js-post-comments-component';
-    const showMoreCommentsButtonSelector = '.js-show-link.comments-link:not(.dno)';
+    const commentListSelector = '.comments-list.js-comments-list';
 
     const buildNewPath = (commentId) => {
         return `/posts/comments/${commentId}`;
@@ -43,18 +42,13 @@
         }, 50);
     };
 
-    // Watch for the addition of the dno class to the comment selector
-    // This indicates that the comments have been loaded, so we can replace the links once again
-    const classNameObserver = new MutationObserver((mutationsList) => {
+    const newCommentObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
-            if (mutation.attributeName === 'class') {
-                if (/dno/.exec(mutation.target.className)) {
-                    updateCommentLinks(
-                        $(mutation.target)
-                            .closest(commentComponentContainerSelector) // Only check comments in this container
-                            .find(commentLinkSelector)
-                    );
-                }
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                updateCommentLinks(
+                    $(mutation.target).find(commentLinkSelector)
+                );
+                break; // a single mutation that adds comments will add all comments
             }
         }
     });
@@ -62,14 +56,10 @@
 
     StackExchange.ready(() => {
         updateCommentLinks($(commentLinkSelector));
-        // Bind the observer to all Show More buttons
-        $(showMoreCommentsButtonSelector).each((i, e) => {
-            return classNameObserver.observe(e, {
-                attributes: true,
-                childList: false,
-                subtree: false,
-                characterData: false,
-                attributeFilter: ['class']
+        // Bind the observer to all posts
+        $(commentListSelector).each((i, e) => {
+            newCommentObserver.observe(e, {
+                childList: true
             });
         });
     });
