@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         SE Toast Suppressor
-// @description  Suppress just the "You haven&#39;t voted on questions in a while; questions need votes too!" toast
+// @description  Suppress annoying toast messages network-wide
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.6
