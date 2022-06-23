@@ -4,8 +4,8 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.8
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 //
 // @match        *://*.askubuntu.com/*
 // @match        *://*.serverfault.com/*
