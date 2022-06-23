@@ -3,7 +3,7 @@
 // @description  Suppress annoying toast/overlay messages network-wide
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.7
+// @version      0.0.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SEToastSuppressor.user.js
 //
@@ -14,6 +14,8 @@
 // @match        *://*.stackoverflow.com/*
 // @match        *://*.superuser.com/*
 // @match        *://*.mathoverflow.net/*
+//
+// @run-at       document-start
 //
 // @grant        none
 //
@@ -50,5 +52,24 @@
         });
     };
 
-    addProxies();
+    if (window.StackExchange === undefined || Object.keys(window.StackExchange).length === 0) {
+        Object.defineProperty(window, 'StackExchange', {
+            configurable: true,
+            internalSE: undefined,
+            get () {
+                return this.internalSE;
+            },
+            set (newStackExchange) {
+                if (Object.keys(newStackExchange).length !== 0) {
+                    delete window.StackExchange;
+                    window.StackExchange = newStackExchange;
+                    addProxies();
+                } else {
+                    this.internalSE = newStackExchange;
+                }
+            }
+        });
+    } else {
+        addProxies();
+    }
 }());
