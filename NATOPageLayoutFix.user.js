@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.5
+// @version      1.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -87,9 +87,26 @@
         `;
         document.head.append(style);
     };
+
+    const pullDownAndHighlightPostVotes = async (answerIdSet) => {
+        // Highlight Existing Votes
+        for (const answerId of answerIdSet) {
+            const response = await fetch(`/posts/${answerId}/votes`);
+            if (response.status === 200) {
+                const resData = await response.json();
+                // Update UI as we go
+                StackExchange.vote.highlightExistingVotes(resData);
+            }
+            await new Promise((resolve) => {
+                return setTimeout(resolve, 75);
+            });
+        }
+    };
+
     const rebuildNATOLayout = () => {
         $(`${config.selector.mainbar}`).attr('class', config.css.container);
         const table = $(`${config.selector.table}`);
+        const answerIdSet = new Set();
         $(`${config.selector.table} > tbody > tr`).each((idx, tr) => {
             const tds = $(tr).find('td');
             const answerNode = $(tds[0]);
@@ -104,6 +121,7 @@
             answerLink.removeClass(config.css.answerHyperlink);
             answerLink.attr('target', '_blank');
             const answerId = answerLink.attr('href').split('#')[1];
+            answerIdSet.add(answerId);
 
             // Build New Container for Answer Body and Answer Controls
             const answerWrapper = $(`<div class="${config.css.answer}"  data-answerid="${answerId}">`);
@@ -145,6 +163,18 @@
                            title="Revise and improve this post">Edit</a>
                     </div>
                     <div class="flex--item">
+                        <button type="button"
+                                id="btnFollowPost-${answerId}" 
+                                class="s-btn s-btn__link js-follow-post js-follow-question"
+                                data-gps-track=""
+                                data-controller="s-tooltip " data-s-tooltip-placement="bottom"
+                                data-s-popover-placement="bottom" aria-controls=""
+                                title="Follow this question to receive notifications">
+                            Follow
+                        </button>
+                    </div>
+
+                    <div class="flex--item">
                         <button type="button" class="js-flag-post-link s-btn s-btn__link"
                                 title="Flag this post for serious problems or moderator attention">
                             Flag
@@ -174,13 +204,13 @@
         StackExchange.question.initShareLinks();
         // Create inline editor support
         StackExchange.inlineEditing.init();
-        // Watch for edit to complete
-        $('html').on('inline-edit-complete', () => {
-            // Delete any follow buttons when edit is complete
-            $(config.selector.jsFollowAnswer).parent().remove();
-        });
+        // Support for Follow
+        StackExchange.vote.follow_init();
         // Create Click Listener for Flag Button
         StackExchange.vote_closingAndFlagging.init();
+
+        // Background pull votes on the post and highlight (Voting button UIs update: Follow button becomes Following, etc.)
+        void pullDownAndHighlightPostVotes(answerIdSet);
     };
 
     const enableCodeSupport = () => {
