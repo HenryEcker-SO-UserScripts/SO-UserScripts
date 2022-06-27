@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.3
+// @version      1.0.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -39,6 +39,7 @@
             // needed for inline editing
             answer: 'answer',
             answerCell: 'answercell',
+            jsFollowAnswer: 'js-follow-answer', // Inline editor responds with full UI (hide button that comes back)
             // needed for Natty in AF
             questionTime: 'nato-question-time',
             userInfo: 'user-info'
@@ -83,6 +84,10 @@
                 margin: 0 !important;
                 padding-left: 5px !important;
             }
+            
+            .${config.css.jsFollowAnswer} {
+                display: none;
+            }
         `;
         document.head.append(style);
     };
@@ -120,6 +125,26 @@
             <div class="js-post-menu pt2" data-post-id="${answerId}">
                 <div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap">
                     <div class="flex--item">
+                        <a href="/a/${answerId}/${StackExchange.options.user.userId}"
+                           rel="nofollow"
+                           itemprop="url"
+                           class="js-share-link"
+                           title="Short permalink to this answer"
+                           data-controller="se-share-sheet s-popover"
+                           data-se-share-sheet-title="Share a link to this answer"
+                           data-se-share-sheet-subtitle="(includes your user id)"
+                           data-se-share-sheet-post-type="answer"
+                           data-se-share-sheet-social="facebook twitter" 
+                           data-se-share-sheet-location="2"
+                           data-se-share-sheet-license-url="https%3a%2f%2fcreativecommons.org%2flicenses%2fby-sa%2f4.0%2f"
+                           data-se-share-sheet-license-name="CC BY-SA 4.0"
+                           data-s-popover-placement="bottom-start" 
+                           aria-controls="se-share-sheet-10"
+                           data-action=" s-popover#toggle se-share-sheet#preventNavigation s-popover:show->se-share-sheet#willShow s-popover:shown->se-share-sheet#didShow">
+                            Share
+                        </a>
+                    </div>
+                    <div class="flex--item">
                         <a href="/posts/${answerId}/edit" class="js-edit-post"
                            title="Revise and improve this post">Edit</a>
                     </div>
@@ -149,10 +174,14 @@
             NATOWrapper.insertBefore(table);
         });
         table.remove();
-        // Create Click Listener for Flag Button
-        StackExchange.vote_closingAndFlagging.init();
+        // Enable Share Links
+        StackExchange.question.initShareLinks();
         // Create inline editor support
         StackExchange.inlineEditing.init();
+        // Enable Follow Buttons
+        StackExchange.vote.follow_init();
+        // Create Click Listener for Flag Button
+        StackExchange.vote_closingAndFlagging.init();
     };
 
     const enableCodeSupport = () => {
