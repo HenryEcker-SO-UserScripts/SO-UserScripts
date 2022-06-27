@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.4
+// @version      1.0.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -29,7 +29,8 @@
             table: 'table.default-view-post-table',
             answerLink: 'a.answer-hyperlink',
             postBody: 'div.s-prose.js-post-body',
-            relativeTime: 'span.relativetime'
+            relativeTime: 'span.relativetime',
+            jsFollowAnswer: '.js-follow-answer'
         },
         css: {
             container: 'grid-nato-display',
@@ -39,7 +40,6 @@
             // needed for inline editing
             answer: 'answer',
             answerCell: 'answercell',
-            jsFollowAnswer: 'js-follow-answer', // Inline editor responds with full UI (hide button that comes back)
             // needed for Natty in AF
             questionTime: 'nato-question-time',
             userInfo: 'user-info'
@@ -83,10 +83,6 @@
             .${config.css.rowCell} > .${config.css.deletedAnswer} {
                 margin: 0 !important;
                 padding-left: 5px !important;
-            }
-            
-            .${config.css.jsFollowAnswer} {
-                display: none;
             }
         `;
         document.head.append(style);
@@ -178,8 +174,11 @@
         StackExchange.question.initShareLinks();
         // Create inline editor support
         StackExchange.inlineEditing.init();
-        // Enable Follow Buttons
-        StackExchange.vote.follow_init();
+        // Watch for edit to complete
+        $('html').on('inline-edit-complete', () => {
+            // Delete any follow buttons when edit is complete
+            $(config.selector.jsFollowAnswer).parent().remove();
+        });
         // Create Click Listener for Flag Button
         StackExchange.vote_closingAndFlagging.init();
     };
