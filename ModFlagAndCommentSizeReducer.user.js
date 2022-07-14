@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.5
+// @version      1.1.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -47,7 +47,7 @@
 
     const selectors = {
         jquerySelector: {
-            addCommentButton: '.js-add-link.comments-link',
+            commentList: '.comments-list.js-comments-list',
             commentTextArea: 'textarea.s-textarea.js-comment-text-input',
             commentFlagDialogue: {
                 textArea: 'textarea.s-textarea',
@@ -68,8 +68,7 @@
         },
         ids: {
             flagDialogue: 'popup-flag-post',
-            commentFlagDDialogue: 'modal-base',
-            reduceButton: 'mfacsr-reduce-pattern-btn'
+            commentFlagDDialogue: 'modal-base'
         },
         attrs: {
             monitoredTextArea: 'data-mfacsr-monitored'
@@ -302,8 +301,8 @@
                 })
         );
 
-        // Add comment textarea listener to add comment  buttons
-        $(selectors.jquerySelector.addCommentButton).on(
+        // Add comment textarea listener to add comment areas (handles both edit and add comment)
+        $(selectors.jquerySelector.commentList).on(
             'click',
             attachDOMNodeListenerToButton(
                 testIsCommentBox,
