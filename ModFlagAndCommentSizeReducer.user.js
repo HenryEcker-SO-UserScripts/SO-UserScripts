@@ -47,7 +47,7 @@
 
     const selectors = {
         jquerySelector: {
-            commentContainer: '.comments.js-comments-container',
+            commentList: '.comments-list.js-comments-list',
             commentTextArea: 'textarea.s-textarea.js-comment-text-input',
             commentFlagDialogue: {
                 textArea: 'textarea.s-textarea',
@@ -301,8 +301,8 @@
                 })
         );
 
-        // Add comment textarea listener to existing comment areas (handles both edit and add comment)
-        $(selectors.jquerySelector.commentContainer).on(
+        // Add comment textarea listener to add comment areas (handles both edit and add comment)
+        $(selectors.jquerySelector.commentList).on(
             'click',
             attachDOMNodeListenerToButton(
                 testIsCommentBox,
