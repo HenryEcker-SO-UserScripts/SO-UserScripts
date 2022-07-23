@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         10k Tools Topbar Button
+// @name         10K Tools Topbar Button
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -19,18 +19,20 @@
 
     StackExchange.ready(() => {
         const userRep = StackExchange.options.user.rep;
-        if (userRep > 10e3) {
-
-
+        if (userRep >= 10e3 || StackExchange.options.user.isModerator === true) {
             const popoverId = 'tools-popover';
+            const tenKToolsButtonId = 'ten-k-tools-button';
 
-            const rowClasses = '-item lh-xxl';
+            const tenKToolsLabel = '10K Tools';
+
+            const rowLinkClasses = 's-block-link';
+            const rowLabelClasses = 'tt-capitalize';
 
             const topbarButton = $(`<li>
-    <button id="10k-tools-button"
-            class="s-topbar--item s-btn"
-            aria-label="10k Tools"
-            title="10k Tools"
+    <button id="${tenKToolsButtonId}"
+            class="s-topbar--item s-btn s-btn__muted"
+            aria-label="${tenKToolsLabel}"
+            title="${tenKToolsLabel}"
             role="menuitem"
             aria-controls="${popoverId}"
             data-controller="s-popover"
@@ -40,13 +42,13 @@
         <svg aria-hidden="true" class="svg-icon iconGraph" width="18" height="18" viewBox="0 0 18 18">
             <path d="M3 1h12c1.09 0 2 .91 2 2v12c0 1.09-.91 2-2 2H3c-1.09 0-2-.91-2-2V3c0-1.1.9-2 2-2Zm1 8v5h2V9H4Zm4-5v10h2V4H8Zm4 3v7h2V7h-2Z"></path>
         </svg>
-        <div class="v-visible-sr">10k Tools</div>
+        <div class="v-visible-sr">${tenKToolsLabel}</div>
     </button>
 </li>`);
             const topbarDialogue = $(`<li role="presentation">
     <div class="topbar-dialog" id="${popoverId}" role="menu">
         <div class="header fw-wrap">
-            <h3 class="flex--item">10k Tools</h3>
+            <h3 class="flex--item">${tenKToolsLabel}</h3>
             <div class="flex--item fl1">
                 <div class="ai-center d-flex jc-end">
                     <div class="-right">
@@ -58,35 +60,35 @@
                 </div>
             </div>
         </div>
-
-        <div class="modal-content">
-            <ul>
-                <li class="${rowClasses}"><a href="/tools?tab=stats"><span class="-title">Stats</span></a></li>
-                <li class="${rowClasses}"><a href="/tools?tab=migrated"><span class="-title">Migrated</span></a></li>
-                <li class="${rowClasses}"><a href="/tools?tab=close"><span class="-title">Closed</span></a></li>
-                <li class="${rowClasses}"><a href="/tools?tab=delete"><span class="-title">Deleted</span></a></li>
-                <li class="${rowClasses}"><a href="/tools/new-answers-old-questions"><span class="-title">New answers to old questions</span></a></li>
-                <li class="${rowClasses}"><a href="/tools/suggested-edits"><span class="-title">Suggested edit stats</span></a></li>
-                <li class="${rowClasses}"><a href="/tools/post-feedback"><span class="-title">Anonymous and low rep post feedback</span></a></li>
-                ${userRep >= 25e3 ? `<li class="${rowClasses}"><a href="/site-analytics"><span class="-title">Site analytics</span></a></li>` : ''}
-                <li class="${rowClasses}"><a href="/tools/question-close-stats"><span class="-title">Question close stats</span></a></li>
-                <li class="${rowClasses}"><a href="/tools/protected-questions"><span class="-title">Protected questions</span></a></li>
-            </ul>
-        </div>
+        <ul class="s-menu" role="menu">
+            <li class="s-menu--title" role="separator">Reports</li>
+            <li role="menuitem"><a href="/tools/new-answers-old-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new answers to old questions</span></a></li>
+            <li role="menuitem"><a href="/tools/protected-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">protected questions</span></a></li>
+            <li role="menuitem"><a href="/tools/post-feedback" class="${rowLinkClasses}"><span class="${rowLabelClasses}">anonymous and low rep post feedback</span></a></li>
+            <li class="s-menu--title" role="separator">Tags</li>
+            <li role="menuitem"><a href="/tags/synonyms" class="${rowLinkClasses}"><span class="${rowLabelClasses}">tag synonyms</span></a></li>
+            <li role="menuitem"><a href="/tags?tab=new" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new tags</span></a></li>
+            <li class="s-menu--title" role="separator">Stats</li>
+            <li role="menuitem"><a href="/tools/question-close-stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">question close stats</span></a></li>
+            <li role="menuitem"><a href="/tools/suggested-edits" class="${rowLinkClasses}"><span class="${rowLabelClasses}">suggested edit stats</span></a></li>
+            <li role="menuitem"><a href="/tools?tab=stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">stats</span></a></li>
+            <li role="menuitem"><a href="/tools?tab=migrated" class="${rowLinkClasses}"><span class="${rowLabelClasses}">migrated</span></a></li>
+            <li role="menuitem"><a href="/tools?tab=close" class="${rowLinkClasses}"><span class="${rowLabelClasses}">closed</span></a></li>
+            <li role="menuitem"><a href="/tools?tab=delete" class="${rowLinkClasses}"><span class="${rowLabelClasses}">deleted</span></a></li>
+            ${(userRep >= 25e3 || StackExchange.options.user.isModerator === true) ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${rowLinkClasses}"><span class="${rowLabelClasses}">site analytics</span></a></li>` : ''}
+        </ul>
     </div>
 </li>`);
 
             const addStyleSheet = () => {
                 const style = document.createElement('style');
                 style.id = '10k-tools-topbar-styles';
-                style.type = 'text/css';
                 style.innerHTML = `#${popoverId}:not(.is-visible){display:none;}#${popoverId}{margin-top: -10px !important;}`;
                 document.head.appendChild(style);
             };
 
             const addTopButton = () => {
                 const mountAfter = $('#review-button').closest('li');
-                console.log(mountAfter);
                 mountAfter.after(topbarButton);
                 topbarButton.after(topbarDialogue);
             };
