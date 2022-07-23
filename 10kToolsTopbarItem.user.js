@@ -18,6 +18,7 @@
 // @exclude     *://chat.stackexchange.com/*
 // @exclude     *://chat.meta.stackexchange.com/*
 // @exclude     *://chat.stackoverflow.com/*
+// @exclude     *://area51*.stackexchange.com/
 //
 // @grant        GM_getValue
 // @grant        GM_setValue
