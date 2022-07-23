@@ -3,13 +3,24 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.3
+// @version      0.0.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
-// @match        *://*.stackoverflow.com/*
+// @match       *://*.askubuntu.com/*
+// @match       *://*.serverfault.com/*
+// @match       *://*.stackapps.com/*
+// @match       *://*.stackexchange.com/*
+// @match       *://*.stackoverflow.com/*
+// @match       *://*.superuser.com/*
+// @match       *://*.mathoverflow.net/*
 //
-// @grant        none
+// @exclude     *://chat.stackexchange.com/*
+// @exclude     *://chat.meta.stackexchange.com/*
+// @exclude     *://chat.stackoverflow.com/*
+//
+// @grant        GM_getValue
+// @grant        GM_setValue
 //
 // ==/UserScript==
 /* globals $, StackExchange */
@@ -17,9 +28,41 @@
 (function () {
     'use strict';
 
-    StackExchange.ready(() => {
+    const getRepThresholds = async (siteName) => {
+        const apiResponseSearchValues = [{
+            'key': 'toolAccess',
+            'short_description': 'Access moderator tools'
+        }, {
+            'key': 'siteAnalyticsAccess',
+            'short_description': 'Access to site analytics'
+        }];
+        let repThresholds = GM_getValue(siteName);
+
+        if (repThresholds === undefined) {
+            const resData = await fetch(`https://api.stackexchange.com/2.3/privileges?key=0BXFrOWQNt8HFRYCHbjdrg((&site=${siteName}`).then((res) => {
+                return res.json();
+            });
+            repThresholds = {};
+            for (const repEntry of resData.items) {
+                for (const searchEntry of apiResponseSearchValues) {
+                    if (repEntry.short_description === searchEntry.short_description) {
+                        repThresholds[searchEntry.key] = repEntry.reputation;
+                    }
+                }
+            }
+            GM_setValue(siteName, JSON.stringify(repThresholds));
+        } else {
+            repThresholds = JSON.parse(repThresholds);
+        }
+        return repThresholds;
+    };
+
+    const main = async () => {
         const userRep = StackExchange.options.user.rep;
-        if (userRep >= 10e3 || StackExchange.options.user.isModerator === true) {
+
+        const repThresholds = await getRepThresholds(window.location.host);
+
+        if (userRep >= repThresholds.toolAccess || StackExchange.options.user.isModerator === true) {
             const popoverId = 'tools-popover';
             const tenKToolsButtonId = 'ten-k-tools-button';
 
@@ -75,7 +118,7 @@
             <li role="menuitem"><a href="/tools?tab=migrated" class="${rowLinkClasses}"><span class="${rowLabelClasses}">migrated</span></a></li>
             <li role="menuitem"><a href="/tools?tab=close" class="${rowLinkClasses}"><span class="${rowLabelClasses}">closed</span></a></li>
             <li role="menuitem"><a href="/tools?tab=delete" class="${rowLinkClasses}"><span class="${rowLabelClasses}">deleted</span></a></li>
-            ${(userRep >= 25e3 || StackExchange.options.user.isModerator === true) ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${rowLinkClasses}"><span class="${rowLabelClasses}">site analytics</span></a></li>` : ''}
+            ${(userRep >= repThresholds.siteAnalyticsAccess || StackExchange.options.user.isModerator === true) ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${rowLinkClasses}"><span class="${rowLabelClasses}">site analytics</span></a></li>` : ''}
         </ul>
     </div>
 </li>`);
@@ -96,5 +139,9 @@
             addStyleSheet();
             addTopButton();
         }
+    };
+
+    StackExchange.ready(() => {
+        void main();
     });
 })();
