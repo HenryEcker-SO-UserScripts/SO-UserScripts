@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Adds a 10k Tools
+// @name         10k Tools Topbar Button
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
