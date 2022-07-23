@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.4
+// @version      0.0.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -31,11 +31,9 @@
 
     const getRepThresholds = async (siteName) => {
         const apiResponseSearchValues = [{
-            'key': 'toolAccess',
-            'short_description': 'Access moderator tools'
+            'key': 'toolAccess', 'short_description': 'Access moderator tools'
         }, {
-            'key': 'siteAnalyticsAccess',
-            'short_description': 'Access to site analytics'
+            'key': 'siteAnalyticsAccess', 'short_description': 'Access to site analytics'
         }];
 
         if (StackExchange.options.user.isModerator === true) {
@@ -118,30 +116,42 @@
                 </div>
             </div>
         </div>
-        <ul class="s-menu" role="menu">
-            <li class="s-menu--title" role="separator">Reports</li>
-            <li role="menuitem"><a href="/tools/new-answers-old-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new answers to old questions</span></a></li>
-            <li role="menuitem"><a href="/tools/protected-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">protected questions</span></a></li>
-            <li role="menuitem"><a href="/tools/post-feedback" class="${rowLinkClasses}"><span class="${rowLabelClasses}">anonymous and low rep post feedback</span></a></li>
-            <li class="s-menu--title" role="separator">Tags</li>
-            <li role="menuitem"><a href="/tags/synonyms" class="${rowLinkClasses}"><span class="${rowLabelClasses}">tag synonyms</span></a></li>
-            <li role="menuitem"><a href="/tags?tab=new" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new tags</span></a></li>
-            <li class="s-menu--title" role="separator">Stats</li>
-            <li role="menuitem"><a href="/tools/question-close-stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">question close stats</span></a></li>
-            <li role="menuitem"><a href="/tools/suggested-edits" class="${rowLinkClasses}"><span class="${rowLabelClasses}">suggested edit stats</span></a></li>
-            <li role="menuitem"><a href="/tools?tab=stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">stats</span></a></li>
-            <li role="menuitem"><a href="/tools?tab=migrated" class="${rowLinkClasses}"><span class="${rowLabelClasses}">migrated</span></a></li>
-            <li role="menuitem"><a href="/tools?tab=close" class="${rowLinkClasses}"><span class="${rowLabelClasses}">closed</span></a></li>
-            <li role="menuitem"><a href="/tools?tab=delete" class="${rowLinkClasses}"><span class="${rowLabelClasses}">deleted</span></a></li>
-            ${(userRep >= repThresholds.siteAnalyticsAccess || StackExchange.options.user.isModerator === true) ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${rowLinkClasses}"><span class="${rowLabelClasses}">site analytics</span></a></li>` : ''}
-        </ul>
+        <div class="px0 pb4">
+            <ul class="s-menu" role="menu">
+                <li class="s-menu--title" role="separator">Reports</li>
+                <li role="menuitem"><a href="/tools/new-answers-old-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new answers to old questions</span></a></li>
+                <li role="menuitem"><a href="/tools/protected-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">protected questions</span></a></li>
+                <li role="menuitem"><a href="/tools/post-feedback" class="${rowLinkClasses}"><span class="${rowLabelClasses}">anonymous and low rep post feedback</span></a></li>
+                <li class="s-menu--title" role="separator">Tags</li>
+                <li role="menuitem"><a href="/tags/synonyms" class="${rowLinkClasses}"><span class="${rowLabelClasses}">tag synonyms</span></a></li>
+                <li role="menuitem"><a href="/tags?tab=new" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new tags</span></a></li>
+                <li class="s-menu--title" role="separator">Stats</li>
+                <li role="menuitem"><a href="/tools/question-close-stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">question close stats</span></a></li>
+                <li role="menuitem"><a href="/tools/suggested-edits" class="${rowLinkClasses}"><span class="${rowLabelClasses}">suggested edit stats</span></a></li>
+                <li role="menuitem"><a href="/tools?tab=stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">stats</span></a></li>
+                <li role="menuitem"><a href="/tools?tab=migrated" class="${rowLinkClasses}"><span class="${rowLabelClasses}">migrated</span></a></li>
+                <li role="menuitem"><a href="/tools?tab=close" class="${rowLinkClasses}"><span class="${rowLabelClasses}">closed</span></a></li>
+                <li role="menuitem"><a href="/tools?tab=delete" class="${rowLinkClasses}"><span class="${rowLabelClasses}">deleted</span></a></li>
+                ${(userRep >= repThresholds.siteAnalyticsAccess || StackExchange.options.user.isModerator === true) ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${rowLinkClasses}"><span class="${rowLabelClasses}">site analytics</span></a></li>` : ''}
+            </ul>
+        </div>
     </div>
 </li>`);
 
             const addStyleSheet = () => {
                 const style = document.createElement('style');
                 style.id = '10k-tools-topbar-styles';
-                style.innerHTML = `#${popoverId}:not(.is-visible){display:none;}#${popoverId}{margin-top: -10px !important;}`;
+                style.innerHTML = `#${popoverId} {
+  margin-top: -10px !important;
+}
+
+#${popoverId}:not(.is-visible) {
+  display: none;
+}
+
+#${tenKToolsButtonId}:focus {
+  box-shadow: none;
+}`;
                 document.head.appendChild(style);
             };
 
