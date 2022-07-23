@@ -37,6 +37,14 @@
             'key': 'siteAnalyticsAccess',
             'short_description': 'Access to site analytics'
         }];
+
+        if (StackExchange.options.user.isModerator === true) {
+            // There is no rep requirement for mods so set access threshold to the minimum rep (1)
+            return Object.keys(apiResponseSearchValues).reduce((acc, k) => {
+                return {...acc, [k]: 1};
+            }, {});
+        }
+
         let repThresholds = GM_getValue(siteName);
 
         if (repThresholds === undefined) {
@@ -61,9 +69,15 @@
     const main = async () => {
         const userRep = StackExchange.options.user.rep;
 
-        const repThresholds = await getRepThresholds(window.location.host);
+        let siteName = window.location.host;
+        // Map child meta's to parent's for reputation (prevent unnecessary duplicate entries)
+        if (StackExchange.options.site.isChildMeta === true) {
+            siteName = new URL(StackExchange.options.site.parentUrl).host;
+        }
 
-        if (userRep >= repThresholds.toolAccess || StackExchange.options.user.isModerator === true) {
+        const repThresholds = await getRepThresholds(siteName);
+
+        if (userRep >= repThresholds.toolAccess) {
             const popoverId = 'tools-popover';
             const tenKToolsButtonId = 'ten-k-tools-button';
 
