@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
+// @version      0.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -31,9 +31,11 @@
 
     const getRepThresholds = async (siteName) => {
         const apiResponseSearchValues = [{
-            'key': 'toolAccess', 'short_description': 'Access moderator tools'
+            'key': 'toolAccess',
+            'short_description': 'Access moderator tools'
         }, {
-            'key': 'siteAnalyticsAccess', 'short_description': 'Access to site analytics'
+            'key': 'siteAnalyticsAccess',
+            'short_description': 'Access to site analytics'
         }];
 
         if (StackExchange.options.user.isModerator === true) {
@@ -46,7 +48,9 @@
         let repThresholds = GM_getValue(siteName);
 
         if (repThresholds === undefined) {
-            const resData = await fetch(`https://api.stackexchange.com/2.3/privileges?key=0BXFrOWQNt8HFRYCHbjdrg((&site=${siteName}`).then((res) => {
+            const resData = await fetch(
+                `https://api.stackexchange.com/2.3/privileges?key=0BXFrOWQNt8HFRYCHbjdrg((&site=${siteName}`
+            ).then((res) => {
                 return res.json();
             });
             repThresholds = {};
@@ -79,7 +83,7 @@
             const popoverId = 'tools-popover';
             const tenKToolsButtonId = 'ten-k-tools-button';
 
-            const tenKToolsLabel = '10K Tools';
+            const tenKToolsLabel = 'Moderator Tools';
 
             const rowLinkClasses = 's-block-link';
             const rowLabelClasses = 'tt-capitalize';
@@ -116,7 +120,7 @@
                 </div>
             </div>
         </div>
-        <div class="px0 pb4">
+        <div class="px0 py4">
             <ul class="s-menu" role="menu">
                 <li class="s-menu--title" role="separator">Reports</li>
                 <li role="menuitem"><a href="/tools/new-answers-old-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new answers to old questions</span></a></li>
@@ -155,14 +159,14 @@
                 document.head.appendChild(style);
             };
 
-            const addTopButton = () => {
+            const addTopbarButton = () => {
                 const mountAfter = $('#review-button').closest('li');
                 mountAfter.after(topbarButton);
                 topbarButton.after(topbarDialogue);
             };
 
             addStyleSheet();
-            addTopButton();
+            addTopbarButton();
         }
     };
 
