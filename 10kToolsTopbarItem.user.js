@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.8
+// @version      1.0.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -35,6 +35,7 @@
                 popover: 'tools-popover',
                 tenKToolsButton: 'ten-k-tools-button',
                 reportsExpandable: 'ten-k-tools-expandable-reports',
+                anonAndLowRepExpandable: 'ten-k-tools-expandable-anon-and-low-rep',
                 tagsExpandable: 'ten-k-tools-expandable-tags',
                 statsExpandable: 'ten-k-tools-expandable-stats',
                 suggestedEditStatsExpandable: 'ten-k-tools-suggested-edit-expandable-stats',
@@ -127,15 +128,15 @@
     </button>
 </li>`);
 
-
                 const buildExpandable = (elemId, label, children) => {
                     const isOpen = GM_getValue(elemId) === true;
                     return `<li class="${config.css.menuTitle} ${config.css.expandableMenu} ${isOpen ? config.css.menuSelected : ''}" 
                                 role="separator" 
                                 data-controller="s-expandable-control"
                                 data-s-expandable-control-toggle-class="${config.css.menuSelected}"
-                                aria-controls="${elemId}"
-                            >${label}</li>
+                                aria-controls="${elemId}">
+                                ${label}
+                            </li>
                             <div class="s-expandable ${isOpen ? config.css.isExpanded : ''}" id="${elemId}">
                                 <div class="s-expandable--content">
                                     ${children}
@@ -163,8 +164,17 @@
                     config.id.reportsExpandable,
                     'reports',
                     `<li role="menuitem"><a href="/tools/new-answers-old-questions" class="${config.css.menuLink}">new answers to old questions</a></li>
-                            <li role="menuitem"><a href="/tools/protected-questions" class="${config.css.menuLink}">protected questions</a></li>
-                            <li role="menuitem"><a href="/tools/post-feedback" class="${config.css.menuLink}">anonymous and low rep post feedback</a></li>`
+                            <li role="menuitem"><a href="/tools/protected-questions" class="${config.css.menuLink}">protected questions</a></li>`
+                )}
+                ${buildExpandable(
+                    config.id.anonAndLowRepExpandable,
+                    'anonymous and low rep post feedback',
+                    //  filter=day to reduce page load time
+                    `<li role="menuitem"><a href="/tools/post-feedback?filter=day" class="${config.css.menuLink}">anonymous and low rep post feedback</a></li>
+                            <li role="menuitem"><a href="/tools/post-feedback/underrated?filter=day" class="${config.css.menuLink}">underrated</a></li>
+                            <li role="menuitem"><a href="/tools/post-feedback/overrated?filter=day" class="${config.css.menuLink}">overrated</a></li>
+                            <li role="menuitem"><a href="/tools/post-feedback/most-helpful?filter=day" class="${config.css.menuLink}">most helpful</a></li>
+                            <li role="menuitem"><a href="/tools/post-feedback/least-helpful?filter=day" class="${config.css.menuLink}">least helpful</a></li>`
                 )}
                 ${buildExpandable(
                     config.id.tagsExpandable,
@@ -174,7 +184,7 @@
                 )}
                 ${buildExpandable(
                     config.id.statsExpandable,
-                    'stats',
+                    'close/migration/delete stats',
                     `<li role="menuitem"><a href="/tools/question-close-stats" class="${config.css.menuLink}">question close stats</a></li>
                             <li role="menuitem"><a href="/tools?tab=stats" class="${config.css.menuLink}">stats</a></li>
                             <li role="menuitem"><a href="/tools?tab=migrated" class="${config.css.menuLink}">migrated</a></li>
