@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.6
+// @version      0.0.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -29,12 +29,31 @@
 (function () {
     'use strict';
 
+
+    const config = {
+        id: {
+            popover: 'tools-popover',
+            tenKToolsButton: 'ten-k-tools-button'
+        },
+        label: {
+            tenKToolsLabel: 'Moderator Tools'
+        },
+        css: {
+            menuLink: 's-block-link tt-capitalize'
+
+        },
+        access: {
+            tools: 'toolAccess',
+            siteAnalytics: 'siteAnalyticsAccess'
+        }
+    };
+
     const getRepThresholds = async (siteName) => {
         const apiResponseSearchValues = [{
-            'key': 'toolAccess',
+            'key': config.access.tools,
             'short_description': 'Access moderator tools'
         }, {
-            'key': 'siteAnalyticsAccess',
+            'key': config.access.siteAnalytics,
             'short_description': 'Access to site analytics'
         }];
 
@@ -71,30 +90,21 @@
     const main = async () => {
         const userRep = StackExchange.options.user.rep;
 
-        let siteName = window.location.host;
-        // Map child meta's to parent's for reputation (prevent unnecessary duplicate entries)
-        if (StackExchange.options.site.isChildMeta === true) {
-            siteName = new URL(StackExchange.options.site.parentUrl).host;
-        }
+        const repThresholds = await getRepThresholds(
+            StackExchange.options.site.isChildMeta === true ?
+                // Map child meta's to parent's for reputation (prevent unnecessary duplicate entries)
+                new URL(StackExchange.options.site.parentUrl).host :
+                window.location.host
+        );
 
-        const repThresholds = await getRepThresholds(siteName);
-
-        if (userRep >= repThresholds.toolAccess) {
-            const popoverId = 'tools-popover';
-            const tenKToolsButtonId = 'ten-k-tools-button';
-
-            const tenKToolsLabel = 'Moderator Tools';
-
-            const rowLinkClasses = 's-block-link';
-            const rowLabelClasses = 'tt-capitalize';
-
+        if (userRep >= repThresholds[config.access.tools]) {
             const topbarButton = $(`<li>
-    <button id="${tenKToolsButtonId}"
+    <button id="${config.id.tenKToolsButton}"
             class="s-topbar--item s-btn s-btn__muted"
-            aria-label="${tenKToolsLabel}"
-            title="${tenKToolsLabel}"
+            aria-label="${config.label.tenKToolsLabel}"
+            title="${config.label.tenKToolsLabel}"
             role="menuitem"
-            aria-controls="${popoverId}"
+            aria-controls="${config.id.popover}"
             data-controller="s-popover"
             data-action="s-popover#toggle"
             data-s-popover-placement="bottom-end"
@@ -102,13 +112,13 @@
         <svg aria-hidden="true" class="svg-icon iconGraph" width="18" height="18" viewBox="0 0 18 18">
             <path d="M3 1h12c1.09 0 2 .91 2 2v12c0 1.09-.91 2-2 2H3c-1.09 0-2-.91-2-2V3c0-1.1.9-2 2-2Zm1 8v5h2V9H4Zm4-5v10h2V4H8Zm4 3v7h2V7h-2Z"></path>
         </svg>
-        <div class="v-visible-sr">${tenKToolsLabel}</div>
+        <div class="v-visible-sr">${config.label.tenKToolsLabel}</div>
     </button>
 </li>`);
             const topbarDialogue = $(`<li role="presentation">
-    <div class="topbar-dialog" id="${popoverId}" role="menu">
+    <div class="topbar-dialog" id="${config.id.popover}" role="menu">
         <div class="header fw-wrap">
-            <h3 class="flex--item">${tenKToolsLabel}</h3>
+            <h3 class="flex--item">${config.label.tenKToolsLabel}</h3>
             <div class="flex--item fl1">
                 <div class="ai-center d-flex jc-end">
                     <div class="-right">
@@ -123,20 +133,20 @@
         <div class="px0 py4">
             <ul class="s-menu" role="menu">
                 <li class="s-menu--title" role="separator">Reports</li>
-                <li role="menuitem"><a href="/tools/new-answers-old-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new answers to old questions</span></a></li>
-                <li role="menuitem"><a href="/tools/protected-questions" class="${rowLinkClasses}"><span class="${rowLabelClasses}">protected questions</span></a></li>
-                <li role="menuitem"><a href="/tools/post-feedback" class="${rowLinkClasses}"><span class="${rowLabelClasses}">anonymous and low rep post feedback</span></a></li>
+                <li role="menuitem"><a href="/tools/new-answers-old-questions" class="${config.css.menuLink}">new answers to old questions</a></li>
+                <li role="menuitem"><a href="/tools/protected-questions" class="${config.css.menuLink}">protected questions</a></li>
+                <li role="menuitem"><a href="/tools/post-feedback" class="${config.css.menuLink}">anonymous and low rep post feedback</a></li>
                 <li class="s-menu--title" role="separator">Tags</li>
-                <li role="menuitem"><a href="/tags/synonyms" class="${rowLinkClasses}"><span class="${rowLabelClasses}">tag synonyms</span></a></li>
-                <li role="menuitem"><a href="/tags?tab=new" class="${rowLinkClasses}"><span class="${rowLabelClasses}">new tags</span></a></li>
+                <li role="menuitem"><a href="/tags/synonyms" class="${config.css.menuLink}">tag synonyms</a></li>
+                <li role="menuitem"><a href="/tags?tab=new" class="${config.css.menuLink}">new tags</a></li>
                 <li class="s-menu--title" role="separator">Stats</li>
-                <li role="menuitem"><a href="/tools/question-close-stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">question close stats</span></a></li>
-                <li role="menuitem"><a href="/tools/suggested-edits" class="${rowLinkClasses}"><span class="${rowLabelClasses}">suggested edit stats</span></a></li>
-                <li role="menuitem"><a href="/tools?tab=stats" class="${rowLinkClasses}"><span class="${rowLabelClasses}">stats</span></a></li>
-                <li role="menuitem"><a href="/tools?tab=migrated" class="${rowLinkClasses}"><span class="${rowLabelClasses}">migrated</span></a></li>
-                <li role="menuitem"><a href="/tools?tab=close" class="${rowLinkClasses}"><span class="${rowLabelClasses}">closed</span></a></li>
-                <li role="menuitem"><a href="/tools?tab=delete" class="${rowLinkClasses}"><span class="${rowLabelClasses}">deleted</span></a></li>
-                ${(userRep >= repThresholds.siteAnalyticsAccess || StackExchange.options.user.isModerator === true) ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${rowLinkClasses}"><span class="${rowLabelClasses}">site analytics</span></a></li>` : ''}
+                <li role="menuitem"><a href="/tools/question-close-stats" class="${config.css.menuLink}">question close stats</a></li>
+                <li role="menuitem"><a href="/tools/suggested-edits" class="${config.css.menuLink}">suggested edit stats</a></li>
+                <li role="menuitem"><a href="/tools?tab=stats" class="${config.css.menuLink}">stats</a></li>
+                <li role="menuitem"><a href="/tools?tab=migrated" class="${config.css.menuLink}">migrated</a></li>
+                <li role="menuitem"><a href="/tools?tab=close" class="${config.css.menuLink}">closed</a></li>
+                <li role="menuitem"><a href="/tools?tab=delete" class="${config.css.menuLink}">deleted</a></li>
+                ${userRep >= repThresholds[config.access.siteAnalytics] ? `<li class="s-menu--title" role="separator">Analytics</li><li role="menuitem"><a href="/site-analytics" class="${config.css.menuLink}">site analytics</a></li>` : ''}
             </ul>
         </div>
     </div>
@@ -145,15 +155,15 @@
             const addStyleSheet = () => {
                 const style = document.createElement('style');
                 style.id = '10k-tools-topbar-styles';
-                style.innerHTML = `#${popoverId} {
+                style.innerHTML = `#${config.id.popover} {
   margin-top: -10px !important;
 }
 
-#${popoverId}:not(.is-visible) {
+#${config.id.popover}:not(.is-visible) {
   display: none;
 }
 
-#${tenKToolsButtonId}:focus {
+#${config.id.tenKToolsButton}:focus {
   box-shadow: none;
 }`;
                 document.head.appendChild(style);
