@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Inline delete/undelete buttons user pages
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @description  Adds delete/undelete buttons on the questions and answers tabs in user page
+// @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/Delete-UndeleteFromUserPage.user.js
