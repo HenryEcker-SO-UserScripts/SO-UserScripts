@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.0
+// @version      1.0.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -33,6 +33,7 @@
         const config = {
             id: {
                 popover: 'tools-popover',
+                popoverBody: 'popover-body',
                 tenKToolsButton: 'ten-k-tools-button',
                 reportsExpandable: 'ten-k-tools-expandable-reports',
                 anonAndLowRepExpandable: 'ten-k-tools-expandable-anon-and-low-rep',
@@ -158,7 +159,7 @@
                 </div>
             </div>
         </div>
-        <div class="px0 py4">
+        <div id="${config.id.popoverBody}" class="px4 py4 overflow-y-auto">
             <ul class="s-menu" role="menu">
                 ${buildExpandable(
                     config.id.reportsExpandable,
@@ -219,6 +220,10 @@
                     style.id = '10k-tools-topbar-styles';
                     style.innerHTML = `#${config.id.popover} {
   margin-top: -10px !important;
+}
+
+#${config.id.popoverBody} {
+   max-height: 80vh;
 }
 
 #${config.id.popover}:not(.is-visible) {
