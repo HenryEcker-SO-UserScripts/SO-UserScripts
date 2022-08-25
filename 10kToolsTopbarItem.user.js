@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.1
+// @version      1.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -39,6 +39,7 @@
                 anonAndLowRepExpandable: 'ten-k-tools-expandable-anon-and-low-rep',
                 tagsExpandable: 'ten-k-tools-expandable-tags',
                 statsExpandable: 'ten-k-tools-expandable-stats',
+                annotatedPosts: 'ten-k-tools-annotated-posts',
                 suggestedEditStatsExpandable: 'ten-k-tools-suggested-edit-expandable-stats',
                 siteAnalyticsExpandable: 'ten-k-tools-suggested-edit-expandable-site-analytics'
             },
@@ -191,6 +192,17 @@
                             <li role="menuitem"><a href="/tools?tab=migrated" class="${config.css.menuLink}">migrated</a></li>
                             <li role="menuitem"><a href="/tools?tab=close" class="${config.css.menuLink}">closed</a></li>
                             <li role="menuitem"><a href="/tools?tab=delete" class="${config.css.menuLink}">deleted</a></li>`
+                )}
+                ${buildExpandable(
+                    config.id.annotatedPosts,
+                    'Annotated Posts',
+                    `<li role="menuitem"><a href="/annotated-posts?tab=locked" class="${config.css.menuLink}">All Locked</a></li>
+                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=migrated" class="${config.css.menuLink}">Migrated</a></li>
+                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=duplicate" class="${config.css.menuLink}">Locked Duplicate</a></li>
+                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=merged" class="${config.css.menuLink}">Merged</a></li>
+                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=noticed" class="${config.css.menuLink}">Noticed (Locked)</a></li>
+                            <li role="menuitem"><a href="/annotated-posts?tab=noticed" class="${config.css.menuLink}">Noticed (Not Locked)</a></li>
+                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=other" class="${config.css.menuLink}">Locked Other</a></li>`
                 )}
                 ${buildExpandable(
                     config.id.suggestedEditStatsExpandable,
