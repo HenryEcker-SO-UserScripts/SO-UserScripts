@@ -35,7 +35,7 @@
             userScriptToggleComponentId: 'aus-sheet-toggle-controller-id'
         },
         eventName: {showPopover: 's-popover:show'},
-        gmStorageKey: 'shouldAnonymiseShareLinks'
+        gmStorageKey: 'shouldIncludeUserId'
     };
 
     const getShouldIncludeUserId = () => {
