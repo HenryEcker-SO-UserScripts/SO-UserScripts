@@ -38,7 +38,8 @@
             userScriptToggleComponentId: 'aus-sheet-toggle-controller-id'
         },
         attributeValue: {
-            popoverSubtitleText: '(Includes your user id)'
+            popoverSubtitleText: '(Includes your user id)',
+            toggleLabelText: 'Include user id'
         },
         eventName: {
             showPopover: 's-popover:show'
@@ -72,7 +73,7 @@
         const popoverCheckboxId = `${popoverId}-input`;
         const popoverToggleComponentId = `${popoverId}-toggle-component`;
         const toggleComponent = $(`<div id='${popoverToggleComponentId}' class='my8 d-flex ai-center'>
-    <label class='flex--item s-label__sm fw-bold' for='${popoverCheckboxId}'>Include User Id</label>
+    <label class='flex--item s-label__sm fw-bold' for='${popoverCheckboxId}'>${config.attributeValue.toggleLabelText}</label>
     <div class='mx4 flex--item s-toggle-switch'>
         <input id='${popoverCheckboxId}' type='checkbox' ${shouldInclude ? 'checked' : ''} style='${config.css.toggleStyleStr}'>
         <div class='s-toggle-switch--indicator' style='${config.css.toggleStyleStr}'></div>
