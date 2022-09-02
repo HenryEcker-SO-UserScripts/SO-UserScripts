@@ -152,9 +152,7 @@
                     );
                 } else {
                     // Rebuild and replace with new toggle component (IDK Stacks toggle does not display correctly even with attribute changes without re-rendering)
-                    $(`#${ev.detail.dispatcher.getAttribute(
-                            config.attributeName.userScriptToggleComponentId
-                    )}`).replaceWith(toggleComponent);
+                    $(`#${toggleComponentId}`).replaceWith(toggleComponent);
                 }
 
 
