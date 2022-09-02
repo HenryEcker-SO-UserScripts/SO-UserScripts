@@ -49,7 +49,9 @@
         },
         attributeValue: {
             popoverSubtitleText: '(Includes your user id)',
-            toggleLabelText: 'Include user id'
+            toggleLabelText: 'Include user id',
+            onetimeAnonymousLabelText: 'anonymous link',
+            onetimeUserIdLabelText: 'link with id'
         },
         eventName: {
             showPopover: 's-popover:show'
@@ -79,6 +81,7 @@
         return href.splitOnLast('/')[0]; // Implemented in SE's JavaScript
     };
 
+    // Copy Logic Modified From SE's copy logic
     const tryCopy = (value) => {
         if (navigator.clipboard) {
             return navigator.clipboard.writeText(value);
@@ -104,17 +107,20 @@
     };
 
     const copy = (value) => {
-        tryCopy(value).then(() => {
-            StackExchange.helpers.showToast(
-                __tr(['Link copied to clipboard.'], undefined, 'en', []),
-                {transientTimeout: 3000, type: 'success'}
-            );
-        }, function () {
-            StackExchange.helpers.showToast(
-                __tr(['Could not copy link to clipboard.'], undefined, 'en', []),
-                {transientTimeout: 5000, type: 'danger'}
-            );
-        });
+        tryCopy(value).then(
+            () => {
+                StackExchange.helpers.showToast(
+                    __tr(['Link copied to clipboard.'], undefined, 'en', []),
+                    {transientTimeout: 3000, type: 'success'}
+                );
+            },
+            () => {
+                StackExchange.helpers.showToast(
+                    __tr(['Could not copy link to clipboard.'], undefined, 'en', []),
+                    {transientTimeout: 5000, type: 'danger'}
+                );
+            }
+        );
     };
 
     const buildToggleComponent = (ev, popoverId, currentHref, shouldInclude) => {
@@ -140,7 +146,7 @@
 
 
         const oneTimeButton = $(`<button class="js-copy-link-btn s-btn s-btn__link ml-auto">
-Copy ${shouldInclude ? ('anonymous link') : ('link with id')}
+Copy ${shouldInclude ? config.attributeValue.onetimeAnonymousLabelText : config.attributeValue.onetimeUserIdLabelText}
 </button>`);
 
         oneTimeButton.on('click', () => {
