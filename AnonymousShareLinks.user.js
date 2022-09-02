@@ -62,7 +62,7 @@
     };
 
     const stripId = (href) => {
-        return href.splitOnLast('/')[0];
+        return href.splitOnLast('/')[0]; // Implemented in SE's JavaScript
     };
 
     const buildToggleComponent = (ev, popoverId, shouldInclude) => {
