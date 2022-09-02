@@ -3,7 +3,7 @@
 // @description  Adds a toggle button to all share popovers which will allow share links to exclude user ids
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 //
@@ -34,18 +34,17 @@
             userScriptPopoverContainsUserId: 'aus-sheet-contains-user-id',
             userScriptToggleComponentId: 'aus-sheet-toggle-controller-id'
         },
-        eventName: {showPopover: 's-popover:show'},
+        attributeValue: {
+            popoverSubtitleText: '(Includes your user id)'
+        },
+        eventName: {
+            showPopover: 's-popover:show'
+        },
         gmStorageKey: 'shouldIncludeUserId'
     };
 
     const getShouldIncludeUserId = () => {
-        const shouldIncludeUserId = GM_getValue(config.gmStorageKey);
-        if (shouldIncludeUserId === null) {
-            GM_setValue(config.gmStorageKey, 'true');
-            return true;
-        } else {
-            return shouldIncludeUserId === 'true';
-        }
+        return GM_getValue(config.gmStorageKey, 'true') === 'true';
     };
 
     const testDispatcherIsSharePopover = (dispatcher) => {
@@ -100,7 +99,7 @@
             if (!hasSubtitleAttr) {
                 ev.detail.dispatcher.setAttribute(
                     config.attributeName.popoverSubtitle,
-                    '(Includes your user id)'
+                    config.attributeValue.popoverSubtitleText
                 );
             }
         } else {
