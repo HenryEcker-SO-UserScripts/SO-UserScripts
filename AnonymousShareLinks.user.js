@@ -53,9 +53,12 @@
             dispatcher.matches(config.jQuerySelector.shareLinks)
         );
     };
+    const getUserId = () => {
+        return StackExchange.options.user.userId;
+    };
 
     const appendId = (href) => {
-        return `${href}/${StackExchange.options.user.userId}`;
+        return `${href}/${getUserId()}`;
     };
 
     const stripId = (href) => {
@@ -176,5 +179,9 @@
         });
     };
 
-    StackExchange.ready(main);
+    StackExchange.ready(() => {
+        if (getUserId() !== undefined) {
+            main();
+        }
+    });
 })();
