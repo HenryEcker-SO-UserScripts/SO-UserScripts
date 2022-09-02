@@ -3,7 +3,7 @@
 // @description  Adds a toggle button to all share popovers which will allow share links to exclude user ids
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
+// @version      0.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 //
@@ -30,7 +30,7 @@
 //
 //
 // ==/UserScript==
-/* globals $, StackExchange, Stacks */
+/* globals $, StackExchange, Stacks, __tr */
 
 (function () {
     'use strict';
@@ -79,7 +79,45 @@
         return href.splitOnLast('/')[0]; // Implemented in SE's JavaScript
     };
 
-    const buildToggleComponent = (ev, popoverId, shouldInclude) => {
+    const tryCopy = (value) => {
+        if (navigator.clipboard) {
+            return navigator.clipboard.writeText(value);
+        } else {
+            let copied;
+
+            try {
+                copied = document.execCommand('copy');
+            } catch (_) {
+                copied = false;
+            }
+
+            const deferred = $.Deferred();
+
+            if (copied) {
+                deferred.resolve();
+            } else {
+                deferred.reject();
+            }
+
+            return deferred.promise();
+        }
+    };
+
+    const copy = (value) => {
+        tryCopy(value).then(() => {
+            StackExchange.helpers.showToast(
+                __tr(['Link copied to clipboard.'], undefined, 'en', []),
+                {transientTimeout: 3000, type: 'success'}
+            );
+        }, function () {
+            StackExchange.helpers.showToast(
+                __tr(['Could not copy link to clipboard.'], undefined, 'en', []),
+                {transientTimeout: 5000, type: 'danger'}
+            );
+        });
+    };
+
+    const buildToggleComponent = (ev, popoverId, currentHref, shouldInclude) => {
         const popoverCheckboxId = `${popoverId}-input`;
         const popoverToggleComponentId = `${popoverId}-toggle-component`;
         const toggleComponent = $(`<div id='${popoverToggleComponentId}' class='my8 d-flex ai-center'>
@@ -99,11 +137,26 @@
             Stacks.hidePopover(ev.detail.dispatcher);
             Stacks.showPopover(ev.detail.dispatcher);
         });
+
+
+        const oneTimeButton = $(`<button class="js-copy-link-btn s-btn s-btn__link ml-auto">
+Copy ${shouldInclude ? ('anonymous link') : ('link with id')}
+</button>`);
+
+        oneTimeButton.on('click', () => {
+            // If normally should include strip id
+            // If normally should not include append id
+            void copy((shouldInclude ? stripId : appendId)(
+                // Expand to full URL
+                new URL(currentHref, window.location.origin).href
+            ));
+        });
+
+        toggleComponent.append(oneTimeButton);
         return toggleComponent;
     };
 
-    const updatePopover = (ev, shouldInclude) => {
-        const currentHref = ev.detail.dispatcher.getAttribute('href');
+    const updatePopover = (ev, currentHref, shouldInclude) => {
         const hasSubtitleAttr = ev.detail.dispatcher.hasAttribute(config.attributeName.popoverSubtitle);
 
         if (shouldInclude) {
@@ -147,13 +200,14 @@
                 const toggleComponentId = ev.detail.dispatcher.getAttribute(
                     config.attributeName.userScriptToggleComponentId
                 );
+                const currentHref = ev.detail.dispatcher.getAttribute('href');
 
 
                 // Find corresponding popover
                 const popover = $(`#${ev.detail.dispatcher.getAttribute('aria-controls')}`);
                 // Build toggle component
                 const toggleComponent = buildToggleComponent(
-                    ev, popover.attr('id'), shouldIncludeUserId
+                    ev, popover.attr('id'), currentHref, shouldIncludeUserId
                 );
 
                 if (toggleComponentId === null) {
@@ -178,7 +232,7 @@
                     // Prevent popover from opening
                     ev.preventDefault();
                     // Make needed popover state changes
-                    updatePopover(ev, shouldIncludeUserId);
+                    updatePopover(ev, currentHref, shouldIncludeUserId);
                     // Update attribute
                     ev.detail.dispatcher.setAttribute(
                         config.attributeName.userScriptPopoverContainsUserId,
