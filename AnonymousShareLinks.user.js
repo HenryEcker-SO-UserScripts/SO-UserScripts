@@ -3,7 +3,7 @@
 // @description  Adds a toggle button to all share popovers which will allow share links to exclude user ids
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.7
+// @version      0.0.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 //
@@ -44,8 +44,13 @@
         },
         attributeName: {
             popoverSubtitle: 'data-se-share-sheet-subtitle',
-            userScriptPopoverContainsUserId: 'aus-sheet-contains-user-id',
-            userScriptToggleComponentId: 'aus-sheet-toggle-controller-id'
+            userScript: {
+                popoverContainsUserId: 'aus-sheet-contains-user-id',
+                toggleComponentId: 'aus-sheet-toggle-controller-id',
+                toggleCheckboxId: 'aus-sheet-toggle-checkbox-id',
+                linkWithUserId: 'aus-sheet-user-id-share-link',
+                linkWithoutUserId: 'aus-sheet-anon-share-link'
+            }
         },
         attributeValue: {
             popoverSubtitleText: '(Includes your user id)',
@@ -69,6 +74,7 @@
             dispatcher.matches(config.jQuerySelector.shareLinks)
         );
     };
+
     const getUserId = () => {
         return StackExchange.options.user.userId;
     };
@@ -79,6 +85,28 @@
 
     const stripId = (href) => {
         return href.splitOnLast('/')[0]; // Implemented in SE's JavaScript
+    };
+
+
+    const qualifyRelativeLink = (relativeLink) => {
+        return new URL(relativeLink, window.location.origin).href;
+    };
+
+    const getLink = (currentHref, withUserId) => {
+        if (withUserId) {
+            // If popover missing user id add it back
+            if (currentHref.match(/^\/([^/]+?)\/(\d+)$/) !== null) {
+                // Update Attribute (append user id)
+                return qualifyRelativeLink(appendId(currentHref));
+            }
+        } else {
+            // If popover has user id remove it
+            if (currentHref.match(/^\/([^/]+?)\/(\d+)\/\d+$/) !== null) {
+                // Update Attribute (strip user id)
+                return qualifyRelativeLink(stripId(currentHref));
+            }
+        }
+        return qualifyRelativeLink(currentHref);
     };
 
     // Copy Logic Modified From SE's copy logic
@@ -123,9 +151,7 @@
         );
     };
 
-    const buildToggleComponent = (ev, popoverId, currentHref, shouldInclude) => {
-        const popoverCheckboxId = `${popoverId}-input`;
-        const popoverToggleComponentId = `${popoverId}-toggle-component`;
+    const buildToggleComponent = (ev, popoverCheckboxId, popoverToggleComponentId, shouldInclude) => {
         const toggleComponent = $(`<div id='${popoverToggleComponentId}' class='my8 d-flex ai-center'>
     <label class='flex--item s-label__sm fw-bold' for='${popoverCheckboxId}'>${config.attributeValue.toggleLabelText}</label>
     <div class='mx4 flex--item s-toggle-switch'>
@@ -150,29 +176,34 @@ Copy ${shouldInclude ? config.attributeValue.onetimeAnonymousLabelText : config.
 </button>`);
 
         oneTimeButton.on('click', () => {
-            // If normally should include strip id
-            // If normally should not include append id
-            void copy((shouldInclude ? stripId : appendId)(
-                // Expand to full URL
-                new URL(currentHref, window.location.origin).href
-            ));
+            // If normally should include use link without id
+            // If normally should not include use link with id
+            void copy(
+                ev.detail.dispatcher.getAttribute(
+                    !shouldInclude ?
+                        config.attributeName.userScript.linkWithUserId :
+                        config.attributeName.userScript.linkWithoutUserId
+                )
+            );
         });
 
         toggleComponent.append(oneTimeButton);
         return toggleComponent;
     };
 
-    const updatePopover = (ev, currentHref, shouldInclude, toggleComponentId) => {
+    const updatePopover = (ev, shouldInclude) => {
+        /* Update HREF in share-sheet */
+        ev.detail.dispatcher.setAttribute(
+            'href',
+            ev.detail.dispatcher.getAttribute(
+                shouldInclude ?
+                    config.attributeName.userScript.linkWithUserId :
+                    config.attributeName.userScript.linkWithoutUserId
+            )
+        );
+        /* Update Subtitle in share-sheet */
         const hasSubtitleAttr = ev.detail.dispatcher.hasAttribute(config.attributeName.popoverSubtitle);
-
-        let newHref = currentHref;
-
         if (shouldInclude) {
-            // If popover missing user id add it back
-            if (currentHref.match(/^\/([^/]+?)\/(\d+)$/) !== null) {
-                // Update Attribute (append user id)
-                newHref = appendId(currentHref);
-            }
             // If popover missing subtitle add it back
             if (!hasSubtitleAttr) {
                 ev.detail.dispatcher.setAttribute(
@@ -181,11 +212,6 @@ Copy ${shouldInclude ? config.attributeValue.onetimeAnonymousLabelText : config.
                 );
             }
         } else {
-            // If popover has user id remove it
-            if (currentHref.match(/^\/([^/]+?)\/(\d+)\/\d+$/) !== null) {
-                // Update Attribute (strip user id)
-                newHref = stripId(currentHref);
-            }
             // If popover has subtitle remove it
             if (hasSubtitleAttr) {
                 ev.detail.dispatcher.removeAttribute(
@@ -194,29 +220,16 @@ Copy ${shouldInclude ? config.attributeValue.onetimeAnonymousLabelText : config.
             }
         }
 
-        // Update Href to new value
-        ev.detail.dispatcher.setAttribute('href', newHref);
-
-
-        // Find corresponding popover
-        const popover = $(`#${ev.detail.dispatcher.getAttribute('aria-controls')}`);
-        // Build toggle component
-        const toggleComponent = buildToggleComponent(
-            ev, popover.attr('id'), newHref, shouldInclude
+        /* Build and Replace Toggle Component */
+        const toggleComponentId = ev.detail.dispatcher.getAttribute(config.attributeName.userScript.toggleComponentId);
+        $(`#${toggleComponentId}`).replaceWith(
+            buildToggleComponent(
+                ev,
+                ev.detail.dispatcher.getAttribute(config.attributeName.userScript.toggleCheckboxId),
+                toggleComponentId,
+                shouldInclude
+            )
         );
-
-        if (toggleComponentId === null) {
-            // Place toggle component after input field
-            popover.find('div.my8').after(toggleComponent);
-            // Update attribute with component id
-            ev.detail.dispatcher.setAttribute(
-                config.attributeName.userScriptToggleComponentId,
-                toggleComponent.attr('id')
-            );
-        } else {
-            // Rebuild and replace with new toggle component (IDK Stacks toggle does not display correctly even with attribute changes without re-rendering)
-            $(`#${toggleComponentId}`).replaceWith(toggleComponent);
-        }
     };
 
     const main = () => {
@@ -227,26 +240,55 @@ Copy ${shouldInclude ? config.attributeValue.onetimeAnonymousLabelText : config.
 
                 // Check existing popover for UserScript attributes
                 const containsUserId = ev.detail.dispatcher.getAttribute(
-                    config.attributeName.userScriptPopoverContainsUserId
+                    config.attributeName.userScript.popoverContainsUserId
                 );
 
-                // Determine if any changes need to be made to controller attributes
+                const currentHref = ev.detail.dispatcher.getAttribute('href');
+
+                // Set up attributes on inital build only
+                if (containsUserId === null) {
+                    ev.detail.dispatcher.setAttribute(
+                        config.attributeName.userScript.linkWithUserId,
+                        getLink(currentHref, true)
+                    );
+                    ev.detail.dispatcher.setAttribute(
+                        config.attributeName.userScript.linkWithoutUserId,
+                        getLink(currentHref, false)
+                    );
+                    // Find corresponding popover
+                    const popover = $(`#${ev.detail.dispatcher.getAttribute('aria-controls')}`);
+                    const popoverId = popover.attr('id');
+                    const popoverCheckboxId = `${popoverId}-input`;
+                    const popoverToggleComponentId = `${popoverId}-toggle-component`;
+
+                    // Place div in correct point to mount toggle element
+                    popover.find('div.my8').after($(`<div id="${popoverToggleComponentId}"></div>`));
+
+                    // Update attribute with ids
+                    ev.detail.dispatcher.setAttribute(
+                        config.attributeName.userScript.toggleCheckboxId,
+                        popoverCheckboxId
+                    );
+                    ev.detail.dispatcher.setAttribute(
+                        config.attributeName.userScript.toggleComponentId,
+                        popoverToggleComponentId
+                    );
+                }
+
+                // Determine if any changes need to be made to component
                 if (
-                    containsUserId === null ||
+                    (containsUserId === null) ||
                     ((containsUserId === 'true') !== shouldIncludeUserId)
                 ) {
                     // Prevent popover from opening
                     ev.preventDefault();
-                    const toggleComponentId = ev.detail.dispatcher.getAttribute(
-                        config.attributeName.userScriptToggleComponentId
-                    );
-                    const currentHref = ev.detail.dispatcher.getAttribute('href');
+
                     // Make needed popover state changes
-                    updatePopover(ev, currentHref, shouldIncludeUserId, toggleComponentId);
+                    updatePopover(ev, shouldIncludeUserId);
 
                     // Update attribute
                     ev.detail.dispatcher.setAttribute(
-                        config.attributeName.userScriptPopoverContainsUserId,
+                        config.attributeName.userScript.popoverContainsUserId,
                         shouldIncludeUserId
                     );
                     // Now Show Popover
