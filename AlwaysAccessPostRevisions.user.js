@@ -42,7 +42,7 @@
             const e = $(n);
             const postId = e.attr('data-post-id');
             const stacksTooltip = `--stacks-s-tooltip-aapr-${postId}`;
-            // Add Link (and icon) to post revisions on all posts)
+            // Add Link (and icon) to post revisions on all posts
             $(`<a href="/posts/${postId}/revisions" class="${config.votingContainerButtonClasses}" data-controller="s-tooltip" data-s-tooltip-placement="right" aria-label="Timeline" aria-describedby="${stacksTooltip}">${config.revisionButtonIcon}</a>`).appendTo(e);
             $(`<div id="${stacksTooltip}" class="s-popover s-popover__tooltip wmx2" role="tooltip">Show post revisions.<div class="s-popover--arrow" style=""></div></div>`).appendTo(e);
         });
