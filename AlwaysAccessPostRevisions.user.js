@@ -3,7 +3,7 @@
 // @description  Adds a link to post revisions to all posts voting containers (including posts with no edits)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
 //
@@ -50,7 +50,10 @@
 
     // Monitor add buttons when review task is loaded
     $(document).on('ajaxComplete', (event, {responseJSON}, {url}) => {
-        if (url.startsWith('/review/next-task') && responseJSON?.reviewTaskId !== undefined) {
+        if (
+            (url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')) &&
+            responseJSON?.reviewTaskId !== undefined
+        ) {
             main();
         }
     });
