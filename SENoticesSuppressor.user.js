@@ -3,7 +3,7 @@
 // @description  Suppress annoying toast/overlay messages network-wide
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.8
+// @version      0.0.9
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 //
@@ -14,6 +14,9 @@
 // @match        *://*.stackoverflow.com/*
 // @match        *://*.superuser.com/*
 // @match        *://*.mathoverflow.net/*
+//
+// @exclude      *://chat.stackoverflow.com/*
+// @exclude      *://chat.*stackexchange.com/*
 //
 // @run-at       document-start
 //
