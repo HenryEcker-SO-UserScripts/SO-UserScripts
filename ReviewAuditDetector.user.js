@@ -3,7 +3,7 @@
 // @description  Tries to detect audits when reviewing
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.3
+// @version      0.0.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ReviewAuditDetector.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ReviewAuditDetector.user.js
 //
@@ -38,6 +38,10 @@
                 if (responseJSON.isAudit) {
                     postTitleBanner.innerHTML = '<span>(Audit) </span>' + postTitleBanner.innerHTML;
                     postTitleBanner.style.backgroundColor = 'var(--red-200)';
+                    StackExchange.helpers.showToast('This is an audit', {type: 'danger', transientTimeout: 5000});
+                } else {
+                    // Hide any active toasts on new review page
+                    StackExchange.helpers.hideToasts();
                 }
             }
         });
