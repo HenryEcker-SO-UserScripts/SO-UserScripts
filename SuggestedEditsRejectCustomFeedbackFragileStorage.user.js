@@ -4,8 +4,8 @@
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
 // @version      0.0.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.js
+// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
+// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
 //
 // @match        *://*.askubuntu.com/review/suggested-edits/*
 // @match        *://*.serverfault.com/review/suggested-edits/*
