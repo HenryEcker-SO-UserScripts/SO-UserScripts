@@ -199,6 +199,10 @@
         );
     };
 
+    const changeFlagTextAreaSize = (textArea) => {
+        textArea.attr('rows', 9);
+    };
+
     const textAreaMonitor = (textArea, maxLen, cb = undefined) => {
         if (textArea.attr(selectors.attrs.monitoredTextArea) !== true) { // prevent adding the listener multiple times
             textArea.on('input propertychange', (ev) => {
@@ -261,6 +265,8 @@
                 () => {
                     const textArea = $(selectors.jquerySelector.postFlagDialogue.textArea);
 
+                    changeFlagTextAreaSize(textArea);
+
                     textAreaMonitor(textArea, textAreaMaxLens.postFlagMaxLen, (reducedText) => {
                         flagText = reducedText || undefined;
                     });
@@ -282,6 +288,9 @@
                 testIsCommentFlagPopup,
                 (nodeEvent) => {
                     const textArea = $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea);
+
+                    changeFlagTextAreaSize(textArea);
+
                     textAreaMonitor(
                         textArea,
                         textAreaMaxLens.commentFlagMaxLen,
