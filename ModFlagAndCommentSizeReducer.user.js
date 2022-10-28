@@ -41,7 +41,7 @@
 
     const textAreaMaxLens = {
         postFlagMaxLen: 500,
-        commentFlagMaxLen: 200,
+        commentFlagMaxLen: 500,
         commentMaxLen: 600
     };
 
