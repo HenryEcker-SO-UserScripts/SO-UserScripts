@@ -113,6 +113,10 @@
                     return `[${p1}](/users/${p2}${p3})`;
                 });
             },
+            // Shorten /qa/postId/userid to just /qa/postId
+            (s) => {
+                return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/\d+\)/g, '[$1](/$2/$3)');
+            },
             //----- BARE LINK ENUMERATION ------//
             // Convert any post links from [1](/qa/postId/userid) to [QA1](/qa/postId/userid)
             (s) => {
@@ -147,13 +151,6 @@
             }
         ],
         // Tier Two Reducers
-        [
-            // Shorten /qa/postId/userid to just /qa/postId
-            (s) => {
-                return s.replace(/\[(.*?)]\(\/([qa])\/(\d+)\/\d+\)/g, '[$1](/$2/$3)');
-            }
-        ],
-        // Tier Three Reducers
         [
             // Further shorten the enumerated links by removing the link type prefix letter and re-enumerating
             (s) => {
