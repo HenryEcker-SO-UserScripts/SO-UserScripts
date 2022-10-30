@@ -41,10 +41,10 @@
         return isDeleted || !actionText.contains('delet');
     }).remove();
 
-    const button = $('<button class="s-btn s-btn__xs s-btn__outlined ml6">Open All</button>');
+    const button = $('<button class="s-btn s-btn__xs s-btn__outlined ml6" title="Open all unvisited review tasks in new tabs">Open All</button>');
     button.on('click', (ev) => {
         ev.preventDefault();
-        for (const e of $(config.selector.rowSelector).find('td:eq(2) a')) {
+        for (const e of $(config.selector.rowSelector).find(`td:eq(2) a:not(.${config.styles.visitedStyle})`)) {
             window.open(e.getAttribute('href'), '_blank');
             $(e).addClass(config.styles.visitedStyle);
         }
