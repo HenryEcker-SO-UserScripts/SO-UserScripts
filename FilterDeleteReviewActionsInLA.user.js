@@ -3,7 +3,7 @@
 // @description  Only shows Delete and Recommend Deletion actions (for posts which are not deleted)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 //
@@ -25,7 +25,7 @@
         // Make link modifications
         const link = action.find('a');
         link.attr('target', '_blank');
-        link.on('click', () => {
+        link.on('mousedown', () => {
             // Keep track of which links have already been clicked
             link.addClass('bg-red-500');
         });
