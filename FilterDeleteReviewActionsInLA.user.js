@@ -3,7 +3,7 @@
 // @description  Only shows Delete and Recommend Deletion actions (for posts which are not deleted)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
+// @version      0.0.6
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 //
@@ -51,5 +51,18 @@
             }
         });
         $('#content table tr:eq(0) th:eq(2)').append(button);
+
+
+        document.addEventListener('keydown', (ev) => {
+            if (ev.key === 'x') {
+                const href = $('a[rel="next"]').attr('href');
+                window.location.assign(href);
+            } else if (ev.key === 'z') {
+                const href = $('a[rel="prev"]').attr('href');
+                window.location.assign(href);
+            } else if (ev.key === 'n') {
+                button.click();
+            }
+        });
     });
 })();
