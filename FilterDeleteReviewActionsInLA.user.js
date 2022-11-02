@@ -69,8 +69,10 @@
                 $('#answer .js-flag-post-link').click();
             };
             document.addEventListener('keydown', (ev) => {
-                if (ev.key === 'f' && !ev.ctrlKey) {
-                    openFlagDialogue();
+                if ($('#popup-flag-post').length === 0) {
+                    if (ev.key === 'f' && !ev.ctrlKey) {
+                        openFlagDialogue();
+                    }
                 }
             });
         }
