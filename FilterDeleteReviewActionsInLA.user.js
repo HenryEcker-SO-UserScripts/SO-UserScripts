@@ -69,7 +69,7 @@
                 $('#answer .js-flag-post-link').click();
             };
             document.addEventListener('keydown', (ev) => {
-                if (ev.key === 'f') {
+                if (ev.key === 'f' && !ev.ctrlKey) {
                     openFlagDialogue();
                 }
             });
