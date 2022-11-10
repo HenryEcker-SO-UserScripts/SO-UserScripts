@@ -3,7 +3,7 @@
 // @description  Only shows Delete and Recommend Deletion actions (for posts which are not deleted)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.7
+// @version      0.0.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 //
@@ -20,7 +20,8 @@
 
     const config = {
         selector: {rowSelector: '#content table tr:gt(0)'},
-        styles: {visitedStyle: 'bg-red-500'}
+        styles: {visitedStyle: 'bg-red-500'},
+        maxOpen: 6
     };
 
     StackExchange.ready(() => {
@@ -42,10 +43,10 @@
                 return isDeleted || !actionText.contains('delet');
             }).remove();
 
-            const button = $('<button class="s-btn s-btn__xs s-btn__outlined ml6" title="Open all unvisited review tasks in new tabs">Open All</button>');
+            const button = $(`<button class="s-btn s-btn__xs s-btn__outlined ml6" title="Open up to ${config.maxOpen} unvisited review tasks in new tabs">Open up to ${config.maxOpen}</button>`);
             button.on('click', (ev) => {
                 ev.preventDefault();
-                for (const e of $(config.selector.rowSelector).find(`td:eq(2) a:not(.${config.styles.visitedStyle})`)) {
+                for (const e of $(config.selector.rowSelector).find(`td:eq(2) a:not(.${config.styles.visitedStyle})`).slice(0, config.maxOpen)) {
                     window.open(e.getAttribute('href'), '_blank');
                     $(e).addClass(config.styles.visitedStyle);
                 }
