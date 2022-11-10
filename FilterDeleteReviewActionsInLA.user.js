@@ -3,7 +3,7 @@
 // @description  Only shows Delete and Recommend Deletion actions (for posts which are not deleted)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.8
+// @version      0.0.9
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 //
@@ -22,6 +22,27 @@
         selector: {rowSelector: '#content table tr:gt(0)'},
         styles: {visitedStyle: 'bg-red-500'},
         maxOpen: 6
+    };
+
+    const goToNextPage = () => {
+        const href = $('a[rel="next"]').attr('href');
+        window.location.assign(href);
+    };
+
+    const goToPrevPage = () => {
+        const href = $('a[rel="prev"]').attr('href');
+        window.location.assign(href);
+    };
+
+    const openLinks = (autoNext = false) => {
+        const links = $(config.selector.rowSelector).find(`td:eq(2) a:not(.${config.styles.visitedStyle})`);
+        for (const e of links.slice(0, config.maxOpen)) {
+            window.open(e.getAttribute('href'), '_blank');
+            $(e).addClass(config.styles.visitedStyle);
+        }
+        if (autoNext && links.length <= config.maxOpen) {
+            goToNextPage();
+        }
     };
 
     StackExchange.ready(() => {
@@ -46,21 +67,18 @@
             const button = $(`<button class="s-btn s-btn__xs s-btn__outlined ml6" title="Open up to ${config.maxOpen} unvisited review tasks in new tabs">Open up to ${config.maxOpen}</button>`);
             button.on('click', (ev) => {
                 ev.preventDefault();
-                for (const e of $(config.selector.rowSelector).find(`td:eq(2) a:not(.${config.styles.visitedStyle})`).slice(0, config.maxOpen)) {
-                    window.open(e.getAttribute('href'), '_blank');
-                    $(e).addClass(config.styles.visitedStyle);
-                }
+                openLinks(false);
             });
             $('#content table tr:eq(0) th:eq(2)').append(button);
 
 
             document.addEventListener('keydown', (ev) => {
                 if (ev.key === 'x') {
-                    const href = $('a[rel="next"]').attr('href');
-                    window.location.assign(href);
+                    openLinks(true);
+                } else if (ev.key === 'X') {
+                    goToNextPage();
                 } else if (ev.key === 'z') {
-                    const href = $('a[rel="prev"]').attr('href');
-                    window.location.assign(href);
+                    goToPrevPage();
                 } else if (ev.key === 'n') {
                     button.click();
                 }
