@@ -3,7 +3,7 @@
 // @description  Suppress annoying toast/overlay messages network-wide
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.9
+// @version      0.1.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 //
@@ -39,17 +39,19 @@
 
     const addProxies = () => {
         StackExchange.helpers.showToast = new Proxy(StackExchange.helpers.showToast, {
-            apply: (target, thisArg, [message, config]) => {
+            apply: (target, thisArg, args) => {
+                const [message] = args; // [message, config]
                 if (!toastMessagesToSuppress.has(message)) {
-                    target(message, config);
+                    Reflect.apply(target, thisArg, args);
                 }
             }
         });
 
         StackExchange.helpers.showFancyOverlay = new Proxy(StackExchange.helpers.showFancyOverlay, {
-            apply: (target, thisArg, [config]) => {
+            apply: (target, thisArg, args) => {
+                const [config] = args; // [config]
                 if (!fancyOverlayMessagesToSuppress.has(config.message)) {
-                    target(config);
+                    Reflect.apply(target, thisArg, args);
                 }
             }
         });
