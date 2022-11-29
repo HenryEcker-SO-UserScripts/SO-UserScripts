@@ -3,7 +3,7 @@
 // @description  Adds links to all chat servers in the site list
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatLinksInSiteList.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatLinksInSiteList.user.js
 //
@@ -37,27 +37,27 @@
     </h3>
 </div>`)
         );
+        const linkClasses = 'site-link d-flex ai-center g12';
         mountBefore.before(
             // Chat Links
             $(`<div class="modal-content">
-    <ul class="my-sites">
-        <li>
-            <a href="https://chat.stackoverflow.com" class="site-link d-flex gs8 gsx">
-                <div class="favicon favicon-stackoverflow site-icon flex--item" title="Stack Overflow Chat"></div>
-                <span class="flex--item fl1">Stack Overflow Chat</span>
+    <ul class="my-sites p6 d-flex fd-row ai-center jc-space-around">
+        <li class="bbw0">
+            <a href="https://chat.stackoverflow.com" class="${linkClasses}" title="Meta Stack Exchange Chat">
+                <div class="favicon favicon-stackoverflow site-icon flex--item"></div>
+                <span class="flex--item fl1">Chat.SO</span>
             </a>
         </li>
-        <li>
-            <a href="https://chat.stackexchange.com" class="site-link d-flex gs8 gsx">
-                <div class="favicon favicon-stackexchange site-icon flex--item" title="Meta Stack Exchange Chat"></div>
-                <span class="flex--item fl1">Stack Exchange Chat</span>
+        <li class="bbw0">
+            <a href="https://chat.stackexchange.com" class="${linkClasses}" title="Meta Stack Exchange Chat">
+                <div class="favicon favicon-stackexchange site-icon flex--item"></div>
+                <span class="flex--item fl1">Chat.SE</span>
             </a>
         </li>
-        <li>
-            <a href="https://chat.meta.stackexchange.com" class="site-link d-flex gs8 gsx">
-                <div class="favicon favicon-stackexchangemeta site-icon flex--item"
-                     title="Meta Stack Exchange Chat"></div>
-                <span class="flex--item fl1">Meta Stack Exchange Chat</span>
+        <li class="bbw0">
+            <a href="https://chat.meta.stackexchange.com" class="${linkClasses}" title="Meta Stack Exchange Chat">
+                <div class="favicon favicon-stackexchangemeta site-icon flex--item"></div>
+                <span class="flex--item fl1">Chat.MSE</span>
             </a>
         </li>
     </ul>
