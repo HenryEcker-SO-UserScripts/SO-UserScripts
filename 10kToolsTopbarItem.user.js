@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.2
+// @version      1.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -73,8 +73,8 @@
 
             if (StackExchange.options.user.isModerator === true) {
                 // There is no rep requirement for mods so set access threshold to the minimum rep (1)
-                return Object.keys(apiResponseSearchValues).reduce((acc, k) => {
-                    return {...acc, [k]: 1};
+                return apiResponseSearchValues.reduce((acc, {key}) => {
+                    return {...acc, [key]: 1};
                 }, {});
             }
 
