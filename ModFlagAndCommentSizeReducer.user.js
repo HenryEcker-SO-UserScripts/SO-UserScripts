@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.7
+// @version      1.1.8
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -48,6 +48,7 @@
     const selectors = {
         jquerySelector: {
             addCommentButton: '.js-add-link.comments-link',
+            editCommentButton: '.js-comment-edit',
             commentTextArea: 'textarea.s-textarea.js-comment-text-input',
             commentFlagDialogue: {
                 textArea: 'textarea.s-textarea',
@@ -173,7 +174,7 @@
 
     const commentReducerTiers = [
         // Tier One Reducers
-        shortestRelativeLinkReducer,
+        [...shortestRelativeLinkReducer, ...enumerationReducers],
         // Tier Two Reducers
         [stripUserIdFromQAReducer]
     ];
@@ -322,6 +323,19 @@
                 })
         );
 
+        const addToCommentEditButton = () => {
+            $(selectors.jquerySelector.editCommentButton).on(
+                'click',
+                attachDOMNodeListenerToButton(
+                    testIsCommentBox,
+                    (nodeEvent) => {
+                        textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen, commentReducerTiers);
+                    })
+            );
+        };
+
+        addToCommentEditButton();
+
         // Add comment textarea listener to add comment  buttons
         $(selectors.jquerySelector.addCommentButton).on(
             'click',
@@ -331,5 +345,24 @@
                     textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen, commentReducerTiers);
                 })
         );
+
+        $(document).on('ajaxComplete', (event, _, {url, type}) => {
+            // Listen for post response to add comment to attach listener to newly created edit button
+            // Also listen for edit buttons that get added when clicking "show more comments"
+            if (
+                (
+                    // add comment
+                    type.toLowerCase() === 'post' &&
+                    url.match(/\/posts\/\d+\/comments.*/gi) !== null
+                ) ||
+                (
+                    // show more comments
+                    type.toLowerCase() === 'get' &&
+                    url.match(/\/posts\/\d+\/comments.*/gi) !== null
+                )
+            ) {
+                addToCommentEditButton();
+            }
+        });
     });
 }());
