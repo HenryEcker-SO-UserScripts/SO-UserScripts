@@ -32,7 +32,7 @@
         'countAlias': ['count', 'amount', 'number']
     };
 
-    function getFormDataFromObject (obj) {
+    function getFormDataFromObject(obj) {
         return Object.entries(obj).reduce((acc, [key, value]) => {
             acc.set(key, value);
             return acc;
@@ -40,7 +40,7 @@
     }
 
 
-    function sendMessagePOST (messageText) {
+    function sendMessagePOST(messageText) {
         return fetch(`/chats/${CHAT.CURRENT_ROOM_ID}/messages/new`, {
             method: 'POST',
             body: getFormDataFromObject({
@@ -50,7 +50,7 @@
         });
     }
 
-    function sendMessageOnButtonClick (messageTextBuilder) {
+    function sendMessageOnButtonClick(messageTextBuilder) {
         return () => {
             sendMessagePOST(messageTextBuilder()).then(() => {
                 // Do Nothing
@@ -62,17 +62,17 @@
         };
     }
 
-    function getFetchButtonText () {
+    function getFetchButtonText() {
         const fetchType = GM_config.get('TYPE_TO_FETCH');
         return `Fetch ${fetchType.charAt(0).toUpperCase()}${fetchType.slice(1)}`;
     }
 
 
-    function sampleArray (arr) {
+    function sampleArray(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function main () {
+    function main() {
         const options = [...Object.keys(STATIC_CONFIG.maxRowLengths)];
         GM_config.init({
             'id': 'Natty_Fetch_Helper_Config',
