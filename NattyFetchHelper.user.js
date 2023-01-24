@@ -3,7 +3,7 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.9
+// @version      1.2.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
@@ -16,14 +16,6 @@
 // ==/UserScript==
 /* globals CHAT, $, GM_config */
 
-const getFormDataFromObject = (obj) => {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-        acc.set(key, value);
-        return acc;
-    }, new FormData());
-};
-
-
 (function () {
     'use strict';
 
@@ -34,17 +26,21 @@ const getFormDataFromObject = (obj) => {
     const STATIC_CONFIG = {
         'maxRowLengths': {
             'links': 11,
+            'nondeleted': 11,
             'sentinel': 8
         },
         'countAlias': ['count', 'amount', 'number']
     };
 
-    Array.prototype.sample = function () {
-        return this[Math.floor(Math.random() * this.length)];
-    };
+    function getFormDataFromObject (obj) {
+        return Object.entries(obj).reduce((acc, [key, value]) => {
+            acc.set(key, value);
+            return acc;
+        }, new FormData());
+    }
 
 
-    const sendMessagePOST = (messageText) => {
+    function sendMessagePOST (messageText) {
         return fetch(`/chats/${CHAT.CURRENT_ROOM_ID}/messages/new`, {
             method: 'POST',
             body: getFormDataFromObject({
@@ -52,9 +48,9 @@ const getFormDataFromObject = (obj) => {
                 'fkey': window.fkey().fkey
             })
         });
-    };
+    }
 
-    const sendMessageOnButtonClick = (messageTextBuilder) => {
+    function sendMessageOnButtonClick (messageTextBuilder) {
         return () => {
             sendMessagePOST(messageTextBuilder()).then(() => {
                 // Do Nothing
@@ -64,14 +60,20 @@ const getFormDataFromObject = (obj) => {
                 console.error(res);
             });
         };
-    };
+    }
 
-    const getFetchButtonText = () => {
+    function getFetchButtonText () {
         const fetchType = GM_config.get('TYPE_TO_FETCH');
         return `Fetch ${fetchType.charAt(0).toUpperCase()}${fetchType.slice(1)}`;
-    };
+    }
 
-    const main = () => {
+
+    function sampleArray (arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function main () {
+        const options = [...Object.keys(STATIC_CONFIG.maxRowLengths)];
         GM_config.init({
             'id': 'Natty_Fetch_Helper_Config',
             'title': 'Natty Fetch Helper Config',
@@ -79,8 +81,8 @@ const getFormDataFromObject = (obj) => {
                 'TYPE_TO_FETCH': {
                     'label': 'Type to fetch',
                     'type': 'select',
-                    'options': ['links', 'sentinel'],
-                    'default': 'links'
+                    'options': options,
+                    'default': options[0]
                 },
                 'ROWS_TO_FETCH': {
                     'label': 'Number of rows to request per message',
@@ -97,7 +99,6 @@ const getFormDataFromObject = (obj) => {
             }
         });
 
-
         const fetchButton = $(`<button class="button" style="margin-left: 5px">${getFetchButtonText()}</button>`);
         fetchButton.on('click', sendMessageOnButtonClick(() => {
             const fetchType = GM_config.get('TYPE_TO_FETCH');
@@ -107,7 +108,7 @@ const getFormDataFromObject = (obj) => {
 
         const fetchCountButton = $('<button class="button" style="margin-left: 5px">Fetch Count</button>');
         fetchCountButton.on('click', sendMessageOnButtonClick(() => {
-            return `@Natty fetch ${STATIC_CONFIG.countAlias.sample()}`;
+            return `@Natty fetch ${sampleArray(STATIC_CONFIG.countAlias)}`;
         }));
 
         const settingsButton = $('<button class="button" title="Natty Fetch Helper Settings" style="margin-left: 5px">⚙</button>');
@@ -119,6 +120,7 @@ const getFormDataFromObject = (obj) => {
         cb.append(fetchButton);
         cb.append(fetchCountButton);
         cb.append(settingsButton);
-    };
+    }
+
     main();
 })();
