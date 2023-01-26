@@ -3,7 +3,7 @@
 // @description  Adds a toggle button to all share popovers which will allow share links to exclude user ids
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.8
+// @version      0.0.9
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 //
@@ -40,7 +40,7 @@
             shareLinks: 'a.js-share-link'
         },
         css: {
-            toggleStyleStr: 'width: 33px; height: 18px;'
+            toggleStyleStr: 'width: 29px; height: 16px;'
         },
         attributeName: {
             popoverSubtitle: 'data-se-share-sheet-subtitle',
@@ -154,8 +154,8 @@
     const buildToggleComponent = (ev, popoverCheckboxId, popoverToggleComponentId, shouldInclude) => {
         const toggleComponent = $(`<div id='${popoverToggleComponentId}' class='my8 d-flex ai-center'>
     <label class='flex--item s-label__sm fw-bold' for='${popoverCheckboxId}'>${config.attributeValue.toggleLabelText}</label>
-    <div class='mx4 flex--item s-toggle-switch'>
-        <input id='${popoverCheckboxId}' type='checkbox' ${shouldInclude ? 'checked' : ''} style='${config.css.toggleStyleStr}'>
+    <div class='mx8 flex--item s-toggle-switch d-flex ai-center jc-center'>
+        <input id='${popoverCheckboxId}' type='checkbox' ${shouldInclude ? 'checked' : ''} style='${config.css.toggleStyleStr} position:absolute;'>
         <div class='s-toggle-switch--indicator' style='${config.css.toggleStyleStr}'></div>
     </div>
 </div>`);
