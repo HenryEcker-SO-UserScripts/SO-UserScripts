@@ -61,10 +61,10 @@
         Object.defineProperty(window, 'StackExchange', {
             configurable: true,
             internalSE: undefined,
-            get () {
+            get() {
                 return this.internalSE;
             },
-            set (newStackExchange) {
+            set(newStackExchange) {
                 if (Object.keys(newStackExchange).length !== 0) {
                     delete window.StackExchange;
                     window.StackExchange = newStackExchange;
