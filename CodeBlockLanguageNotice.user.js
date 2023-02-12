@@ -3,7 +3,7 @@
 // @description  Adds indicator to code blocks that displays what language the code block is actually being highlighted with
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
 //
@@ -34,7 +34,7 @@
     }
 
     function buildNotice(highlightLanguageText) {
-        return $('<div style="position: relative;height: 2rem;"></div>')
+        return $('<div style="position: relative;height: 1.1rem;"></div>')
             .append(
                 $('<div style="position: absolute;left: -9px;top: -9px;" class="ba bar-sm p2 o50"></div>')
                     .append(`<span title="This code block is highlighted using the rules for ${highlightLanguageText}">${highlightLanguageText}</span>`)
