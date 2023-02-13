@@ -3,7 +3,7 @@
 // @description  A number of very small tweaks to make suggested edits easier to review
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
 //
@@ -26,7 +26,9 @@
     const config = {
         postTypeMapping: {
             1: 'Question',
-            2: 'Answer'
+            2: 'Answer',
+            4: 'Tag Wiki Excerpt',
+            5: 'Tag Wiki'
         }
     };
 
@@ -46,18 +48,18 @@
     }
 
     function addPostTypeNotice(postTypeId) {
-        if (postTypeId === undefined || postTypeId === 0) {
+        if (postTypeId === undefined || !Object.hasOwn(config.postTypeMapping, postTypeId)) {
             return;
         }
-        $('.js-review-task .js-review-content .s-post-summary')
-            .after($(`<div class="fs-display1 ta-center fc-red-800">${config.postTypeMapping[postTypeId]}</div>`));
+        $('#panel-revision')
+            .before($(`<div class="fs-headline2 ta-center fc-red-800">${config.postTypeMapping[postTypeId]}</div>`));
     }
 
 
     function addOnTaskChangeHandler() {
         $(document).on('ajaxComplete', (_0, {responseJSON}, {url}) => {
             if (url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')) {
-                addPostTypeNotice(responseJSON.postTypeId);
+                addPostTypeNotice(responseJSON?.postTypeId);
             }
         });
     }
