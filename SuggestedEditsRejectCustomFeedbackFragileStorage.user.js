@@ -3,17 +3,17 @@
 // @description  Adds very fragile storage so that the reject modal can be closed without losing in-progress feedback
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
+// @version      0.0.2
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
 //
-// @match        *://*.askubuntu.com/review/suggested-edits/*
-// @match        *://*.serverfault.com/review/suggested-edits/*
-// @match        *://*.stackapps.com/review/suggested-edits/*
-// @match        *://*.stackexchange.com/review/suggested-edits/*
-// @match        *://*.stackoverflow.com/review/suggested-edits/*
-// @match        *://*.superuser.com/review/suggested-edits/*
-// @match        *://*.mathoverflow.net/review/suggested-edits/*
+// @match        *://*.askubuntu.com/review/suggested-edits*
+// @match        *://*.serverfault.com/review/suggested-edits*
+// @match        *://*.stackapps.com/review/suggested-edits*
+// @match        *://*.stackexchange.com/review/suggested-edits*
+// @match        *://*.stackoverflow.com/review/suggested-edits*
+// @match        *://*.superuser.com/review/suggested-edits*
+// @match        *://*.mathoverflow.net/review/suggested-edits*
 //
 // @exclude      /^https?:\/\/.*((askubuntu|serverfault|stackapps|stackexchange|stackoverflow|superuser)\.com|mathoverflow\.net)\/review\/.*\/(stats|history)/
 //
