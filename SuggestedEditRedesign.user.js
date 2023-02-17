@@ -3,7 +3,7 @@
 // @description  A number of very small tweaks to make suggested edits easier to review
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
 //
@@ -29,6 +29,9 @@
             2: 'Answer',
             4: 'Tag Wiki Excerpt',
             5: 'Tag Wiki'
+        },
+        ids: {
+            reviewTopViewAnchor: 'ser-review-task'
         }
     };
 
@@ -48,18 +51,26 @@
     }
 
     function addPostTypeNotice(postTypeId) {
-        if (postTypeId === undefined || !Object.hasOwn(config.postTypeMapping, postTypeId)) {
-            return;
-        }
         $('#panel-revision')
-            .before($(`<div class="fs-headline2 ta-center fc-red-800">${config.postTypeMapping[postTypeId]}</div>`));
+            .before(
+                $(`<div id="${config.ids.reviewTopViewAnchor}" class="fs-headline2 ta-center fc-red-800">${config.postTypeMapping[postTypeId]}</div>`)
+            );
+    }
+
+    function scrollToPostNotice() {
+        $('html, body').scrollTop($(`#${config.ids.reviewTopViewAnchor}`).offset()?.top);
     }
 
 
     function addOnTaskChangeHandler() {
         $(document).on('ajaxComplete', (_0, {responseJSON}, {url}) => {
             if (url.startsWith('/review/next-task') || url.startsWith('/review/task-reviewed/')) {
-                addPostTypeNotice(responseJSON?.postTypeId);
+                const postTypeId = responseJSON?.postTypeId;
+                if (postTypeId === undefined || !Object.hasOwn(config.postTypeMapping, postTypeId)) {
+                    return; // Don't do anything for completed reviews/unknown types
+                }
+                addPostTypeNotice(postTypeId);
+                scrollToPostNotice();
             }
         });
     }
