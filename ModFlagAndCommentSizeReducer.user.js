@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.9
+// @version      1.2.0
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -34,7 +34,7 @@
 // @grant        none
 //
 // ==/UserScript==
-/* globals StackExchange, $ */
+/* globals StackExchange, $, Stacks */
 
 (function () {
     'use strict';
@@ -76,17 +76,26 @@
             monitoredTextArea: 'data-mfacsr-monitored'
         }
     };
+    const data = {
+        controller: 'tasr-size-reducer',
+        target: {
+            textField: 'text-field'
+        },
+        info: {
+            newRows: 'new-rows'
+        },
+        param: {
+            reducerPattern: 'reducer-pattern',
+            maxLen: 'field-max-length'
+        },
+        action: {
+            handleUpdate: 'handleReduceTextContent'
+        }
+    };
 
-    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w#$&+/=?@\\-%]+)`, 'g');
     const absoluteLinkPattern = new RegExp(`\\[(.*?)]\\((?:${window.location.origin})/([^)]+)\\)`, 'g');
 
     const shortestRelativeLinkReducer = [
-        // Convert any bare link
-        (s) => {
-            return s.replace(bareDomainLink, (sub) => {
-                return `[1](${sub})`;
-            });
-        },
         // Convert any absolute links to relative links
         (s) => {
             return s.replace(absoluteLinkPattern, '[$1](/$2)');
@@ -114,8 +123,14 @@
         }
     ];
 
+    const bareDomainLink = new RegExp(`(?<!]\\()${window.location.origin}(\\/[\\w#$&+/=?@\\-%]+)`, 'g');
+    const bareLinkReducer = (s) => {
+        return s.replace(bareDomainLink, (sub) => {
+            return `[1](${sub})`;
+        });
+    };
     const enumerationReducers = [
-        //----- BARE LINK ENUMERATION ------//
+        //----- BARE LINK ENUMERATION ------//,
         // Convert any post links from [1](/qa/postId/userid) to [QA1](/qa/postId/userid)
         (s) => {
             return s.replace(/\[\d+]\(\/([qa])\/(\d+)(\/(\d+))?\)/g, (sub, p1, p2, p3) => {
@@ -165,20 +180,6 @@
         });
     };
 
-    const flagReducerTiers = [
-        // Tier One Reducers
-        [...shortestRelativeLinkReducer, stripUserIdFromQAReducer, ...enumerationReducers],
-        // Tier Two Reducers
-        [removeEnumerationPrefixReducer]
-    ];
-
-    const commentReducerTiers = [
-        // Tier One Reducers
-        [...shortestRelativeLinkReducer, ...enumerationReducers],
-        // Tier Two Reducers
-        [stripUserIdFromQAReducer]
-    ];
-
     const patternReducer = (reducers, text, pos) => {
         return reducers.reduce((
             [newText, newPos], reducer
@@ -213,50 +214,66 @@
         );
     };
 
-    const changeFlagTextAreaSize = (textArea) => {
-        textArea.attr('rows', 9);
-    };
-
-    const textAreaMonitor = (textArea, maxLen, reducerTiers, cb = undefined) => {
-        if (textArea.attr(selectors.attrs.monitoredTextArea) !== true) { // prevent adding the listener multiple times
-            textArea.on('input propertychange', (ev) => {
-                let reducedText = ev.target.value;
-                let selectionStart = ev.target.selectionStart;
-                for (const reducers of reducerTiers) {
-                    [reducedText, selectionStart] = patternReducer(reducers, reducedText, selectionStart);
-                    // If reducedText is under maxLen stop reducing
-                    if (reducedText.length <= maxLen) {
-                        break;
-                    }
-                }
-                ev.target.value = reducedText;
-                // Fix Cursor Position
-                ev.target.selectionStart = selectionStart;
-                ev.target.selectionEnd = selectionStart;
-
-                // Optionally do something else with reducedText and selectionStart
-                if (cb) {
-                    cb(reducedText, selectionStart);
-                }
-            });
-            textArea.attr(selectors.attrs.monitoredTextArea, true);
+    const handleReduceText = (reducedText, reducerTiers, maxLen, selectionStart) => {
+        for (const reducers of reducerTiers) {
+            [reducedText, selectionStart] = patternReducer(reducers, reducedText, selectionStart);
+            // If reducedText is under maxLen stop reducing
+            if (reducedText.length <= maxLen) {
+                break;
+            }
         }
+        return reducedText;
     };
 
-    const handlePopulateText = (inputButton, textArea, text) => {
-        inputButton.trigger('click');
-        inputButton.trigger('change');
+    const addDataAttributesToTextarea = (textarea, reducerType, maxLen, rows) => {
+        if (rows !== undefined) {
+            textarea.attr(`data-${data.info.newRows}`, rows);
+        }
+        textarea.attr(`data-${data.controller}-target`, data.target.textField);
+        textarea.attr(`data-${data.controller}-${data.param.reducerPattern}-param`, reducerType);
+        textarea.attr(`data-${data.controller}-${data.param.maxLen}-param`, maxLen);
+        textarea.attr('data-action', `input->${data.controller}#${data.action.handleUpdate}`);
+        textarea.attr('data-controller', data.controller);
+    };
 
-        textArea.val(text);
-        textArea.trigger('input');
-        textArea.trigger('propertychange');
-        textArea.focus();
+    const addStacksController = () => {
+        Stacks.addController(
+            data.controller,
+            {
+                targets: [data.target.textField],
+                connect() {
+                    const newRows = this[`${data.target.textField}Target`].getAttribute('data-new-rows');
+                    if (newRows !== undefined) {
+                        this[`${data.target.textField}Target`].setAttribute('rows', newRows);
+                    }
+                },
+                flagReducerTiers: [
+                    // Tier One Reducers
+                    [...shortestRelativeLinkReducer, stripUserIdFromQAReducer],
+                    [bareLinkReducer, ...shortestRelativeLinkReducer, ...enumerationReducers],
+                    [removeEnumerationPrefixReducer]
+                ],
+                commentReducerTiers: [
+                    // Tier One Reducers
+                    [...shortestRelativeLinkReducer],
+                    [bareLinkReducer, ...shortestRelativeLinkReducer, ...enumerationReducers],
+                    [stripUserIdFromQAReducer]
+                ],
+                [data.action.handleUpdate](ev) {
+                    const selectionStart = ev.target.selectionStart;
+                    const {reducerPattern, fieldMaxLength} = ev.params;
+                    ev.target.value = handleReduceText(ev.target.value, this[reducerPattern], fieldMaxLength, selectionStart);
+                    // Fix Cursor Position
+                    ev.target.selectionStart = selectionStart;
+                    ev.target.selectionEnd = selectionStart;
+                }
+            }
+        );
     };
 
 
     StackExchange.ready(() => {
-        let flagText = undefined; // Keep flag text (fragile save)
-        let commentFlagText = undefined; // Keep flag text (fragile save)
+        addStacksController();
 
         const attachDOMNodeListenerToButton = (evaluateNode, action) => {
             return (ev) => {
@@ -271,29 +288,36 @@
             };
         };
 
+        // Add comment textarea listener to add comment  buttons
+        $(selectors.jquerySelector.addCommentButton).on(
+            'click',
+            attachDOMNodeListenerToButton(
+                testIsCommentBox,
+                (nodeEvent) => {
+                    addDataAttributesToTextarea(
+                        $(nodeEvent.target),
+                        'commentReducerTiers',
+                        textAreaMaxLens.commentMaxLen
+                    );
+                })
+        );
+
         // Add post flag listener to post flag buttons
         $(selectors.jquerySelector.flagButtons.postFlag).on(
             'click',
             attachDOMNodeListenerToButton(
                 testIsFlagPopup,
                 () => {
-                    const textArea = $(selectors.jquerySelector.postFlagDialogue.textArea);
-
-                    changeFlagTextAreaSize(textArea);
-
-                    textAreaMonitor(textArea, textAreaMaxLens.postFlagMaxLen, flagReducerTiers, (reducedText) => {
-                        flagText = reducedText || undefined;
-                    });
-
-                    if (flagText !== undefined) {
-                        handlePopulateText(
-                            $(selectors.jquerySelector.postFlagDialogue.inputButton),
-                            textArea,
-                            flagText
-                        );
-                    }
-                })
+                    addDataAttributesToTextarea(
+                        $(selectors.jquerySelector.postFlagDialogue.textArea),
+                        'flagReducerTiers',
+                        textAreaMaxLens.postFlagMaxLen,
+                        9
+                    );
+                }
+            )
         );
+
 
         // Add comment flag listener to comment flag buttons
         $(selectors.jquerySelector.flagButtons.commentFlag).on(
@@ -301,68 +325,13 @@
             attachDOMNodeListenerToButton(
                 testIsCommentFlagPopup,
                 (nodeEvent) => {
-                    const textArea = $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea);
-
-                    changeFlagTextAreaSize(textArea);
-
-                    textAreaMonitor(
-                        textArea,
-                        textAreaMaxLens.commentFlagMaxLen,
-                        flagReducerTiers,
-                        (reducedText) => {
-                            commentFlagText = reducedText || undefined;
-                        }
+                    addDataAttributesToTextarea(
+                        $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea),
+                        'flagReducerTiers',
+                        textAreaMaxLens.commentFlagMaxLen
                     );
-                    if (commentFlagText !== undefined) {
-                        handlePopulateText(
-                            $(selectors.jquerySelector.commentFlagDialogue.inputButton),
-                            textArea,
-                            commentFlagText
-                        );
-                    }
-                })
+                }
+            )
         );
-
-        const addToCommentEditButton = () => {
-            $(selectors.jquerySelector.editCommentButton).on(
-                'click',
-                attachDOMNodeListenerToButton(
-                    testIsCommentBox,
-                    (nodeEvent) => {
-                        textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen, commentReducerTiers);
-                    })
-            );
-        };
-
-        addToCommentEditButton();
-
-        // Add comment textarea listener to add comment  buttons
-        $(selectors.jquerySelector.addCommentButton).on(
-            'click',
-            attachDOMNodeListenerToButton(
-                testIsCommentBox,
-                (nodeEvent) => {
-                    textAreaMonitor($(nodeEvent.target), textAreaMaxLens.commentMaxLen, commentReducerTiers);
-                })
-        );
-
-        $(document).on('ajaxComplete', (event, _, {url, type}) => {
-            // Listen for post response to add comment to attach listener to newly created edit button
-            // Also listen for edit buttons that get added when clicking "show more comments"
-            if (
-                (
-                    // add comment
-                    type.toLowerCase() === 'post' &&
-                    url.match(/\/posts\/\d+\/comments.*/gi) !== null
-                ) ||
-                (
-                    // show more comments
-                    type.toLowerCase() === 'get' &&
-                    url.match(/\/posts\/\d+\/comments.*/gi) !== null
-                )
-            ) {
-                addToCommentEditButton();
-            }
-        });
     });
 }());
