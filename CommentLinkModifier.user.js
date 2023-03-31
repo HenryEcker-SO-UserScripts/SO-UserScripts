@@ -3,7 +3,7 @@
 // @description  Changes comment links to user /posts/comments/:comment_id instead of the standard long link that includes the title
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.6
+// @version      0.0.7
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CommentLinkModifier.user.js
 //
@@ -14,6 +14,14 @@
 // @match        *://*.stackoverflow.com/questions/*
 // @match        *://*.superuser.com/questions/*
 // @match        *://*.mathoverflow.net/questions/*
+//
+// @exclude      *://*.askubuntu.com/questions/ask*
+// @exclude      *://*.mathoverflow.net/questions/ask*
+// @exclude      *://*.serverfault.com/questions/ask*
+// @exclude      *://*.stackapps.com/questions/ask*
+// @exclude      *://*.stackexchange.com/questions/ask*
+// @exclude      *://*.stackoverflow.com/questions/ask*
+// @exclude      *://*.superuser.com/questions/ask*
 // @grant        none
 //
 // ==/UserScript==

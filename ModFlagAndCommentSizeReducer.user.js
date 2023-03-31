@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.1.8
+// @version      1.1.9
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -23,13 +23,13 @@
 // @match        *://*.superuser.com/review/*
 // @match        *://*.mathoverflow.net/review/*
 //
-// @match        *://*.askubuntu.com/tools/new-answers-old-questions*
-// @match        *://*.serverfault.com/tools/new-answers-old-questions*
-// @match        *://*.stackapps.com/tools/new-answers-old-questions*
-// @match        *://*.stackexchange.com/tools/new-answers-old-questions*
-// @match        *://*.stackoverflow.com/tools/new-answers-old-questions*
-// @match        *://*.superuser.com/tools/new-answers-old-questions*
-// @match        *://*.mathoverflow.net/tools/new-answers-old-questions*
+// @exclude      *://*.askubuntu.com/questions/ask*
+// @exclude      *://*.mathoverflow.net/questions/ask*
+// @exclude      *://*.serverfault.com/questions/ask*
+// @exclude      *://*.stackapps.com/questions/ask*
+// @exclude      *://*.stackexchange.com/questions/ask*
+// @exclude      *://*.stackoverflow.com/questions/ask*
+// @exclude      *://*.superuser.com/questions/ask*
 //
 // @grant        none
 //

@@ -3,7 +3,7 @@
 // @description  Adds a toggle button to all share popovers which will allow share links to exclude user ids
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.9
+// @version      0.0.10
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 //
@@ -23,6 +23,13 @@
 // @match        *://*.superuser.com/review/*
 // @match        *://*.mathoverflow.net/review/*
 //
+// @exclude      *://*.askubuntu.com/questions/ask*
+// @exclude      *://*.mathoverflow.net/questions/ask*
+// @exclude      *://*.serverfault.com/questions/ask*
+// @exclude      *://*.stackapps.com/questions/ask*
+// @exclude      *://*.stackexchange.com/questions/ask*
+// @exclude      *://*.stackoverflow.com/questions/ask*
+// @exclude      *://*.superuser.com/questions/ask*
 // @exclude      /^https?:\/\/.*((askubuntu|serverfault|stackapps|stackexchange|stackoverflow|superuser)\.com|mathoverflow\.net)\/review\/.*\/(stats|history)/
 //
 // @grant        GM_getValue

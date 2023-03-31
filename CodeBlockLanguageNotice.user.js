@@ -3,7 +3,7 @@
 // @description  Adds indicator to code blocks that displays what language the code block is actually being highlighted with
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
 //
@@ -15,6 +15,13 @@
 // @match        *://*.superuser.com/questions/*
 // @match        *://*.mathoverflow.net/questions/*
 //
+// @exclude      *://*.askubuntu.com/questions/ask*
+// @exclude      *://*.mathoverflow.net/questions/ask*
+// @exclude      *://*.serverfault.com/questions/ask*
+// @exclude      *://*.stackapps.com/questions/ask*
+// @exclude      *://*.stackexchange.com/questions/ask*
+// @exclude      *://*.stackoverflow.com/questions/ask*
+// @exclude      *://*.superuser.com/questions/ask*
 // @grant        none
 //
 // ==/UserScript==

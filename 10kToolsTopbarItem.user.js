@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.3
+// @version      1.0.4
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -18,7 +18,9 @@
 // @exclude     *://chat.stackexchange.com/*
 // @exclude     *://chat.meta.stackexchange.com/*
 // @exclude     *://chat.stackoverflow.com/*
-// @exclude     *://area51*.stackexchange.com/
+// @exclude     *://area51*.stackexchange.com/*
+// @exclude     *://api.stackexchange.com/*
+// @exclude     *://data.stackexchange.com/*
 //
 // @grant        GM_getValue
 // @grant        GM_setValue
