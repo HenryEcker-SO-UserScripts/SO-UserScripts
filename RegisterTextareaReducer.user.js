@@ -3,7 +3,7 @@
 // @description  Registers a stacks controller that shortens relative links anywhere the controller is active
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.0
+// @version      1.0.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/RegisterTextareaReducer.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/RegisterTextareaReducer.user.js
 //
@@ -18,6 +18,8 @@
 // @exclude      *://data.stackexchange.com/*
 // @exclude      *://api.stackexchange.com/*
 // @exclude      *://stackoverflow.blog/*
+// @exclude      *://chat.stackoverflow.com/*
+// @exclude      *://chat*.stackexchange.com/*
 //
 // @grant        none
 //
