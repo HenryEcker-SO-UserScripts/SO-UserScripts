@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.4
+// @version      1.0.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -36,14 +36,7 @@
             id: {
                 popover: 'tools-popover',
                 popoverBody: 'popover-body',
-                tenKToolsButton: 'ten-k-tools-button',
-                reportsExpandable: 'ten-k-tools-expandable-reports',
-                anonAndLowRepExpandable: 'ten-k-tools-expandable-anon-and-low-rep',
-                tagsExpandable: 'ten-k-tools-expandable-tags',
-                statsExpandable: 'ten-k-tools-expandable-stats',
-                annotatedPosts: 'ten-k-tools-annotated-posts',
-                suggestedEditStatsExpandable: 'ten-k-tools-suggested-edit-expandable-stats',
-                siteAnalyticsExpandable: 'ten-k-tools-suggested-edit-expandable-site-analytics'
+                tenKToolsButton: 'ten-k-tools-button'
             },
             label: {
                 tenKToolsLabel: 'Moderator Tools'
@@ -147,6 +140,29 @@
                                 </div>
                             </div>`;
                 };
+                const buildAllExpandables = (expandables) => {
+                    return Object.entries(expandables).map(([label, {conditional, children}], index) => {
+                        console.log({
+                            l: label,
+                            c: conditional,
+                            children: children
+                        });
+                        if (conditional === undefined || conditional === true) {
+                            return buildExpandable(
+                                `ten-k-tools-expandable-${index}`,
+                                label,
+                                children.map(({href, text}) => {
+                                    return `<li role="menuitem"><a href="${href}" class="${config.css.menuLink}">${text}</a></li>`;
+                                }).join('\n')
+                            );
+                        } else {
+                            return undefined;
+                        }
+                    }).filter((e) => {
+                        return e !== undefined;
+                    }).join('\n');
+                };
+
                 const topbarDialogue = $(`<li role="presentation">
     <div class="topbar-dialog" id="${config.id.popover}" role="menu">
         <div class="header fw-wrap">
@@ -164,66 +180,144 @@
         </div>
         <div id="${config.id.popoverBody}" class="px4 py4 overflow-y-auto">
             <ul class="s-menu" role="menu">
-                ${buildExpandable(
-                    config.id.reportsExpandable,
-                    'reports',
-                    `<li role="menuitem"><a href="/tools/new-answers-old-questions" class="${config.css.menuLink}">new answers to old questions</a></li>
-                            <li role="menuitem"><a href="/tools/protected-questions" class="${config.css.menuLink}">protected questions</a></li>`
-                )}
-                ${buildExpandable(
-                    config.id.anonAndLowRepExpandable,
-                    'anonymous and low rep post feedback',
-                    //  filter=day to reduce page load time
-                    `<li role="menuitem"><a href="/tools/post-feedback?filter=day" class="${config.css.menuLink}">anonymous and low rep post feedback</a></li>
-                            <li role="menuitem"><a href="/tools/post-feedback/underrated?filter=day" class="${config.css.menuLink}">underrated</a></li>
-                            <li role="menuitem"><a href="/tools/post-feedback/overrated?filter=day" class="${config.css.menuLink}">overrated</a></li>
-                            <li role="menuitem"><a href="/tools/post-feedback/most-helpful?filter=day" class="${config.css.menuLink}">most helpful</a></li>
-                            <li role="menuitem"><a href="/tools/post-feedback/least-helpful?filter=day" class="${config.css.menuLink}">least helpful</a></li>`
-                )}
-                ${buildExpandable(
-                    config.id.tagsExpandable,
-                    'tags',
-                    `<li role="menuitem"><a href="/tags/synonyms" class="${config.css.menuLink}">tag synonyms</a></li>
-                            <li role="menuitem"><a href="/tags?tab=new" class="${config.css.menuLink}">new tags</a></li>`
-                )}
-                ${buildExpandable(
-                    config.id.statsExpandable,
-                    'close/migration/delete stats',
-                    `<li role="menuitem"><a href="/tools/question-close-stats" class="${config.css.menuLink}">question close stats</a></li>
-                            <li role="menuitem"><a href="/tools?tab=stats" class="${config.css.menuLink}">stats</a></li>
-                            <li role="menuitem"><a href="/tools?tab=migrated" class="${config.css.menuLink}">migrated</a></li>
-                            <li role="menuitem"><a href="/tools?tab=close" class="${config.css.menuLink}">closed</a></li>
-                            <li role="menuitem"><a href="/tools?tab=delete" class="${config.css.menuLink}">deleted</a></li>`
-                )}
-                ${buildExpandable(
-                    config.id.annotatedPosts,
-                    'Annotated Posts',
-                    `<li role="menuitem"><a href="/annotated-posts?tab=locked" class="${config.css.menuLink}">All Locked</a></li>
-                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=migrated" class="${config.css.menuLink}">Migrated</a></li>
-                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=duplicate" class="${config.css.menuLink}">Locked Duplicate</a></li>
-                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=merged" class="${config.css.menuLink}">Merged</a></li>
-                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=noticed" class="${config.css.menuLink}">Noticed (Locked)</a></li>
-                            <li role="menuitem"><a href="/annotated-posts?tab=noticed" class="${config.css.menuLink}">Noticed (Not Locked)</a></li>
-                            <li role="menuitem"><a href="/annotated-posts?tab=locked&filter=other" class="${config.css.menuLink}">Locked Other</a></li>`
-                )}
-                ${buildExpandable(
-                    config.id.suggestedEditStatsExpandable,
-                    'suggested edit stats',
-                    `<li role="menuitem"><a href="/tools/suggested-edits?tab=all" class="${config.css.menuLink}">suggested edit stats</a></li>
-                            <li role="menuitem"><a href="/tools/suggested-edits?tab=approved" class="${config.css.menuLink}">approved</a></li>
-                            <li role="menuitem"><a href="/tools/suggested-edits?tab=rejected" class="${config.css.menuLink}">rejected</a></li>
-                            <li role="menuitem"><a href="/tools/suggested-edits?tab=controversial" class="${config.css.menuLink}">controversial</a></li>
-                            <li role="menuitem"><a href="/tools/suggested-edits?tab=anonymous" class="${config.css.menuLink}">anonymous</a></li>
-                            <li role="menuitem"><a href="/tools/suggested-edits?tab=improved" class="${config.css.menuLink}">improved</a></li>`
-                )}
-                ${
-                    userRep >= repThresholds[config.access.siteAnalytics] ?
-                        buildExpandable(
-                            config.id.siteAnalyticsExpandable,
-                            'analytics',
-                            `<li role="menuitem"><a href="/site-analytics" class="${config.css.menuLink}">site analytics</a></li>`
-                        ) : ''
-                }
+                ${buildAllExpandables({
+                    'reports': {
+                        children: [
+                            {
+                                href: '/tools/new-answers-old-questions',
+                                text: 'new answers to old questions'
+                            },
+                            {
+                                href: '/tools/protected-questions',
+                                text: 'protected questions'
+                            }
+
+                        ]
+                    },
+                    'anonymous and low rep post feedback': {
+                        children: [
+                            {
+                                href: '/tools/post-feedback?filter=day',
+                                text: 'anonymous and low rep post feedback'
+                            },
+                            {
+                                href: '/tools/post-feedback/underrated?filter=day',
+                                text: 'underrated'
+                            },
+                            {
+                                href: '/tools/post-feedback/overrated?filter=day',
+                                text: 'overrated'
+                            },
+                            {
+                                href: '/tools/post-feedback/most-helpful?filter=day',
+                                text: 'most helpful'
+                            },
+                            {
+                                href: '/tools/post-feedback/least-helpful?filter=day',
+                                text: 'least helpful'
+                            }
+                        ]
+                    },
+                    'tags': {
+                        children: [
+                            {href: '/tags/synonyms', text: 'tag synonyms'},
+                            {href: '/tags?tab=new', text: 'new tags'}
+                        ]
+                    },
+                    'close/migration/delete stats': {
+                        children: [
+                            {
+                                href: '/tools/question-close-stats',
+                                text: 'question close stats'
+                            },
+                            {
+                                href: '/tools?tab=stats',
+                                text: 'stats'
+                            },
+                            {
+                                href: '/tools?tab=migrated',
+                                text: 'migrated'
+                            },
+                            {
+                                href: '/tools?tab=close',
+                                text: 'closed'
+                            },
+                            {
+                                href: '/tools?tab=delete',
+                                text: 'deleted'
+                            }
+                        ]
+                    },
+                    'Annotated Posts': {
+                        children: [
+                            {
+                                'href': '/annotated-posts?tab=locked',
+                                'text': 'All Locked'
+                            },
+                            {
+                                'href': '/annotated-posts?tab=locked&filter=migrated',
+                                'text': 'Migrated'
+                            },
+                            {
+                                'href': '/annotated-posts?tab=locked&filter=duplicate',
+                                'text': 'Locked Duplicate'
+                            },
+                            {
+                                'href': '/annotated-posts?tab=locked&filter=merged',
+                                'text': 'Merged'
+                            },
+                            {
+                                'href': '/annotated-posts?tab=locked&filter=noticed',
+                                'text': 'Noticed (Locked)'
+                            },
+                            {
+                                'href': '/annotated-posts?tab=noticed',
+                                'text': 'Noticed (Not Locked)'
+                            },
+                            {
+                                'href': '/annotated-posts?tab=locked&filter=other',
+                                'text': 'Locked Other'
+                            }
+                        ]
+                    },
+                    'suggested edit stats': {
+                        children: [
+                            {
+                                'href': '/tools/suggested-edits?tab=all',
+                                'text': 'suggested edit stats'
+                            },
+                            {
+                                'href': '/tools/suggested-edits?tab=approved',
+                                'text': 'approved'
+                            },
+                            {
+                                'href': '/tools/suggested-edits?tab=rejected',
+                                'text': 'rejected'
+                            },
+                            {
+                                'href': '/tools/suggested-edits?tab=controversial',
+                                'text': 'controversial'
+                            },
+                            {
+                                'href': '/tools/suggested-edits?tab=anonymous',
+                                'text': 'anonymous'
+                            },
+                            {
+                                'href': '/tools/suggested-edits?tab=improved',
+                                'text': 'improved'
+                            }
+                        ]
+                    },
+                    analytics: {
+                        conditional: userRep >= repThresholds[config.access.siteAnalytics],
+                        children: [
+                            {
+                                href: '/site-analytics',
+                                text: 'site analytics'
+                            }
+                        ]
+                    }
+                })}
             </ul>
         </div>
     </div>
