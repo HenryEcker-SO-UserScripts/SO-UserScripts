@@ -3,7 +3,7 @@
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.2.0
+// @version      1.2.1
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
@@ -14,7 +14,7 @@
 // @grant        GM_setValue
 //
 // ==/UserScript==
-/* globals CHAT, $, GM_config */
+/* globals CHAT $, GM_config */
 
 (function () {
     'use strict';
@@ -72,31 +72,36 @@
         return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function main() {
-        const options = [...Object.keys(STATIC_CONFIG.maxRowLengths)];
-        GM_config.init({
-            'id': 'Natty_Fetch_Helper_Config',
-            'title': 'Natty Fetch Helper Config',
-            'fields': {
-                'TYPE_TO_FETCH': {
-                    'label': 'Type to fetch',
-                    'type': 'select',
-                    'options': options,
-                    'default': options[0]
+
+    async function main() {
+        // Don't progress until init completes (init event triggers resolve)
+        await new Promise((resolve) => {
+            const options = [...Object.keys(STATIC_CONFIG.maxRowLengths)];
+            GM_config.init({
+                'id': 'Natty_Fetch_Helper_Config',
+                'title': 'Natty Fetch Helper Config',
+                'fields': {
+                    'TYPE_TO_FETCH': {
+                        'label': 'Type to fetch',
+                        'type': 'select',
+                        'options': options,
+                        'default': options[0]
+                    },
+                    'ROWS_TO_FETCH': {
+                        'label': 'Number of rows to request per message',
+                        'type': 'int',
+                        'min': 1,
+                        'max': 10,
+                        'default': 2
+                    }
                 },
-                'ROWS_TO_FETCH': {
-                    'label': 'Number of rows to request per message',
-                    'type': 'int',
-                    'min': 1,
-                    'max': 10,
-                    'default': 2
+                'events': {
+                    'init': resolve,
+                    'save': () => {
+                        fetchButton.text(getFetchButtonText());
+                    }
                 }
-            },
-            'events': {
-                'save': () => {
-                    fetchButton.text(getFetchButtonText());
-                }
-            }
+            });
         });
 
         const fetchButton = $(`<button class="button" style="margin-left: 5px">${getFetchButtonText()}</button>`);
@@ -122,5 +127,5 @@
         cb.append(settingsButton);
     }
 
-    main();
+    void main();
 })();
