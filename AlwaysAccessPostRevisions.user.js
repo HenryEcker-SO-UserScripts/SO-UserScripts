@@ -3,7 +3,7 @@
 // @description  Adds a link to post revisions to all posts voting containers (including posts with no edits)
 // @homepage     https://github.com/HenryEcker/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.4
+// @version      0.0.5
 // @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
 // @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
 //
@@ -52,7 +52,7 @@
             const stacksTooltip = `--stacks-s-tooltip-aapr-${postId}`;
             // Add Link (and icon) to post revisions on all posts
             $(`<div id="${stacksTooltip}" class="s-popover s-popover__tooltip wmx2" role="tooltip">Show post revisions.<div class="s-popover--arrow" style=""></div></div>`).insertAfter(e);
-            $(`<a href="/posts/${postId}/revisions" class="${config.votingContainerButtonClasses}" data-controller="s-tooltip" data-s-tooltip-placement="right" aria-label="Timeline" aria-describedby="${stacksTooltip}">${config.revisionButtonIcon}</a>`).insertAfter(e);
+            $(`<a href="/posts/${postId}/revisions" class="${config.votingContainerButtonClasses}" data-controller="s-tooltip" data-s-tooltip-placement="right" aria-label="Revisions" aria-describedby="${stacksTooltip}">${config.revisionButtonIcon}</a>`).insertAfter(e);
         });
     };
 
