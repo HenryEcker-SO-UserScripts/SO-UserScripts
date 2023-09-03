@@ -15,23 +15,6 @@
 // @match        *://*.superuser.com/questions/*
 // @match        *://*.mathoverflow.net/questions/*
 //
-// @match        *://*.askubuntu.com/review/*
-// @match        *://*.serverfault.com/review/*
-// @match        *://*.stackapps.com/review/*
-// @match        *://*.stackexchange.com/review/*
-// @match        *://*.stackoverflow.com/review/*
-// @match        *://*.superuser.com/review/*
-// @match        *://*.mathoverflow.net/review/*
-//
-// @exclude      *://*.askubuntu.com/questions/ask*
-// @exclude      *://*.mathoverflow.net/questions/ask*
-// @exclude      *://*.serverfault.com/questions/ask*
-// @exclude      *://*.stackapps.com/questions/ask*
-// @exclude      *://*.stackexchange.com/questions/ask*
-// @exclude      *://*.stackoverflow.com/questions/ask*
-// @exclude      *://*.superuser.com/questions/ask*
-// @exclude      /^https?:\/\/.*((askubuntu|serverfault|stackapps|stackexchange|stackoverflow|superuser)\.com|mathoverflow\.net)\/review\/.*\/(stats|history)/
-//
 // ==/UserScript==
 /* globals $, StackExchange */
 
