@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Filter Delete Review Actions in LA
 // @description  Only shows Delete and Recommend Deletion actions (for posts which are not deleted)
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.9
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
+// @version      0.0.10
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/FilterDeleteReviewActionsInLA.user.js
 //
 // @match        *://stackoverflow.com/review/late-answers/*
 //

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Anonymise Share Links
 // @description  Adds a toggle button to all share popovers which will allow share links to exclude user ids
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.10
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
+// @version      0.0.11
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/AnonymousShareLinks.user.js
 //
 // @match        *://*.askubuntu.com/questions/*
 // @match        *://*.serverfault.com/questions/*

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Add Read/Unread Buttons to Full Inbox
 // @description  Messages can only be marked read or unread from the site inbox, but since there's a limit on the amount of messages in the site inbox, it is becomes impossible to mark certain messages unread.
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/MarkReadUnreadInGlobalInbox.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/MarkReadUnreadInGlobalInbox.user.js
+// @version      0.0.2
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/MarkReadUnreadInGlobalInbox.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/MarkReadUnreadInGlobalInbox.user.js
 //
 // @match        *://stackexchange.com/users/*/*?tab=inbox*
 //

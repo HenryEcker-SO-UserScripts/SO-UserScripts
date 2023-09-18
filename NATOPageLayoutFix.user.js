@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         NATO Page Layout Fix
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.5
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
+// @version      1.0.6
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
 // @match        *://*.askubuntu.com/tools/new-answers-old-questions*
 // @match        *://*.serverfault.com/tools/new-answers-old-questions*

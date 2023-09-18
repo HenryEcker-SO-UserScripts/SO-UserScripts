@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Reputation History Question and Answer Icons
 // @description  Adds question and answer icons next to reputation history events to clarify the type of post
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/QuestionAnswerIconsOnReputationHistory.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/QuestionAnswerIconsOnReputationHistory.user.js
+// @version      0.0.3
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/QuestionAnswerIconsOnReputationHistory.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/QuestionAnswerIconsOnReputationHistory.user.js
 //
 // @match        *://*.askubuntu.com/users/*/*?tab=reputation*
 // @match        *://*.serverfault.com/users/*/*?tab=reputation*

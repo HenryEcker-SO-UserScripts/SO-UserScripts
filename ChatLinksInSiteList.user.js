@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Site List Chat Links
 // @description  Adds links to all chat servers in the site list
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.4
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatLinksInSiteList.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ChatLinksInSiteList.user.js
+// @version      0.0.5
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ChatLinksInSiteList.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ChatLinksInSiteList.user.js
 //
 // @match       *://*.askubuntu.com/*
 // @match       *://*.serverfault.com/*

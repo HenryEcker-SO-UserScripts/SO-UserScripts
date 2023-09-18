@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         ModFlagAndCommentSizeReducer
 // @description  Tries to make mod flags and comments smaller where possible
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.2.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
+// @version      1.2.2
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
 // @match        *://*.askubuntu.com/questions/*
 // @match        *://*.serverfault.com/questions/*

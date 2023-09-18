@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Suggested Edit Redesign
 // @description  A number of very small tweaks to make suggested edits easier to review
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.3
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
+// @version      0.0.4
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SuggestedEditRedesign.user.js
 //
 // @match        *://*.askubuntu.com/review/suggested-edits*
 // @match        *://*.serverfault.com/review/suggested-edits*

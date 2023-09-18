@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Suggested Edit Custom Reject Feedback Saver
 // @description  Adds very fragile storage so that the reject modal can be closed without losing in-progress feedback
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
+// @version      0.0.3
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SuggestedEditsRejectCustomFeedbackFragileStorage.user.js
 //
 // @match        *://*.askubuntu.com/review/suggested-edits*
 // @match        *://*.serverfault.com/review/suggested-edits*

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Code Block Language Notices
 // @description  Adds indicator to code blocks that displays what language the code block is actually being highlighted with
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.3
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
+// @version      0.0.4
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/CodeBlockLanguageNotice.user.js
 //
 // @match        *://*.askubuntu.com/questions/*
 // @match        *://*.serverfault.com/questions/*

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         10K Tools Topbar Button
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.6
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
+// @version      1.0.7
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
 // @match       *://*.askubuntu.com/*
 // @match       *://*.serverfault.com/*

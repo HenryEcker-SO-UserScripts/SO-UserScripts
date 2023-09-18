@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Natty Fetch Helper
 // @description  Adds buttons to fetch information from Natty (No more unstoppable Natty link dumps forgetting to specify the number)
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.2.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/NattyFetchHelper.user.js
+// @version      1.2.2
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/NattyFetchHelper.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/NattyFetchHelper.user.js
 //
 // @match        *://chat.stackoverflow.com/rooms/111347/*
 //

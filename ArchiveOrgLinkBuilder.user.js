@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Archive.org Link Builder
 // @description  Adds a button which converts post links into archive.org links (links still need to be checked for validity)
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/ArchiveOrgLinkBuilder.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/ArchiveOrgLinkBuilder.user.js
+// @version      0.0.2
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ArchiveOrgLinkBuilder.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ArchiveOrgLinkBuilder.user.js
 //
 // @match        *://*.askubuntu.com/questions/*
 // @match        *://*.serverfault.com/questions/*

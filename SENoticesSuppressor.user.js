@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         SE Toast/FancyOverlay Suppressor
 // @description  Suppress annoying toast/overlay messages network-wide
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.1.0
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
+// @version      0.1.1
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 //
 // @match        *://*.askubuntu.com/*
 // @match        *://*.serverfault.com/*

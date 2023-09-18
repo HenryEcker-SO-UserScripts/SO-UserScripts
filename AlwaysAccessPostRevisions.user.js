@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Post Revision Link
 // @description  Adds a link to post revisions to all posts voting containers (including posts with no edits)
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.5
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
+// @version      0.0.6
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/AlwaysAccessPostRevisions.user.js
 //
 // @match        *://*.askubuntu.com/questions/*
 // @match        *://*.serverfault.com/questions/*

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Textarea Reducer Stacks Controller
 // @description  Registers a stacks controller that shortens relative links anywhere the controller is active
-// @homepage     https://github.com/HenryEcker/SO-UserScripts
+// @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.1
-// @downloadURL  https://github.com/HenryEcker/SO-UserScripts/raw/main/RegisterTextareaReducer.user.js
-// @updateURL    https://github.com/HenryEcker/SO-UserScripts/raw/main/RegisterTextareaReducer.user.js
+// @version      1.0.2
+// @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/RegisterTextareaReducer.user.js
+// @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/RegisterTextareaReducer.user.js
 //
 // @match        *://*.askubuntu.com/*
 // @match        *://*.serverfault.com/*
