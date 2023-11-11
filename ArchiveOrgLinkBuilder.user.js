@@ -3,7 +3,7 @@
 // @description  Adds a button which converts post links into archive.org links (links still need to be checked for validity)
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.0.2
+// @version      0.0.3
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ArchiveOrgLinkBuilder.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ArchiveOrgLinkBuilder.user.js
 //
@@ -26,7 +26,7 @@
         timelineLinkSelector: 'a[href$="/timeline"]',
         postLayoutSelector: '.post-layout',
         postCreationDateSelector: 'time[itemprop="dateCreated"]',
-        proseLinkSelector: '.s-prose a',
+        proseLinkSelector: '.s-prose a:not(.snippet-expand-link)',
         votingContainerButtonClasses: 'flex--item s-btn s-btn__unset c-pointer py6 mx-auto',
         archiveButtonIcon: '<svg aria-hidden="true" class="svg-icon iconArchiveSm" width="14" height="14" viewBox="0 0 14 14"><path d="M1 3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2H1Zm11 1H2v7c0 1.1.9 2 2 2h6a2 2 0 0 0 2-2V4ZM4.5 6h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1Z"></path></svg>'
     };
