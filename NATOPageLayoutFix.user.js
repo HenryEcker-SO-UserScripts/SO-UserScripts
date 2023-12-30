@@ -3,7 +3,7 @@
 // @description  Makes Layout on NATO page consistent by removing the table structure and replacing it with grid layout. Also add easy VLQ and NAA flag buttons
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.6
+// @version      1.0.7
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/NATOPageLayoutFix.user.js
 //
@@ -89,33 +89,35 @@
     };
     const rebuildNATOLayout = () => {
         $(`${config.selector.mainbar}`).attr('class', config.css.container);
-        const table = $(`${config.selector.table}`);
+        const $table = $(`${config.selector.table}`);
         $(`${config.selector.table} > tbody > tr`).each((idx, tr) => {
-            const tds = $(tr).find('td');
-            const answerNode = $(tds[0]);
-            const rightTd = $(tds[1]);
-            const userCard = rightTd.find(`div.${config.css.userInfo}`);
-            userCard.find('a').attr('target', '_blank');
-            const questionTime = rightTd.find(`> ${config.selector.relativeTime}`);
-            questionTime.addClass(config.css.questionTime);
+            const $tds = $(tr).find('td');
+            const $answerNode = $($tds[0]);
+            const $rightTd = $($tds[1]);
+            const $userCard = $rightTd.find(`div.${config.css.userInfo}`);
+            $userCard.find('a').attr('target', '_blank');
+            const $questionTime = $rightTd.find(`> ${config.selector.relativeTime}`);
+            $questionTime.addClass(config.css.questionTime);
 
             // Answer Link
-            const answerLink = answerNode.find(`> ${config.selector.answerLink}`);
-            answerLink.removeClass(config.css.answerHyperlink);
-            answerLink.attr('target', '_blank');
-            const answerId = answerLink.attr('href').split('#')[1];
+            const $answerLink = $answerNode.find(`> ${config.selector.answerLink}`);
+            $answerLink.removeClass(config.css.answerHyperlink);
+            $answerLink.attr('target', '_blank');
+            const answerId = $answerLink.attr('href').split('#')[1];
 
             // Build New Container for Answer Body and Answer Controls
-            const answerWrapper = $(`<div class="${config.css.answer}"  data-answerid="${answerId}">`);
-            const answerCell = $(`<div class="${config.css.answerCell}"/>`);
+            const $answerWrapper = $(`<div class="${config.css.answer}"  data-answerid="${answerId}">`);
+            const $answerCell = $(`<div class="${config.css.answerCell}"/>`);
             // Answer Body
-            const answerBody = answerNode.find(`> ${config.selector.postBody}`);
-            if (answerBody.hasClass(config.css.deletedAnswer)) {
-                answerBody.removeClass(config.css.deletedAnswer);
-                answerWrapper.addClass(config.css.deletedAnswer);
+            const $answerBody = $answerNode.find(`> ${config.selector.postBody}`);
+
+            const answerIsDeleted = $answerBody.hasClass(config.css.deletedAnswer);
+            if (answerIsDeleted) {
+                $answerBody.removeClass(config.css.deletedAnswer);
+                $answerWrapper.addClass(config.css.deletedAnswer);
             }
-            answerCell.append(answerBody);
-            const footer = $(`<div class="mt24">
+            $answerCell.append($answerBody);
+            const $footer = $(`<div class="mt24">
     <div class="d-flex fw-wrap ai-start jc-end gs8 gsy">
         <div class="flex--item mr16" style="flex: 1 1 100px;">
             <div class="js-post-menu pt2" data-post-id="${answerId}">
@@ -157,19 +159,37 @@
         <div class="post-signature flex--item fl0"></div>
     </div>
 </div>`);
-            footer.find('div.post-signature').append(userCard);
-            answerCell.append(footer);
-            answerWrapper.append(answerCell);
+            $footer.find('div.post-signature').append($userCard);
+            if (StackExchange?.options?.user?.isModerator === true) {
+                let $delUndelBtn = $('<button></button>');
+                if (answerIsDeleted) {
+                    $delUndelBtn = $('<button type="button" href="#" title="Vote to undelete this post" class="js-delete-post s-btn s-btn__link deleted-post" data-fancy-delete="false" data-prompt="Undelete this post?" data-is-deleted="true" data-has-active-vote="false" data-has-deleted-vote="false">undelete</button>');
+                } else {
+                    $delUndelBtn = $('<button type="button" href="#" title="Vote to delete this post" class="js-delete-post s-btn s-btn__link" data-fancy-delete="false" data-prompt="Delete this post?" data-is-deleted="false" data-has-active-vote="false" data-has-deleted-vote="false">delete</button>');
+                }
+
+                $('<div class="flex--item"></div>')
+                    .append($delUndelBtn)
+                    .insertAfter(
+                        $footer
+                            .find('.js-post-menu .flex--item:last')
+                    );
+            }
+            $answerCell.append($footer);
+            $answerWrapper.append($answerCell);
 
             // Top Level component
-            const NATOWrapper = $(`<div class="${config.css.rowCell}"/>`);
-            NATOWrapper.append(answerLink);
-            NATOWrapper.append(questionTime);
-            NATOWrapper.append(answerWrapper);
+            const $NATOWrapper = $(`<div class="${config.css.rowCell}"/>`);
+            $NATOWrapper.append($answerLink);
+            $NATOWrapper.append($questionTime);
+            $NATOWrapper.append($answerWrapper);
             // Add to DOM
-            NATOWrapper.insertBefore(table);
+            $NATOWrapper.insertBefore($table);
         });
-        table.remove();
+        $table.remove();
+    };
+
+    const runStackExchangeInitFns = () => {
         // Enable Share Links
         StackExchange.question.initShareLinks();
         // Create inline editor support
@@ -180,7 +200,12 @@
             $(config.selector.jsFollowAnswer).parent().remove();
         });
         // Create Click Listener for Flag Button
-        StackExchange.vote_closingAndFlagging.init();
+        StackExchange.vote_closingAndFlagging.init({});
+
+        // Initialise Delete Vote Ability for Mods
+        if (StackExchange?.options?.user?.isModerator === true) {
+            StackExchange.vote.delete_init();
+        }
     };
 
     const enableCodeSupport = () => {
@@ -196,6 +221,7 @@
     StackExchange.ready(() => {
         buildStyle();
         rebuildNATOLayout();
+        runStackExchangeInitFns();
         enableCodeSupport();
     });
 }());
