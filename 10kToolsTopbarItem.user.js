@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.7
+// @version      1.0.8
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -125,6 +125,12 @@
     </button>
 </li>`);
 
+                const buildHTMLStringFromCollection = (it, filterFn, mapFn) => {
+                    return it.filter(filterFn).map(mapFn).join('\n');
+                };
+                const testConditional = (conditional) => {
+                    return conditional === undefined || conditional === true;
+                };
                 const buildExpandable = (elemId, label, children) => {
                     const isOpen = GM_getValue(elemId) === true;
                     return `<li class="${config.css.menuTitle} ${config.css.expandableMenu} ${isOpen ? config.css.menuSelected : ''}" 
@@ -141,21 +147,27 @@
                             </div>`;
                 };
                 const buildAllExpandables = (expandables) => {
-                    return Object.entries(expandables).map(([label, {conditional, children}], index) => {
-                        if (conditional === undefined || conditional === true) {
+                    return buildHTMLStringFromCollection(
+                        Object.entries(expandables),
+                        ([_label, {conditional}]) => {
+                            return testConditional(conditional);
+                        },
+                        ([label, {children}], index) => {
                             return buildExpandable(
                                 `ten-k-tools-expandable-${index}`,
                                 label,
-                                children.map(({href, text}) => {
-                                    return `<li role="menuitem"><a href="${href}" class="${config.css.menuLink}">${text}</a></li>`;
-                                }).join('\n')
+                                buildHTMLStringFromCollection(
+                                    children,
+                                    ({conditional}) => {
+                                        return testConditional(conditional);
+                                    },
+                                    ({href, text}) => {
+                                        return `<li role="menuitem"><a href="${href}" class="${config.css.menuLink}">${text}</a></li>`;
+                                    }
+                                )
                             );
-                        } else {
-                            return undefined;
                         }
-                    }).filter((e) => {
-                        return e !== undefined;
-                    }).join('\n');
+                    );
                 };
 
                 const topbarDialogue = $(`<li role="presentation">
