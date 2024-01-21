@@ -60,6 +60,12 @@
       "never"
     ],
     "guard-for-in": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
     "quotes": [
       "error",
       "single"
