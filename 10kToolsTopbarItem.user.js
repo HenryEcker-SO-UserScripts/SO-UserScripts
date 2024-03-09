@@ -3,7 +3,7 @@
 // @description  Adds a Button to the topbar which gives a direct list to all 10k tool pages
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.0.8
+// @version      1.0.9
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/10kToolsTopbarItem.user.js
 //
@@ -44,6 +44,7 @@
             css: {
                 menuLink: 's-block-link tt-capitalize',
                 menuTitle: 's-menu--title',
+                cursorPointer: 'c-pointer',
                 expandableMenu: 's-menu-expandable',
                 menuSelected: 'is-open',
                 isExpanded: 'is-expanded'
@@ -133,7 +134,7 @@
                 };
                 const buildExpandable = (elemId, label, children) => {
                     const isOpen = GM_getValue(elemId) === true;
-                    return `<li class="${config.css.menuTitle} ${config.css.expandableMenu} ${isOpen ? config.css.menuSelected : ''}" 
+                    return `<li class="${config.css.menuTitle} ${config.css.expandableMenu} ${config.css.cursorPointer} ${isOpen ? config.css.menuSelected : ''}" 
                                 role="separator" 
                                 data-controller="s-expandable-control"
                                 data-s-expandable-control-toggle-class="${config.css.menuSelected}"
