@@ -3,7 +3,7 @@
 // @description  Tries to make mod flags and comments smaller where possible
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      1.2.2
+// @version      1.2.3
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/ModFlagAndCommentSizeReducer.user.js
 //
@@ -72,23 +72,23 @@
         }
     };
 
-    const testIsFlagPopup = (nodeEvent) => {
+    const testIsFlagPopup = ($node) => {
         return (
-            $(nodeEvent.target).hasClass(selectors.css.flagDialoguePopupClass) && // Popup added
-            $(nodeEvent.target).attr('id') === selectors.ids.flagDialogue // Check is Flag popup
+            $node.hasClass(selectors.css.flagDialoguePopupClass) && // Popup added
+            $node.attr('id') === selectors.ids.flagDialogue // Check is Flag popup
         );
     };
 
-    const testIsCommentFlagPopup = (nodeEvent) => {
+    const testIsCommentFlagPopup = ($node) => {
         return (
-            $(nodeEvent.target).hasClass(selectors.css.commentFlagDialoguePopupClass) &&
-            $(nodeEvent.target).attr('id') === selectors.ids.commentFlagDDialogue
+            $node.hasClass(selectors.css.commentFlagDialoguePopupClass) &&
+            $node.attr('id') === selectors.ids.commentFlagDDialogue
         );
     };
 
-    const testIsCommentBox = (nodeEvent) => {
+    const testIsCommentBox = ($node) => {
         return (
-            $(nodeEvent.target).is(selectors.jquerySelector.commentTextArea)
+            $node.is(selectors.jquerySelector.commentTextArea)
         );
     };
 
@@ -103,13 +103,20 @@
         const attachDOMNodeListenerToButton = (evaluateNode, action) => {
             return (ev) => {
                 ev.preventDefault();
-                $(document).on('DOMNodeInserted', (nodeEvent) => {
-                    if (evaluateNode(nodeEvent)) {
-                        action(nodeEvent);
-                        // Remove Listener since we've found the node we want
-                        $(document).off('DOMNodeInserted');
+                const domObserver = new MutationObserver((mutationList, mutationObserver) => {
+                    for (const mutation of mutationList) {
+                        for (const node of mutation.addedNodes) {
+                            const $node = $(node);
+                            if (evaluateNode($node)) {
+                                action($node);
+                                // Remove Observer since we've found the node we want
+                                mutationObserver.disconnect();
+                                return;
+                            }
+                        }
                     }
                 });
+                domObserver.observe(document.body, {childList: true, subtree: true});
             };
         };
 
@@ -118,9 +125,9 @@
             'click',
             attachDOMNodeListenerToButton(
                 testIsCommentBox,
-                (nodeEvent) => {
+                ($node) => {
                     addDataAttributesToTextarea(
-                        $(nodeEvent.target)
+                        $node
                     );
                 })
         );
@@ -144,9 +151,9 @@
             'click',
             attachDOMNodeListenerToButton(
                 testIsCommentFlagPopup,
-                (nodeEvent) => {
+                ($node) => {
                     addDataAttributesToTextarea(
-                        $(nodeEvent.target).find(selectors.jquerySelector.commentFlagDialogue.textArea)
+                        $node.find(selectors.jquerySelector.commentFlagDialogue.textArea)
                     );
                 }
             )
