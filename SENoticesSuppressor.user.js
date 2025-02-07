@@ -3,7 +3,7 @@
 // @description  Suppress annoying toast/overlay messages network-wide
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.1.1
+// @version      0.1.2
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/SENoticesSuppressor.user.js
 //
@@ -33,9 +33,9 @@
         'Please consider adding a comment if you think this post can be improved.'
     ]);
 
-    const fancyOverlayMessagesToSuppress = new Set([
-        'Welcome back! If you found this question useful,\u003cbr/\u003edon\u0027t forget to vote both the question and the answers up.'
-    ]);
+    // const fancyOverlayMessagesToSuppress = new Set([
+    //     'Welcome back! If you found this question useful,\u003cbr/\u003edon\u0027t forget to vote both the question and the answers up.'
+    // ]);
 
     const addProxies = () => {
         StackExchange.helpers.showToast = new Proxy(StackExchange.helpers.showToast, {
@@ -47,14 +47,14 @@
             }
         });
 
-        StackExchange.helpers.showFancyOverlay = new Proxy(StackExchange.helpers.showFancyOverlay, {
-            apply: (target, thisArg, args) => {
-                const [config] = args; // [config]
-                if (!fancyOverlayMessagesToSuppress.has(config.message)) {
-                    Reflect.apply(target, thisArg, args);
-                }
-            }
-        });
+        // StackExchange.helpers.showFancyOverlay = new Proxy(StackExchange.helpers.showFancyOverlay, {
+        //     apply: (target, thisArg, args) => {
+        //         const [config] = args; // [config]
+        //         if (!fancyOverlayMessagesToSuppress.has(config.message)) {
+        //             Reflect.apply(target, thisArg, args);
+        //         }
+        //     }
+        // });
     };
 
     if (window.StackExchange === undefined || Object.keys(window.StackExchange).length === 0) {
