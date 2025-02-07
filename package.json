@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@userscripters/stackexchange-global-types": "^2.7.0",
+    "@userscripters/stackexchange-global-types": "^2.8.2",
     "eslint": "^8.35.0",
     "jquery": "^3.6.4"
   }
