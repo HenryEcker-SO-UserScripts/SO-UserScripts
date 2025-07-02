@@ -3,7 +3,7 @@
 // @description  Adds a link directly to the chat transcript on each Chat Room element
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.1.0
+// @version      0.1.1
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 //
@@ -31,37 +31,45 @@
 (function () {
     'use strict';
 
-
     const $createBaseTranscriptLink = (roomId) => {
         return $(`<a href="/transcript/${roomId}">transcript</a>`);
     };
 
     const addTranscriptLinksToRooms = () => {
-        $('.room-info-link').each((i, n) => {
+        $('.js-room-card').each((i, n) => {
             const $e = $(n);
 
-            // Place corresponding transcript link at the end of each room-info-link container
-            const roomId = $e.parent('div').attr('id').split('-')[1];
+            // Get room ID from room card
+            const roomId = $e.data('room-id');
 
-            // Build Transcript Object
+            // Find existing link
+            const $roomLinkContainer = $e.find('a[href^="/rooms/"]').parent();
+
+            // Build Transcript Link and place after existing room link
             $createBaseTranscriptLink(roomId)
-                .css({'margin-left': '7px'})
-                .appendTo($e);
-
-            // Reduce left offset to accommodate transcript label
-            $e.css({'left': '70px', 'width': 'unset'});
+                .wrap('<div class="flex--item"></div>')
+                .addClass('fc-blue-400 js-room-card-more-info')
+                .css({textTransform: 'capitalize'})
+                .insertAfter($roomLinkContainer);
         });
     };
 
 
     const addTranscriptLinksToMiniRooms = () => {
-        $('.room-mini-header').each((i, n) => {
+        $('.roomcard').each((i, n) => {
             const $e = $(n);
-            // Get Room id from room name link
-            const roomId = Number(/^\/rooms\/(\d+)/.exec($e.find('.room-name a').attr('href'))[1]);
-            $e.append(
+            // Get Room id from room card id
+            const roomId = Number($e.attr('id').split('-')[1]);
+
+            const $linkContainer = $e.find('.room-info-link');
+
+            $linkContainer
+                .addClass('d-flex g8 w100 jc-center ps-absolute b0')
+                .css({fontSize: '0.75rem'})
+                .removeClass('room-info-link');
+
+            $linkContainer.append(
                 $createBaseTranscriptLink(roomId)
-                    .css({'display': 'block', 'margin-top': '7px'})
             );
         });
     };
