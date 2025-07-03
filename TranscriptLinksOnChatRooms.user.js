@@ -3,7 +3,7 @@
 // @description  Adds a link directly to the chat transcript on each Chat Room element
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.2.0
+// @version      0.2.1
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 //
@@ -47,9 +47,10 @@
 
             // Build Transcript Link and place after existing room link
             $createBaseTranscriptLink(roomId)
-                .wrap('<div class="flex--item"></div>')
                 .addClass('fc-blue-400 js-room-card-more-info')
                 .css({textTransform: 'capitalize'})
+                .wrap('<div class="flex--item"></div>')
+                .parent()
                 .insertAfter($moreInfoLinkContainer);
         });
     };
