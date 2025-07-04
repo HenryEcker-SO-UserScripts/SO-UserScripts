@@ -47,7 +47,7 @@
 
             // Build Transcript Link and place after existing room link
             $createBaseTranscriptLink(roomId)
-                .addClass('fc-blue-400 js-room-card-more-info')
+                .addClass('fc-blue-400')
                 .css({textTransform: 'capitalize'})
                 .wrap('<div class="flex--item"></div>')
                 .parent()
