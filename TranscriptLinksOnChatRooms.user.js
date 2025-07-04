@@ -60,14 +60,14 @@
             const $e = $(n);
             // Get Room id from room card id
             const roomId = Number($e.attr('id').split('-')[1]);
-
+            // Find existing link container
             const $linkContainer = $e.find('.room-info-link');
-
+            // Modify to support holding two links
             $linkContainer
                 .addClass('d-flex g8 w100 jc-center ps-absolute b0')
                 .css({fontSize: '0.75rem'})
                 .removeClass('room-info-link');
-
+            // Add link to container
             $linkContainer.append(
                 $createBaseTranscriptLink(roomId)
             );
