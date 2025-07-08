@@ -3,7 +3,7 @@
 // @description  Adds a link directly to the chat transcript on each Chat Room element
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.2.2
+// @version      0.2.3
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 //
@@ -31,13 +31,23 @@
 (function () {
     'use strict';
 
+    const transcriptLinkClass = 'js-tlocr-transcript-link';
+
     const $createBaseTranscriptLink = (roomId) => {
-        return $(`<a href="/transcript/${roomId}">transcript</a>`);
+        return $(`<a href="/transcript/${roomId}" class="${transcriptLinkClass}">transcript</a>`);
+    };
+
+    const hasTranscriptLink = ($e) => {
+        return $e.find(`.${transcriptLinkClass}`).length !== 0;
     };
 
     const addTranscriptLinksToRooms = () => {
         $('.js-room-card').each((i, n) => {
             const $e = $(n);
+
+            if (hasTranscriptLink($e)) {
+                return;
+            }
 
             // Get room ID from room card
             const roomId = $e.data('room-id');
@@ -58,6 +68,11 @@
     const addTranscriptLinksToMiniRooms = () => {
         $('.roomcard').each((i, n) => {
             const $e = $(n);
+
+            if (hasTranscriptLink($e)) {
+                return;
+            }
+
             // Get Room id from room card id
             const roomId = Number($e.attr('id').split('-')[1]);
             // Find existing link container
