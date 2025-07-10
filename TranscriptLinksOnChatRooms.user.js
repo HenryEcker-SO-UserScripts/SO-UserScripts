@@ -3,7 +3,7 @@
 // @description  Adds a link directly to the chat transcript on each Chat Room element
 // @homepage     https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts
 // @author       Henry Ecker (https://github.com/HenryEcker)
-// @version      0.2.3
+// @version      0.2.4
 // @downloadURL  https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 // @updateURL    https://github.com/HenryEcker-SO-UserScripts/SO-UserScripts/raw/main/TranscriptLinksOnChatRooms.user.js
 //
@@ -41,30 +41,6 @@
         return $e.find(`.${transcriptLinkClass}`).length !== 0;
     };
 
-    const addTranscriptLinksToRooms = () => {
-        $('.js-room-card').each((i, n) => {
-            const $e = $(n);
-
-            if (hasTranscriptLink($e)) {
-                return;
-            }
-
-            // Get room ID from room card
-            const roomId = $e.data('room-id');
-
-            // Find existing link
-            const $moreInfoLinkContainer = $e.find('.js-room-card-more-info').parent();
-
-            // Build Transcript Link and place after existing room link
-            $createBaseTranscriptLink(roomId)
-                .addClass('fc-blue-400 tt-capitalize')
-                .wrap('<div class="flex--item"></div>')
-                .parent()
-                .insertAfter($moreInfoLinkContainer);
-        });
-    };
-
-
     const addTranscriptLinksToMiniRooms = () => {
         $('.roomcard').each((i, n) => {
             const $e = $(n);
@@ -90,15 +66,12 @@
     };
 
     const addTranscriptLinks = () => {
-        addTranscriptLinksToRooms();
         addTranscriptLinksToMiniRooms();
     };
 
     $(document).on('ajaxComplete', (_0, _1, {url}) => {
         // Rebuild on room refresh
-        if (url.startsWith('/rooms')) {
-            addTranscriptLinks();
-        } else if (url.startsWith('/users')) {
+        if (url.startsWith('/users')) {
             addTranscriptLinks();
         }
     });
